@@ -48,13 +48,12 @@ public final class GenesisProto {
       "data\"\220\001\n\007Balance\022\030\n\007address\030\001 \001(\tR\007addre" +
       "ss\022a\n\005coins\030\002 \003(\0132\031.cosmos.base.v1beta1." +
       "CoinB0\310\336\037\000\252\337\037(github.com/cosmos/cosmos-s" +
-      "dk/types.CoinsR\005coins:\010\210\240\037\000\350\240\037\000B\325\001\n\027com." +
-      "cosmos.bank.v1beta1B\014GenesisProtoP\001Z>git" +
-      "hub.com/AssetMantle/modules/cosmos/bank/" +
-      "v1beta1;bankv1beta1\242\002\003CBX\252\002\023Cosmos.Bank." +
-      "V1beta1\312\002\023Cosmos\\Bank\\V1beta1\342\002\037Cosmos\\B" +
-      "ank\\V1beta1\\GPBMetadata\352\002\025Cosmos::Bank::" +
-      "V1beta1b\006proto3"
+      "dk/types.CoinsR\005coins:\010\210\240\037\000\350\240\037\000B\300\001\n\027com." +
+      "cosmos.bank.v1beta1B\014GenesisProtoP\001Z)git" +
+      "hub.com/cosmos/cosmos-sdk/x/bank/types\242\002" +
+      "\003CBX\252\002\023Cosmos.Bank.V1beta1\312\002\023Cosmos\\Bank" +
+      "\\V1beta1\342\002\037Cosmos\\Bank\\V1beta1\\GPBMetada" +
+      "ta\352\002\025Cosmos::Bank::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

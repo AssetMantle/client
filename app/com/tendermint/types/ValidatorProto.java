@@ -52,12 +52,12 @@ public final class ValidatorProto {
       "ty\030\004 \001(\003R\020proposerPriority\"k\n\017SimpleVali" +
       "dator\0225\n\007pub_key\030\001 \001(\0132\034.tendermint.cryp" +
       "to.PublicKeyR\006pubKey\022!\n\014voting_power\030\002 \001" +
-      "(\003R\013votingPowerB\270\001\n\024com.tendermint.types" +
-      "B\016ValidatorProtoP\001Z/github.com/AssetMant" +
-      "le/modules/tendermint/types\242\002\003TTX\252\002\020Tend" +
-      "ermint.Types\312\002\020Tendermint\\Types\342\002\034Tender" +
-      "mint\\Types\\GPBMetadata\352\002\021Tendermint::Typ" +
-      "esb\006proto3"
+      "(\003R\013votingPowerB\300\001\n\024com.tendermint.types" +
+      "B\016ValidatorProtoP\001Z7github.com/tendermin" +
+      "t/tendermint/proto/tendermint/types\242\002\003TT" +
+      "X\252\002\020Tendermint.Types\312\002\020Tendermint\\Types\342" +
+      "\002\034Tendermint\\Types\\GPBMetadata\352\002\021Tenderm" +
+      "int::Typesb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

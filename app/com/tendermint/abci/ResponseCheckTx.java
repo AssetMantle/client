@@ -21,6 +21,8 @@ private static final long serialVersionUID = 0L;
     info_ = "";
     events_ = java.util.Collections.emptyList();
     codespace_ = "";
+    sender_ = "";
+    mempoolError_ = "";
   }
 
   @java.lang.Override
@@ -261,6 +263,105 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int SENDER_FIELD_NUMBER = 9;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object sender_ = "";
+  /**
+   * <code>string sender = 9 [json_name = "sender"];</code>
+   * @return The sender.
+   */
+  @java.lang.Override
+  public java.lang.String getSender() {
+    java.lang.Object ref = sender_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      sender_ = s;
+      return s;
+    }
+  }
+  /**
+   * <code>string sender = 9 [json_name = "sender"];</code>
+   * @return The bytes for sender.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getSenderBytes() {
+    java.lang.Object ref = sender_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      sender_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
+  public static final int PRIORITY_FIELD_NUMBER = 10;
+  private long priority_ = 0L;
+  /**
+   * <code>int64 priority = 10 [json_name = "priority"];</code>
+   * @return The priority.
+   */
+  @java.lang.Override
+  public long getPriority() {
+    return priority_;
+  }
+
+  public static final int MEMPOOL_ERROR_FIELD_NUMBER = 11;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object mempoolError_ = "";
+  /**
+   * <pre>
+   * mempool_error is set by CometBFT.
+   * ABCI applictions creating a ResponseCheckTX should not set mempool_error.
+   * </pre>
+   *
+   * <code>string mempool_error = 11 [json_name = "mempoolError"];</code>
+   * @return The mempoolError.
+   */
+  @java.lang.Override
+  public java.lang.String getMempoolError() {
+    java.lang.Object ref = mempoolError_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      mempoolError_ = s;
+      return s;
+    }
+  }
+  /**
+   * <pre>
+   * mempool_error is set by CometBFT.
+   * ABCI applictions creating a ResponseCheckTX should not set mempool_error.
+   * </pre>
+   *
+   * <code>string mempool_error = 11 [json_name = "mempoolError"];</code>
+   * @return The bytes for mempoolError.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getMempoolErrorBytes() {
+    java.lang.Object ref = mempoolError_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      mempoolError_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -298,6 +399,15 @@ private static final long serialVersionUID = 0L;
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(codespace_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 8, codespace_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(sender_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 9, sender_);
+    }
+    if (priority_ != 0L) {
+      output.writeInt64(10, priority_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(mempoolError_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 11, mempoolError_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -337,6 +447,16 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(codespace_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, codespace_);
     }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(sender_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(9, sender_);
+    }
+    if (priority_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt64Size(10, priority_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(mempoolError_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(11, mempoolError_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -368,6 +488,12 @@ private static final long serialVersionUID = 0L;
         .equals(other.getEventsList())) return false;
     if (!getCodespace()
         .equals(other.getCodespace())) return false;
+    if (!getSender()
+        .equals(other.getSender())) return false;
+    if (getPriority()
+        != other.getPriority()) return false;
+    if (!getMempoolError()
+        .equals(other.getMempoolError())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -399,6 +525,13 @@ private static final long serialVersionUID = 0L;
     }
     hash = (37 * hash) + CODESPACE_FIELD_NUMBER;
     hash = (53 * hash) + getCodespace().hashCode();
+    hash = (37 * hash) + SENDER_FIELD_NUMBER;
+    hash = (53 * hash) + getSender().hashCode();
+    hash = (37 * hash) + PRIORITY_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getPriority());
+    hash = (37 * hash) + MEMPOOL_ERROR_FIELD_NUMBER;
+    hash = (53 * hash) + getMempoolError().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -542,6 +675,9 @@ private static final long serialVersionUID = 0L;
       }
       bitField0_ = (bitField0_ & ~0x00000040);
       codespace_ = "";
+      sender_ = "";
+      priority_ = 0L;
+      mempoolError_ = "";
       return this;
     }
 
@@ -608,6 +744,15 @@ private static final long serialVersionUID = 0L;
       }
       if (((from_bitField0_ & 0x00000080) != 0)) {
         result.codespace_ = codespace_;
+      }
+      if (((from_bitField0_ & 0x00000100) != 0)) {
+        result.sender_ = sender_;
+      }
+      if (((from_bitField0_ & 0x00000200) != 0)) {
+        result.priority_ = priority_;
+      }
+      if (((from_bitField0_ & 0x00000400) != 0)) {
+        result.mempoolError_ = mempoolError_;
       }
     }
 
@@ -708,6 +853,19 @@ private static final long serialVersionUID = 0L;
         bitField0_ |= 0x00000080;
         onChanged();
       }
+      if (!other.getSender().isEmpty()) {
+        sender_ = other.sender_;
+        bitField0_ |= 0x00000100;
+        onChanged();
+      }
+      if (other.getPriority() != 0L) {
+        setPriority(other.getPriority());
+      }
+      if (!other.getMempoolError().isEmpty()) {
+        mempoolError_ = other.mempoolError_;
+        bitField0_ |= 0x00000400;
+        onChanged();
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -782,6 +940,21 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000080;
               break;
             } // case 66
+            case 74: {
+              sender_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000100;
+              break;
+            } // case 74
+            case 80: {
+              priority_ = input.readInt64();
+              bitField0_ |= 0x00000200;
+              break;
+            } // case 80
+            case 90: {
+              mempoolError_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000400;
+              break;
+            } // case 90
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1419,6 +1592,207 @@ private static final long serialVersionUID = 0L;
       checkByteStringIsUtf8(value);
       codespace_ = value;
       bitField0_ |= 0x00000080;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object sender_ = "";
+    /**
+     * <code>string sender = 9 [json_name = "sender"];</code>
+     * @return The sender.
+     */
+    public java.lang.String getSender() {
+      java.lang.Object ref = sender_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        sender_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <code>string sender = 9 [json_name = "sender"];</code>
+     * @return The bytes for sender.
+     */
+    public com.google.protobuf.ByteString
+        getSenderBytes() {
+      java.lang.Object ref = sender_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        sender_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <code>string sender = 9 [json_name = "sender"];</code>
+     * @param value The sender to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSender(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      sender_ = value;
+      bitField0_ |= 0x00000100;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string sender = 9 [json_name = "sender"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearSender() {
+      sender_ = getDefaultInstance().getSender();
+      bitField0_ = (bitField0_ & ~0x00000100);
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>string sender = 9 [json_name = "sender"];</code>
+     * @param value The bytes for sender to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSenderBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      sender_ = value;
+      bitField0_ |= 0x00000100;
+      onChanged();
+      return this;
+    }
+
+    private long priority_ ;
+    /**
+     * <code>int64 priority = 10 [json_name = "priority"];</code>
+     * @return The priority.
+     */
+    @java.lang.Override
+    public long getPriority() {
+      return priority_;
+    }
+    /**
+     * <code>int64 priority = 10 [json_name = "priority"];</code>
+     * @param value The priority to set.
+     * @return This builder for chaining.
+     */
+    public Builder setPriority(long value) {
+
+      priority_ = value;
+      bitField0_ |= 0x00000200;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int64 priority = 10 [json_name = "priority"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearPriority() {
+      bitField0_ = (bitField0_ & ~0x00000200);
+      priority_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object mempoolError_ = "";
+    /**
+     * <pre>
+     * mempool_error is set by CometBFT.
+     * ABCI applictions creating a ResponseCheckTX should not set mempool_error.
+     * </pre>
+     *
+     * <code>string mempool_error = 11 [json_name = "mempoolError"];</code>
+     * @return The mempoolError.
+     */
+    public java.lang.String getMempoolError() {
+      java.lang.Object ref = mempoolError_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        mempoolError_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <pre>
+     * mempool_error is set by CometBFT.
+     * ABCI applictions creating a ResponseCheckTX should not set mempool_error.
+     * </pre>
+     *
+     * <code>string mempool_error = 11 [json_name = "mempoolError"];</code>
+     * @return The bytes for mempoolError.
+     */
+    public com.google.protobuf.ByteString
+        getMempoolErrorBytes() {
+      java.lang.Object ref = mempoolError_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        mempoolError_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <pre>
+     * mempool_error is set by CometBFT.
+     * ABCI applictions creating a ResponseCheckTX should not set mempool_error.
+     * </pre>
+     *
+     * <code>string mempool_error = 11 [json_name = "mempoolError"];</code>
+     * @param value The mempoolError to set.
+     * @return This builder for chaining.
+     */
+    public Builder setMempoolError(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      mempoolError_ = value;
+      bitField0_ |= 0x00000400;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * mempool_error is set by CometBFT.
+     * ABCI applictions creating a ResponseCheckTX should not set mempool_error.
+     * </pre>
+     *
+     * <code>string mempool_error = 11 [json_name = "mempoolError"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearMempoolError() {
+      mempoolError_ = getDefaultInstance().getMempoolError();
+      bitField0_ = (bitField0_ & ~0x00000400);
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * mempool_error is set by CometBFT.
+     * ABCI applictions creating a ResponseCheckTX should not set mempool_error.
+     * </pre>
+     *
+     * <code>string mempool_error = 11 [json_name = "mempoolError"];</code>
+     * @param value The bytes for mempoolError to set.
+     * @return This builder for chaining.
+     */
+    public Builder setMempoolErrorBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      mempoolError_ = value;
+      bitField0_ |= 0x00000400;
       onChanged();
       return this;
     }

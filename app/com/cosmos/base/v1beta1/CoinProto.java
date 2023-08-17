@@ -50,13 +50,12 @@ public final class CoinProto {
       "\024\n\005denom\030\001 \001(\tR\005denom\022#\n\006amount\030\002 \001(\tB\013\310" +
       "\336\037\000\332\336\037\003DecR\006amount:\004\350\240\037\001\")\n\010IntProto\022\035\n\003" +
       "int\030\001 \001(\tB\013\310\336\037\000\332\336\037\003IntR\003int\")\n\010DecProto\022" +
-      "\035\n\003dec\030\001 \001(\tB\013\310\336\037\000\332\336\037\003DecR\003decB\332\001\n\027com.c" +
-      "osmos.base.v1beta1B\tCoinProtoP\001Z>github." +
-      "com/AssetMantle/modules/cosmos/base/v1be" +
-      "ta1;basev1beta1\242\002\003CBX\252\002\023Cosmos.Base.V1be" +
-      "ta1\312\002\023Cosmos\\Base\\V1beta1\342\002\037Cosmos\\Base\\" +
-      "V1beta1\\GPBMetadata\352\002\025Cosmos::Base::V1be" +
-      "ta1\330\341\036\000\200\342\036\000b\006proto3"
+      "\035\n\003dec\030\001 \001(\tB\013\310\336\037\000\332\336\037\003DecR\003decB\276\001\n\027com.c" +
+      "osmos.base.v1beta1B\tCoinProtoP\001Z\"github." +
+      "com/cosmos/cosmos-sdk/types\242\002\003CBX\252\002\023Cosm" +
+      "os.Base.V1beta1\312\002\023Cosmos\\Base\\V1beta1\342\002\037" +
+      "Cosmos\\Base\\V1beta1\\GPBMetadata\352\002\025Cosmos" +
+      "::Base::V1beta1\330\341\036\000\200\342\036\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

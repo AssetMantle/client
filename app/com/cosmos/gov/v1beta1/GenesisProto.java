@@ -46,12 +46,12 @@ public final class GenesisProto {
       "\"voting_params\"R\014votingParams\022_\n\014tally_p" +
       "arams\030\007 \001(\0132\037.cosmos.gov.v1beta1.TallyPa" +
       "ramsB\033\310\336\037\000\362\336\037\023yaml:\"tally_params\"R\013tally" +
-      "ParamsB\316\001\n\026com.cosmos.gov.v1beta1B\014Genes" +
-      "isProtoP\001Z<github.com/AssetMantle/module" +
-      "s/cosmos/gov/v1beta1;govv1beta1\242\002\003CGX\252\002\022" +
-      "Cosmos.Gov.V1beta1\312\002\022Cosmos\\Gov\\V1beta1\342" +
-      "\002\036Cosmos\\Gov\\V1beta1\\GPBMetadata\352\002\024Cosmo" +
-      "s::Gov::V1beta1b\006proto3"
+      "ParamsB\272\001\n\026com.cosmos.gov.v1beta1B\014Genes" +
+      "isProtoP\001Z(github.com/cosmos/cosmos-sdk/" +
+      "x/gov/types\242\002\003CGX\252\002\022Cosmos.Gov.V1beta1\312\002" +
+      "\022Cosmos\\Gov\\V1beta1\342\002\036Cosmos\\Gov\\V1beta1" +
+      "\\GPBMetadata\352\002\024Cosmos::Gov::V1beta1b\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

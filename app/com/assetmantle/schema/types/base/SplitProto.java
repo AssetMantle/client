@@ -29,42 +29,33 @@ public final class SplitProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\026types/base/split.proto\022\035assetmantle.sc" +
-      "hema.types.base\032\024gogoproto/gogo.proto\032\035i" +
-      "ds/base/any_ownable_id.proto\032\032ids/base/i" +
-      "dentity_id.proto\"\263\001\n\005Split\022C\n\towner_i_d\030" +
-      "\001 \001(\0132\'.assetmantle.schema.ids.base.Iden" +
-      "tityIDR\007ownerID\022I\n\013ownable_i_d\030\002 \001(\0132).a" +
-      "ssetmantle.schema.ids.base.AnyOwnableIDR" +
-      "\townableID\022\024\n\005value\030\003 \001(\tR\005value:\004\210\240\037\000B\364" +
-      "\001\n!com.assetmantle.schema.types.baseB\nSp" +
-      "litProtoP\001Z+github.com/AssetMantle/schem" +
-      "a/go/types/base\242\002\004ASTB\252\002\035Assetmantle.Sch" +
-      "ema.Types.Base\312\002\035Assetmantle\\Schema\\Type" +
-      "s\\Base\342\002)Assetmantle\\Schema\\Types\\Base\\G" +
-      "PBMetadata\352\002 Assetmantle::Schema::Types:" +
-      ":Baseb\006proto3"
+      "hema.types.base\032\024gogoproto/gogo.proto\"#\n" +
+      "\005Split\022\024\n\005value\030\001 \001(\tR\005value:\004\210\240\037\000B\364\001\n!c" +
+      "om.assetmantle.schema.types.baseB\nSplitP" +
+      "rotoP\001Z+github.com/AssetMantle/schema/go" +
+      "/types/base\242\002\004ASTB\252\002\035Assetmantle.Schema." +
+      "Types.Base\312\002\035Assetmantle\\Schema\\Types\\Ba" +
+      "se\342\002)Assetmantle\\Schema\\Types\\Base\\GPBMe" +
+      "tadata\352\002 Assetmantle::Schema::Types::Bas" +
+      "eb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.gogoproto.GogoProto.getDescriptor(),
-          com.assetmantle.schema.ids.base.AnyOwnableIdProto.getDescriptor(),
-          com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor(),
         });
     internal_static_assetmantle_schema_types_base_Split_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_schema_types_base_Split_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_schema_types_base_Split_descriptor,
-        new java.lang.String[] { "OwnerID", "OwnableID", "Value", });
+        new java.lang.String[] { "Value", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
-    com.assetmantle.schema.ids.base.AnyOwnableIdProto.getDescriptor();
-    com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -38,10 +38,36 @@ private static final long serialVersionUID = 0L;
             com.assetmantle.schema.ids.base.SplitID.class, com.assetmantle.schema.ids.base.SplitID.Builder.class);
   }
 
-  public static final int OWNER_I_D_FIELD_NUMBER = 1;
+  public static final int ASSET_I_D_FIELD_NUMBER = 1;
+  private com.assetmantle.schema.ids.base.AssetID assetID_;
+  /**
+   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+   * @return Whether the assetID field is set.
+   */
+  @java.lang.Override
+  public boolean hasAssetID() {
+    return assetID_ != null;
+  }
+  /**
+   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+   * @return The assetID.
+   */
+  @java.lang.Override
+  public com.assetmantle.schema.ids.base.AssetID getAssetID() {
+    return assetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
+  }
+  /**
+   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+   */
+  @java.lang.Override
+  public com.assetmantle.schema.ids.base.AssetIDOrBuilder getAssetIDOrBuilder() {
+    return assetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
+  }
+
+  public static final int OWNER_I_D_FIELD_NUMBER = 2;
   private com.assetmantle.schema.ids.base.IdentityID ownerID_;
   /**
-   * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+   * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
    * @return Whether the ownerID field is set.
    */
   @java.lang.Override
@@ -49,7 +75,7 @@ private static final long serialVersionUID = 0L;
     return ownerID_ != null;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+   * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
    * @return The ownerID.
    */
   @java.lang.Override
@@ -57,37 +83,11 @@ private static final long serialVersionUID = 0L;
     return ownerID_ == null ? com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance() : ownerID_;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+   * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.IdentityIDOrBuilder getOwnerIDOrBuilder() {
     return ownerID_ == null ? com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance() : ownerID_;
-  }
-
-  public static final int OWNABLE_I_D_FIELD_NUMBER = 2;
-  private com.assetmantle.schema.ids.base.AnyOwnableID ownableID_;
-  /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-   * @return Whether the ownableID field is set.
-   */
-  @java.lang.Override
-  public boolean hasOwnableID() {
-    return ownableID_ != null;
-  }
-  /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-   * @return The ownableID.
-   */
-  @java.lang.Override
-  public com.assetmantle.schema.ids.base.AnyOwnableID getOwnableID() {
-    return ownableID_ == null ? com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : ownableID_;
-  }
-  /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-   */
-  @java.lang.Override
-  public com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder getOwnableIDOrBuilder() {
-    return ownableID_ == null ? com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : ownableID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -104,11 +104,11 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (ownerID_ != null) {
-      output.writeMessage(1, getOwnerID());
+    if (assetID_ != null) {
+      output.writeMessage(1, getAssetID());
     }
-    if (ownableID_ != null) {
-      output.writeMessage(2, getOwnableID());
+    if (ownerID_ != null) {
+      output.writeMessage(2, getOwnerID());
     }
     getUnknownFields().writeTo(output);
   }
@@ -119,13 +119,13 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
+    if (assetID_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(1, getAssetID());
+    }
     if (ownerID_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getOwnerID());
-    }
-    if (ownableID_ != null) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, getOwnableID());
+        .computeMessageSize(2, getOwnerID());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -142,15 +142,15 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.schema.ids.base.SplitID other = (com.assetmantle.schema.ids.base.SplitID) obj;
 
+    if (hasAssetID() != other.hasAssetID()) return false;
+    if (hasAssetID()) {
+      if (!getAssetID()
+          .equals(other.getAssetID())) return false;
+    }
     if (hasOwnerID() != other.hasOwnerID()) return false;
     if (hasOwnerID()) {
       if (!getOwnerID()
           .equals(other.getOwnerID())) return false;
-    }
-    if (hasOwnableID() != other.hasOwnableID()) return false;
-    if (hasOwnableID()) {
-      if (!getOwnableID()
-          .equals(other.getOwnableID())) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -163,13 +163,13 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
+    if (hasAssetID()) {
+      hash = (37 * hash) + ASSET_I_D_FIELD_NUMBER;
+      hash = (53 * hash) + getAssetID().hashCode();
+    }
     if (hasOwnerID()) {
       hash = (37 * hash) + OWNER_I_D_FIELD_NUMBER;
       hash = (53 * hash) + getOwnerID().hashCode();
-    }
-    if (hasOwnableID()) {
-      hash = (37 * hash) + OWNABLE_I_D_FIELD_NUMBER;
-      hash = (53 * hash) + getOwnableID().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -300,15 +300,15 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
+      assetID_ = null;
+      if (assetIDBuilder_ != null) {
+        assetIDBuilder_.dispose();
+        assetIDBuilder_ = null;
+      }
       ownerID_ = null;
       if (ownerIDBuilder_ != null) {
         ownerIDBuilder_.dispose();
         ownerIDBuilder_ = null;
-      }
-      ownableID_ = null;
-      if (ownableIDBuilder_ != null) {
-        ownableIDBuilder_.dispose();
-        ownableIDBuilder_ = null;
       }
       return this;
     }
@@ -344,14 +344,14 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(com.assetmantle.schema.ids.base.SplitID result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.assetID_ = assetIDBuilder_ == null
+            ? assetID_
+            : assetIDBuilder_.build();
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
         result.ownerID_ = ownerIDBuilder_ == null
             ? ownerID_
             : ownerIDBuilder_.build();
-      }
-      if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.ownableID_ = ownableIDBuilder_ == null
-            ? ownableID_
-            : ownableIDBuilder_.build();
       }
     }
 
@@ -399,11 +399,11 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.schema.ids.base.SplitID other) {
       if (other == com.assetmantle.schema.ids.base.SplitID.getDefaultInstance()) return this;
+      if (other.hasAssetID()) {
+        mergeAssetID(other.getAssetID());
+      }
       if (other.hasOwnerID()) {
         mergeOwnerID(other.getOwnerID());
-      }
-      if (other.hasOwnableID()) {
-        mergeOwnableID(other.getOwnableID());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -433,14 +433,14 @@ private static final long serialVersionUID = 0L;
               break;
             case 10: {
               input.readMessage(
-                  getOwnerIDFieldBuilder().getBuilder(),
+                  getAssetIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
             } // case 10
             case 18: {
               input.readMessage(
-                  getOwnableIDFieldBuilder().getBuilder(),
+                  getOwnerIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000002;
               break;
@@ -462,18 +462,137 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
+    private com.assetmantle.schema.ids.base.AssetID assetID_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder> assetIDBuilder_;
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     * @return Whether the assetID field is set.
+     */
+    public boolean hasAssetID() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     * @return The assetID.
+     */
+    public com.assetmantle.schema.ids.base.AssetID getAssetID() {
+      if (assetIDBuilder_ == null) {
+        return assetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
+      } else {
+        return assetIDBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     */
+    public Builder setAssetID(com.assetmantle.schema.ids.base.AssetID value) {
+      if (assetIDBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        assetID_ = value;
+      } else {
+        assetIDBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     */
+    public Builder setAssetID(
+        com.assetmantle.schema.ids.base.AssetID.Builder builderForValue) {
+      if (assetIDBuilder_ == null) {
+        assetID_ = builderForValue.build();
+      } else {
+        assetIDBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     */
+    public Builder mergeAssetID(com.assetmantle.schema.ids.base.AssetID value) {
+      if (assetIDBuilder_ == null) {
+        if (((bitField0_ & 0x00000001) != 0) &&
+          assetID_ != null &&
+          assetID_ != com.assetmantle.schema.ids.base.AssetID.getDefaultInstance()) {
+          getAssetIDBuilder().mergeFrom(value);
+        } else {
+          assetID_ = value;
+        }
+      } else {
+        assetIDBuilder_.mergeFrom(value);
+      }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     */
+    public Builder clearAssetID() {
+      bitField0_ = (bitField0_ & ~0x00000001);
+      assetID_ = null;
+      if (assetIDBuilder_ != null) {
+        assetIDBuilder_.dispose();
+        assetIDBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     */
+    public com.assetmantle.schema.ids.base.AssetID.Builder getAssetIDBuilder() {
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return getAssetIDFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     */
+    public com.assetmantle.schema.ids.base.AssetIDOrBuilder getAssetIDOrBuilder() {
+      if (assetIDBuilder_ != null) {
+        return assetIDBuilder_.getMessageOrBuilder();
+      } else {
+        return assetID_ == null ?
+            com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
+      }
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder> 
+        getAssetIDFieldBuilder() {
+      if (assetIDBuilder_ == null) {
+        assetIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder>(
+                getAssetID(),
+                getParentForChildren(),
+                isClean());
+        assetID_ = null;
+      }
+      return assetIDBuilder_;
+    }
+
     private com.assetmantle.schema.ids.base.IdentityID ownerID_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.IdentityID, com.assetmantle.schema.ids.base.IdentityID.Builder, com.assetmantle.schema.ids.base.IdentityIDOrBuilder> ownerIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
      * @return Whether the ownerID field is set.
      */
     public boolean hasOwnerID() {
-      return ((bitField0_ & 0x00000001) != 0);
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
      * @return The ownerID.
      */
     public com.assetmantle.schema.ids.base.IdentityID getOwnerID() {
@@ -484,7 +603,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
      */
     public Builder setOwnerID(com.assetmantle.schema.ids.base.IdentityID value) {
       if (ownerIDBuilder_ == null) {
@@ -495,12 +614,12 @@ private static final long serialVersionUID = 0L;
       } else {
         ownerIDBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000001;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
      */
     public Builder setOwnerID(
         com.assetmantle.schema.ids.base.IdentityID.Builder builderForValue) {
@@ -509,16 +628,16 @@ private static final long serialVersionUID = 0L;
       } else {
         ownerIDBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000001;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
      */
     public Builder mergeOwnerID(com.assetmantle.schema.ids.base.IdentityID value) {
       if (ownerIDBuilder_ == null) {
-        if (((bitField0_ & 0x00000001) != 0) &&
+        if (((bitField0_ & 0x00000002) != 0) &&
           ownerID_ != null &&
           ownerID_ != com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance()) {
           getOwnerIDBuilder().mergeFrom(value);
@@ -528,15 +647,15 @@ private static final long serialVersionUID = 0L;
       } else {
         ownerIDBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000001;
+      bitField0_ |= 0x00000002;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
      */
     public Builder clearOwnerID() {
-      bitField0_ = (bitField0_ & ~0x00000001);
+      bitField0_ = (bitField0_ & ~0x00000002);
       ownerID_ = null;
       if (ownerIDBuilder_ != null) {
         ownerIDBuilder_.dispose();
@@ -546,15 +665,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
      */
     public com.assetmantle.schema.ids.base.IdentityID.Builder getOwnerIDBuilder() {
-      bitField0_ |= 0x00000001;
+      bitField0_ |= 0x00000002;
       onChanged();
       return getOwnerIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
      */
     public com.assetmantle.schema.ids.base.IdentityIDOrBuilder getOwnerIDOrBuilder() {
       if (ownerIDBuilder_ != null) {
@@ -565,7 +684,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 1 [json_name = "ownerID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID owner_i_d = 2 [json_name = "ownerID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.IdentityID, com.assetmantle.schema.ids.base.IdentityID.Builder, com.assetmantle.schema.ids.base.IdentityIDOrBuilder> 
@@ -579,125 +698,6 @@ private static final long serialVersionUID = 0L;
         ownerID_ = null;
       }
       return ownerIDBuilder_;
-    }
-
-    private com.assetmantle.schema.ids.base.AnyOwnableID ownableID_;
-    private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder> ownableIDBuilder_;
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-     * @return Whether the ownableID field is set.
-     */
-    public boolean hasOwnableID() {
-      return ((bitField0_ & 0x00000002) != 0);
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-     * @return The ownableID.
-     */
-    public com.assetmantle.schema.ids.base.AnyOwnableID getOwnableID() {
-      if (ownableIDBuilder_ == null) {
-        return ownableID_ == null ? com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : ownableID_;
-      } else {
-        return ownableIDBuilder_.getMessage();
-      }
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-     */
-    public Builder setOwnableID(com.assetmantle.schema.ids.base.AnyOwnableID value) {
-      if (ownableIDBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        ownableID_ = value;
-      } else {
-        ownableIDBuilder_.setMessage(value);
-      }
-      bitField0_ |= 0x00000002;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-     */
-    public Builder setOwnableID(
-        com.assetmantle.schema.ids.base.AnyOwnableID.Builder builderForValue) {
-      if (ownableIDBuilder_ == null) {
-        ownableID_ = builderForValue.build();
-      } else {
-        ownableIDBuilder_.setMessage(builderForValue.build());
-      }
-      bitField0_ |= 0x00000002;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-     */
-    public Builder mergeOwnableID(com.assetmantle.schema.ids.base.AnyOwnableID value) {
-      if (ownableIDBuilder_ == null) {
-        if (((bitField0_ & 0x00000002) != 0) &&
-          ownableID_ != null &&
-          ownableID_ != com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance()) {
-          getOwnableIDBuilder().mergeFrom(value);
-        } else {
-          ownableID_ = value;
-        }
-      } else {
-        ownableIDBuilder_.mergeFrom(value);
-      }
-      bitField0_ |= 0x00000002;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-     */
-    public Builder clearOwnableID() {
-      bitField0_ = (bitField0_ & ~0x00000002);
-      ownableID_ = null;
-      if (ownableIDBuilder_ != null) {
-        ownableIDBuilder_.dispose();
-        ownableIDBuilder_ = null;
-      }
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-     */
-    public com.assetmantle.schema.ids.base.AnyOwnableID.Builder getOwnableIDBuilder() {
-      bitField0_ |= 0x00000002;
-      onChanged();
-      return getOwnableIDFieldBuilder().getBuilder();
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-     */
-    public com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder getOwnableIDOrBuilder() {
-      if (ownableIDBuilder_ != null) {
-        return ownableIDBuilder_.getMessageOrBuilder();
-      } else {
-        return ownableID_ == null ?
-            com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : ownableID_;
-      }
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 2 [json_name = "ownableID"];</code>
-     */
-    private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder> 
-        getOwnableIDFieldBuilder() {
-      if (ownableIDBuilder_ == null) {
-        ownableIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder>(
-                getOwnableID(),
-                getParentForChildren(),
-                isClean());
-        ownableID_ = null;
-      }
-      return ownableIDBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

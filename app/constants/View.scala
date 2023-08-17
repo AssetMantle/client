@@ -454,6 +454,8 @@ object View {
     schema.constants.Messages.ASSET_MUTATE -> "MESSAGE_ASSET_MUTATE",
     schema.constants.Messages.ASSET_RENUMERATE -> "MESSAGE_ASSET_RENUMERATE",
     schema.constants.Messages.ASSET_REVOKE -> "MESSAGE_ASSET_REVOKE",
+    schema.constants.Messages.ASSET_WRAP -> "MESSAGE_SPLIT_WRAP",
+    schema.constants.Messages.ASSET_UNWRAP -> "MESSAGE_SPLIT_UNWRAP",
     //identities
     schema.constants.Messages.IDENTITY_DEFINE -> "MESSAGE_IDENTITY_DEFINE",
     schema.constants.Messages.IDENTITY_DEPUTIZE -> "MESSAGE_IDENTITY_DEPUTIZE",
@@ -466,8 +468,6 @@ object View {
     schema.constants.Messages.IDENTITY_UNPROVISION -> "MESSAGE_IDENTITY_UNPROVISION",
     //splits
     schema.constants.Messages.SPLIT_SEND -> "MESSAGE_SPLIT_SEND",
-    schema.constants.Messages.SPLIT_WRAP -> "MESSAGE_SPLIT_WRAP",
-    schema.constants.Messages.SPLIT_UNWRAP -> "MESSAGE_SPLIT_UNWRAP",
     //orders
     schema.constants.Messages.ORDER_CANCEL -> "MESSAGE_ORDER_CANCEL",
     schema.constants.Messages.ORDER_DEFINE -> "MESSAGE_ORDER_DEFINE",

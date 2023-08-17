@@ -104,12 +104,12 @@ public final class TxProto {
       "deClientResponse\022r\n\022SubmitMisbehaviour\022)" +
       ".ibc.core.client.v1.MsgSubmitMisbehaviou" +
       "r\0321.ibc.core.client.v1.MsgSubmitMisbehav" +
-      "iourResponseB\310\001\n\026com.ibc.core.client.v1B" +
-      "\007TxProtoP\001Z:github.com/AssetMantle/modul" +
-      "es/ibc/core/client/v1;clientv1\242\002\003ICC\252\002\022I" +
-      "bc.Core.Client.V1\312\002\022Ibc\\Core\\Client\\V1\342\002" +
-      "\036Ibc\\Core\\Client\\V1\\GPBMetadata\352\002\025Ibc::C" +
-      "ore::Client::V1b\006proto3"
+      "iourResponseB\306\001\n\026com.ibc.core.client.v1B" +
+      "\007TxProtoP\001Z8github.com/cosmos/ibc-go/v4/" +
+      "modules/core/02-client/types\242\002\003ICC\252\002\022Ibc" +
+      ".Core.Client.V1\312\002\022Ibc\\Core\\Client\\V1\342\002\036I" +
+      "bc\\Core\\Client\\V1\\GPBMetadata\352\002\025Ibc::Cor" +
+      "e::Client::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

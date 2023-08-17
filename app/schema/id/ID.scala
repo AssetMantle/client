@@ -15,6 +15,8 @@ abstract class ID {
 
   def getProtoBytes: Array[Byte]
 
+  def compare(id: ID): Int
+
 }
 
 object ID {
@@ -22,16 +24,14 @@ object ID {
   def apply(anyID: AnyID): ID = anyID.getImplCase.getNumber match {
     case 1 => AssetID(anyID.getAssetID)
     case 2 => ClassificationID(anyID.getClassificationID)
-    case 3 => CoinID(anyID.getCoinID)
-    case 4 => DataID(anyID.getDataID)
-    case 5 => HashID(anyID.getHashID)
-    case 6 => IdentityID(anyID.getIdentityID)
-    case 7 => MaintainerID(anyID.getMaintainerID)
-    case 8 => OrderID(anyID.getOrderID)
-    case 9 => OwnableID(anyID.getOwnableID)
-    case 10 => PropertyID(anyID.getPropertyID)
-    case 11 => SplitID(anyID.getSplitID)
-    case 12 => StringID(anyID.getStringID)
+    case 3 => DataID(anyID.getDataID)
+    case 4 => HashID(anyID.getHashID)
+    case 5 => IdentityID(anyID.getIdentityID)
+    case 6 => MaintainerID(anyID.getMaintainerID)
+    case 7 => OrderID(anyID.getOrderID)
+    case 8 => PropertyID(anyID.getPropertyID)
+    case 9 => SplitID(anyID.getSplitID)
+    case 10 => StringID(anyID.getStringID)
     case _ => throw new IllegalArgumentException("UNKNOWN_ID_IMPL_CASE_NUMBER: " + anyID.getImplCase.getNumber.toString)
   }
 

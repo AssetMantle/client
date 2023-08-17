@@ -92,16 +92,15 @@ public final class GenesisProto {
       "\037\024yaml:\"connection_id\"R\014connectionId\022+\n\007" +
       "port_id\030\002 \001(\tB\022\362\336\037\016yaml:\"port_id\"R\006portI" +
       "d\022C\n\017account_address\030\003 \001(\tB\032\362\336\037\026yaml:\"ac" +
-      "count_address\"R\016accountAddressB\324\002\n+com.i" +
+      "count_address\"R\016accountAddressB\275\002\n+com.i" +
       "bc.applications.interchain_accounts.v1B\014" +
-      "GenesisProtoP\001Z\\github.com/AssetMantle/m" +
-      "odules/ibc/applications/interchain_accou" +
-      "nts/v1;interchain_accountsv1\242\002\003IAI\252\002&Ibc" +
-      ".Applications.InterchainAccounts.V1\312\002&Ib" +
-      "c\\Applications\\InterchainAccounts\\V1\342\0022I" +
-      "bc\\Applications\\InterchainAccounts\\V1\\GP" +
-      "BMetadata\352\002)Ibc::Applications::Interchai" +
-      "nAccounts::V1b\006proto3"
+      "GenesisProtoP\001ZEgithub.com/cosmos/ibc-go" +
+      "/v4/modules/apps/27-interchain-accounts/" +
+      "types\242\002\003IAI\252\002&Ibc.Applications.Interchai" +
+      "nAccounts.V1\312\002&Ibc\\Applications\\Intercha" +
+      "inAccounts\\V1\342\0022Ibc\\Applications\\Interch" +
+      "ainAccounts\\V1\\GPBMetadata\352\002)Ibc::Applic" +
+      "ations::InterchainAccounts::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

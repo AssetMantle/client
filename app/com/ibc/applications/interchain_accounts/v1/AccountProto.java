@@ -37,16 +37,15 @@ public final class AccountProto {
       "ta1.BaseAccountB\033\320\336\037\001\362\336\037\023yaml:\"base_acco" +
       "unt\"R\013baseAccount\022=\n\raccount_owner\030\002 \001(\t" +
       "B\030\362\336\037\024yaml:\"account_owner\"R\014accountOwner" +
-      ":\036\210\240\037\000\230\240\037\000\322\264-\022InterchainAccountIB\324\002\n+com" +
+      ":\036\210\240\037\000\230\240\037\000\322\264-\022InterchainAccountIB\275\002\n+com" +
       ".ibc.applications.interchain_accounts.v1" +
-      "B\014AccountProtoP\001Z\\github.com/AssetMantle" +
-      "/modules/ibc/applications/interchain_acc" +
-      "ounts/v1;interchain_accountsv1\242\002\003IAI\252\002&I" +
-      "bc.Applications.InterchainAccounts.V1\312\002&" +
-      "Ibc\\Applications\\InterchainAccounts\\V1\342\002" +
-      "2Ibc\\Applications\\InterchainAccounts\\V1\\" +
-      "GPBMetadata\352\002)Ibc::Applications::Interch" +
-      "ainAccounts::V1b\006proto3"
+      "B\014AccountProtoP\001ZEgithub.com/cosmos/ibc-" +
+      "go/v4/modules/apps/27-interchain-account" +
+      "s/types\242\002\003IAI\252\002&Ibc.Applications.Interch" +
+      "ainAccounts.V1\312\002&Ibc\\Applications\\Interc" +
+      "hainAccounts\\V1\342\0022Ibc\\Applications\\Inter" +
+      "chainAccounts\\V1\\GPBMetadata\352\002)Ibc::Appl" +
+      "ications::InterchainAccounts::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -8,8 +8,7 @@ object constants {
 
   val AssetIDType: StringID = StringID("AI")
   val AnyIDType: StringID = StringID("I")
-  val ClassificationIDType: StringID = StringID("CI")
-  val CoinIDType: StringID = StringID("COI")
+  val ClassificationIDType: StringID = StringID("CLI")
   val DataIDType: StringID = StringID("DI")
   val HashIDType: StringID = StringID("HI")
   val IdentityIDType: StringID = StringID("II")
@@ -21,7 +20,7 @@ object constants {
 
   val AllIdTypes: Seq[StringID] = Seq(
     AssetIDType, AnyIDType,
-    ClassificationIDType, CoinIDType,
+    ClassificationIDType,
     DataIDType,
     HashIDType,
     IdentityIDType,

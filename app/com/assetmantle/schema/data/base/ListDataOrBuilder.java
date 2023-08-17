@@ -8,26 +8,26 @@ public interface ListDataOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>repeated .assetmantle.schema.data.base.AnyListableData any_listable_data = 1 [json_name = "anyListableData"];</code>
+   * <code>repeated .assetmantle.schema.data.base.AnyListableData value = 1 [json_name = "value"];</code>
    */
   java.util.List<com.assetmantle.schema.data.base.AnyListableData> 
-      getAnyListableDataList();
+      getValueList();
   /**
-   * <code>repeated .assetmantle.schema.data.base.AnyListableData any_listable_data = 1 [json_name = "anyListableData"];</code>
+   * <code>repeated .assetmantle.schema.data.base.AnyListableData value = 1 [json_name = "value"];</code>
    */
-  com.assetmantle.schema.data.base.AnyListableData getAnyListableData(int index);
+  com.assetmantle.schema.data.base.AnyListableData getValue(int index);
   /**
-   * <code>repeated .assetmantle.schema.data.base.AnyListableData any_listable_data = 1 [json_name = "anyListableData"];</code>
+   * <code>repeated .assetmantle.schema.data.base.AnyListableData value = 1 [json_name = "value"];</code>
    */
-  int getAnyListableDataCount();
+  int getValueCount();
   /**
-   * <code>repeated .assetmantle.schema.data.base.AnyListableData any_listable_data = 1 [json_name = "anyListableData"];</code>
+   * <code>repeated .assetmantle.schema.data.base.AnyListableData value = 1 [json_name = "value"];</code>
    */
   java.util.List<? extends com.assetmantle.schema.data.base.AnyListableDataOrBuilder> 
-      getAnyListableDataOrBuilderList();
+      getValueOrBuilderList();
   /**
-   * <code>repeated .assetmantle.schema.data.base.AnyListableData any_listable_data = 1 [json_name = "anyListableData"];</code>
+   * <code>repeated .assetmantle.schema.data.base.AnyListableData value = 1 [json_name = "value"];</code>
    */
-  com.assetmantle.schema.data.base.AnyListableDataOrBuilder getAnyListableDataOrBuilder(
+  com.assetmantle.schema.data.base.AnyListableDataOrBuilder getValueOrBuilder(
       int index);
 }

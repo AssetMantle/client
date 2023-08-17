@@ -6,4 +6,14 @@ package com.ibc.applications.transfer.v1;
 public interface MsgTransferResponseOrBuilder extends
     // @@protoc_insertion_point(interface_extends:ibc.applications.transfer.v1.MsgTransferResponse)
     com.google.protobuf.MessageOrBuilder {
+
+  /**
+   * <pre>
+   * sequence number of the transfer packet sent
+   * </pre>
+   *
+   * <code>uint64 sequence = 1 [json_name = "sequence"];</code>
+   * @return The sequence.
+   */
+  long getSequence();
 }

@@ -15,6 +15,7 @@ import com.cosmos.gov.{v1beta1 => govTx}
 import com.cosmos.slashing.{v1beta1 => slashingTx}
 import com.cosmos.staking.{v1beta1 => stakingTx}
 import com.cosmos.vesting.{v1beta1 => VestingTx}
+import com.ibc.applications.transfer
 import com.ibc.applications.transfer.{v1 => transferTx}
 import com.ibc.core.channel.{v1 => channelTx}
 import com.ibc.core.client.{v1 => clientTx}
@@ -45,6 +46,8 @@ class WalletTransactions @Inject()(
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
+
+  transfer.v1.
 
   private implicit val logger: Logger = Logger(this.getClass)
 

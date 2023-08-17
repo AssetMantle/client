@@ -11,7 +11,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetGenesis @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class GetGenesis @Inject()()(implicit wsClient: WSClient, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.QUERIES_GET_GENESIS
 

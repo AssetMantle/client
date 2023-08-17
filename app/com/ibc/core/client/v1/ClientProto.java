@@ -95,12 +95,12 @@ public final class ClientProto {
       "\030\002 \001(\004B\032\362\336\037\026yaml:\"revision_height\"R\016revi" +
       "sionHeight:\010\210\240\037\000\230\240\037\000\"M\n\006Params\022C\n\017allowe" +
       "d_clients\030\001 \003(\tB\032\362\336\037\026yaml:\"allowed_clien" +
-      "ts\"R\016allowedClientsB\314\001\n\026com.ibc.core.cli" +
-      "ent.v1B\013ClientProtoP\001Z:github.com/AssetM" +
-      "antle/modules/ibc/core/client/v1;clientv" +
-      "1\242\002\003ICC\252\002\022Ibc.Core.Client.V1\312\002\022Ibc\\Core\\" +
-      "Client\\V1\342\002\036Ibc\\Core\\Client\\V1\\GPBMetada" +
-      "ta\352\002\025Ibc::Core::Client::V1b\006proto3"
+      "ts\"R\016allowedClientsB\312\001\n\026com.ibc.core.cli" +
+      "ent.v1B\013ClientProtoP\001Z8github.com/cosmos" +
+      "/ibc-go/v4/modules/core/02-client/types\242" +
+      "\002\003ICC\252\002\022Ibc.Core.Client.V1\312\002\022Ibc\\Core\\Cl" +
+      "ient\\V1\342\002\036Ibc\\Core\\Client\\V1\\GPBMetadata" +
+      "\352\002\025Ibc::Core::Client::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

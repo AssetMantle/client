@@ -147,14 +147,13 @@ public final class GenesisProto {
       "lash_events\030\n \003(\01326.cosmos.distribution." +
       "v1beta1.ValidatorSlashEventRecordB%\310\336\037\000\362" +
       "\336\037\035yaml:\"validator_slash_events\"R\024valida" +
-      "torSlashEvents:\010\210\240\037\000\350\240\037\000B\221\002\n\037com.cosmos." +
-      "distribution.v1beta1B\014GenesisProtoP\001ZNgi" +
-      "thub.com/AssetMantle/modules/cosmos/dist" +
-      "ribution/v1beta1;distributionv1beta1\242\002\003C" +
-      "DX\252\002\033Cosmos.Distribution.V1beta1\312\002\033Cosmo" +
-      "s\\Distribution\\V1beta1\342\002\'Cosmos\\Distribu" +
-      "tion\\V1beta1\\GPBMetadata\352\002\035Cosmos::Distr" +
-      "ibution::V1beta1\250\342\036\001b\006proto3"
+      "torSlashEvents:\010\210\240\037\000\350\240\037\000B\364\001\n\037com.cosmos." +
+      "distribution.v1beta1B\014GenesisProtoP\001Z1gi" +
+      "thub.com/cosmos/cosmos-sdk/x/distributio" +
+      "n/types\242\002\003CDX\252\002\033Cosmos.Distribution.V1be" +
+      "ta1\312\002\033Cosmos\\Distribution\\V1beta1\342\002\'Cosm" +
+      "os\\Distribution\\V1beta1\\GPBMetadata\352\002\035Co" +
+      "smos::Distribution::V1beta1\250\342\036\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

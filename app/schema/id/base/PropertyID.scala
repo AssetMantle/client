@@ -16,6 +16,8 @@ case class PropertyID(keyID: StringID, typeID: StringID) extends ID {
   def toAnyID: AnyID = AnyID.newBuilder().setPropertyID(this.asProtoPropertyID).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoPropertyID.toByteString.toByteArray
+
+  def compare(id: ID): Int = schema.utilities.common.byteArraysCompare(this.getBytes, id.asInstanceOf[PropertyID].getBytes)
 }
 
 object PropertyID {

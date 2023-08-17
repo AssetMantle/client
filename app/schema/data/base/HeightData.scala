@@ -2,7 +2,7 @@ package schema.data.base
 
 import com.assetmantle.schema.data.base.{AnyData, AnyListableData, HeightData => protoHeightData}
 import schema.data._
-import schema.id.base.{DataID, HashID, StringID}
+import schema.id.base.{HashID, StringID}
 import schema.types.Height
 
 case class HeightData(value: Height) extends ListableData {
@@ -10,9 +10,12 @@ case class HeightData(value: Height) extends ListableData {
 
   def getBondWeight: Int = constants.HeightDataWeight
 
-  def getDataID: DataID = DataID(typeID = constants.HeightDataTypeID, hashID = this.generateHashID)
-
   def zeroValue: Data = HeightData(Height(-1))
+
+  def compare(listableData: ListableData): Int = {
+    val compareData = listableData.asInstanceOf[HeightData]
+    this.value.compare(compareData.value)
+  }
 
   def getBytes: Array[Byte] = this.value.getBytes
 

@@ -30,13 +30,13 @@ public final class TypesProto {
     java.lang.String[] descriptorData = {
       "\n tendermint/libs/bits/types.proto\022\024tend" +
       "ermint.libs.bits\"4\n\010BitArray\022\022\n\004bits\030\001 \001" +
-      "(\003R\004bits\022\024\n\005elems\030\002 \003(\004R\005elemsB\315\001\n\030com.t" +
-      "endermint.libs.bitsB\nTypesProtoP\001Z3githu" +
-      "b.com/AssetMantle/modules/tendermint/lib" +
-      "s/bits\242\002\003TLB\252\002\024Tendermint.Libs.Bits\312\002\024Te" +
-      "ndermint\\Libs\\Bits\342\002 Tendermint\\Libs\\Bit" +
-      "s\\GPBMetadata\352\002\026Tendermint::Libs::Bitsb\006" +
-      "proto3"
+      "(\003R\004bits\022\024\n\005elems\030\002 \003(\004R\005elemsB\325\001\n\030com.t" +
+      "endermint.libs.bitsB\nTypesProtoP\001Z;githu" +
+      "b.com/tendermint/tendermint/proto/tender" +
+      "mint/libs/bits\242\002\003TLB\252\002\024Tendermint.Libs.B" +
+      "its\312\002\024Tendermint\\Libs\\Bits\342\002 Tendermint\\" +
+      "Libs\\Bits\\GPBMetadata\352\002\026Tendermint::Libs" +
+      "::Bitsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

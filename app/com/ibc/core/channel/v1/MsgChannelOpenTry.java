@@ -93,15 +93,16 @@ private static final long serialVersionUID = 0L;
   private volatile java.lang.Object previousChannelId_ = "";
   /**
    * <pre>
-   * in the case of crossing hello's, when both chains call OpenInit, we need
-   * the channel identifier of the previous channel in state INIT
+   * Deprecated: this field is unused. Crossing hello's are no longer supported in core IBC.
    * </pre>
    *
-   * <code>string previous_channel_id = 2 [json_name = "previousChannelId", (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+   * <code>string previous_channel_id = 2 [json_name = "previousChannelId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+   * @deprecated ibc.core.channel.v1.MsgChannelOpenTry.previous_channel_id is deprecated.
+   *     See ibc/core/channel/v1/tx.proto;l=82
    * @return The previousChannelId.
    */
   @java.lang.Override
-  public java.lang.String getPreviousChannelId() {
+  @java.lang.Deprecated public java.lang.String getPreviousChannelId() {
     java.lang.Object ref = previousChannelId_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
@@ -115,15 +116,16 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * in the case of crossing hello's, when both chains call OpenInit, we need
-   * the channel identifier of the previous channel in state INIT
+   * Deprecated: this field is unused. Crossing hello's are no longer supported in core IBC.
    * </pre>
    *
-   * <code>string previous_channel_id = 2 [json_name = "previousChannelId", (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+   * <code>string previous_channel_id = 2 [json_name = "previousChannelId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+   * @deprecated ibc.core.channel.v1.MsgChannelOpenTry.previous_channel_id is deprecated.
+   *     See ibc/core/channel/v1/tx.proto;l=82
    * @return The bytes for previousChannelId.
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
+  @java.lang.Deprecated public com.google.protobuf.ByteString
       getPreviousChannelIdBytes() {
     java.lang.Object ref = previousChannelId_;
     if (ref instanceof java.lang.String) {
@@ -862,14 +864,15 @@ private static final long serialVersionUID = 0L;
     private java.lang.Object previousChannelId_ = "";
     /**
      * <pre>
-     * in the case of crossing hello's, when both chains call OpenInit, we need
-     * the channel identifier of the previous channel in state INIT
+     * Deprecated: this field is unused. Crossing hello's are no longer supported in core IBC.
      * </pre>
      *
-     * <code>string previous_channel_id = 2 [json_name = "previousChannelId", (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+     * <code>string previous_channel_id = 2 [json_name = "previousChannelId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+     * @deprecated ibc.core.channel.v1.MsgChannelOpenTry.previous_channel_id is deprecated.
+     *     See ibc/core/channel/v1/tx.proto;l=82
      * @return The previousChannelId.
      */
-    public java.lang.String getPreviousChannelId() {
+    @java.lang.Deprecated public java.lang.String getPreviousChannelId() {
       java.lang.Object ref = previousChannelId_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
@@ -883,14 +886,15 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * in the case of crossing hello's, when both chains call OpenInit, we need
-     * the channel identifier of the previous channel in state INIT
+     * Deprecated: this field is unused. Crossing hello's are no longer supported in core IBC.
      * </pre>
      *
-     * <code>string previous_channel_id = 2 [json_name = "previousChannelId", (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+     * <code>string previous_channel_id = 2 [json_name = "previousChannelId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+     * @deprecated ibc.core.channel.v1.MsgChannelOpenTry.previous_channel_id is deprecated.
+     *     See ibc/core/channel/v1/tx.proto;l=82
      * @return The bytes for previousChannelId.
      */
-    public com.google.protobuf.ByteString
+    @java.lang.Deprecated public com.google.protobuf.ByteString
         getPreviousChannelIdBytes() {
       java.lang.Object ref = previousChannelId_;
       if (ref instanceof String) {
@@ -905,15 +909,16 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * in the case of crossing hello's, when both chains call OpenInit, we need
-     * the channel identifier of the previous channel in state INIT
+     * Deprecated: this field is unused. Crossing hello's are no longer supported in core IBC.
      * </pre>
      *
-     * <code>string previous_channel_id = 2 [json_name = "previousChannelId", (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+     * <code>string previous_channel_id = 2 [json_name = "previousChannelId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+     * @deprecated ibc.core.channel.v1.MsgChannelOpenTry.previous_channel_id is deprecated.
+     *     See ibc/core/channel/v1/tx.proto;l=82
      * @param value The previousChannelId to set.
      * @return This builder for chaining.
      */
-    public Builder setPreviousChannelId(
+    @java.lang.Deprecated public Builder setPreviousChannelId(
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
       previousChannelId_ = value;
@@ -923,14 +928,15 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * in the case of crossing hello's, when both chains call OpenInit, we need
-     * the channel identifier of the previous channel in state INIT
+     * Deprecated: this field is unused. Crossing hello's are no longer supported in core IBC.
      * </pre>
      *
-     * <code>string previous_channel_id = 2 [json_name = "previousChannelId", (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+     * <code>string previous_channel_id = 2 [json_name = "previousChannelId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+     * @deprecated ibc.core.channel.v1.MsgChannelOpenTry.previous_channel_id is deprecated.
+     *     See ibc/core/channel/v1/tx.proto;l=82
      * @return This builder for chaining.
      */
-    public Builder clearPreviousChannelId() {
+    @java.lang.Deprecated public Builder clearPreviousChannelId() {
       previousChannelId_ = getDefaultInstance().getPreviousChannelId();
       bitField0_ = (bitField0_ & ~0x00000002);
       onChanged();
@@ -938,15 +944,16 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * in the case of crossing hello's, when both chains call OpenInit, we need
-     * the channel identifier of the previous channel in state INIT
+     * Deprecated: this field is unused. Crossing hello's are no longer supported in core IBC.
      * </pre>
      *
-     * <code>string previous_channel_id = 2 [json_name = "previousChannelId", (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+     * <code>string previous_channel_id = 2 [json_name = "previousChannelId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_channel_id&#92;""];</code>
+     * @deprecated ibc.core.channel.v1.MsgChannelOpenTry.previous_channel_id is deprecated.
+     *     See ibc/core/channel/v1/tx.proto;l=82
      * @param value The bytes for previousChannelId to set.
      * @return This builder for chaining.
      */
-    public Builder setPreviousChannelIdBytes(
+    @java.lang.Deprecated public Builder setPreviousChannelIdBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);

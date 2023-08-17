@@ -95,13 +95,13 @@ public final class ConnectionProto {
       "\037STATE_UNINITIALIZED_UNSPECIFIED\020\000\032\021\212\235 \r" +
       "UNINITIALIZED\022\030\n\nSTATE_INIT\020\001\032\010\212\235 \004INIT\022" +
       "\036\n\rSTATE_TRYOPEN\020\002\032\013\212\235 \007TRYOPEN\022\030\n\nSTATE" +
-      "_OPEN\020\003\032\010\212\235 \004OPEN\032\004\210\243\036\000B\354\001\n\032com.ibc.core" +
-      ".connection.v1B\017ConnectionProtoP\001ZBgithu" +
-      "b.com/AssetMantle/modules/ibc/core/conne" +
-      "ction/v1;connectionv1\242\002\003ICC\252\002\026Ibc.Core.C" +
-      "onnection.V1\312\002\026Ibc\\Core\\Connection\\V1\342\002\"" +
-      "Ibc\\Core\\Connection\\V1\\GPBMetadata\352\002\031Ibc" +
-      "::Core::Connection::V1b\006proto3"
+      "_OPEN\020\003\032\010\212\235 \004OPEN\032\004\210\243\036\000B\346\001\n\032com.ibc.core" +
+      ".connection.v1B\017ConnectionProtoP\001Z<githu" +
+      "b.com/cosmos/ibc-go/v4/modules/core/03-c" +
+      "onnection/types\242\002\003ICC\252\002\026Ibc.Core.Connect" +
+      "ion.V1\312\002\026Ibc\\Core\\Connection\\V1\342\002\"Ibc\\Co" +
+      "re\\Connection\\V1\\GPBMetadata\352\002\031Ibc::Core" +
+      "::Connection::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

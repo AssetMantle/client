@@ -46,16 +46,14 @@ private static final long serialVersionUID = 0L;
           com.google.protobuf.AbstractMessage.InternalOneOfEnum {
     ASSET_I_D(1),
     CLASSIFICATION_I_D(2),
-    COIN_I_D(3),
-    DATA_I_D(4),
-    HASH_I_D(5),
-    IDENTITY_I_D(6),
-    MAINTAINER_I_D(7),
-    ORDER_I_D(8),
-    OWNABLE_I_D(9),
-    PROPERTY_I_D(10),
-    SPLIT_I_D(11),
-    STRING_I_D(12),
+    DATA_I_D(3),
+    HASH_I_D(4),
+    IDENTITY_I_D(5),
+    MAINTAINER_I_D(6),
+    ORDER_I_D(7),
+    PROPERTY_I_D(8),
+    SPLIT_I_D(9),
+    STRING_I_D(10),
     IMPL_NOT_SET(0);
     private final int value;
     private ImplCase(int value) {
@@ -75,16 +73,14 @@ private static final long serialVersionUID = 0L;
       switch (value) {
         case 1: return ASSET_I_D;
         case 2: return CLASSIFICATION_I_D;
-        case 3: return COIN_I_D;
-        case 4: return DATA_I_D;
-        case 5: return HASH_I_D;
-        case 6: return IDENTITY_I_D;
-        case 7: return MAINTAINER_I_D;
-        case 8: return ORDER_I_D;
-        case 9: return OWNABLE_I_D;
-        case 10: return PROPERTY_I_D;
-        case 11: return SPLIT_I_D;
-        case 12: return STRING_I_D;
+        case 3: return DATA_I_D;
+        case 4: return HASH_I_D;
+        case 5: return IDENTITY_I_D;
+        case 6: return MAINTAINER_I_D;
+        case 7: return ORDER_I_D;
+        case 8: return PROPERTY_I_D;
+        case 9: return SPLIT_I_D;
+        case 10: return STRING_I_D;
         case 0: return IMPL_NOT_SET;
         default: return null;
       }
@@ -162,311 +158,249 @@ private static final long serialVersionUID = 0L;
     return com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance();
   }
 
-  public static final int COIN_I_D_FIELD_NUMBER = 3;
+  public static final int DATA_I_D_FIELD_NUMBER = 3;
   /**
-   * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-   * @return Whether the coinID field is set.
-   */
-  @java.lang.Override
-  public boolean hasCoinID() {
-    return implCase_ == 3;
-  }
-  /**
-   * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-   * @return The coinID.
-   */
-  @java.lang.Override
-  public com.assetmantle.schema.ids.base.CoinID getCoinID() {
-    if (implCase_ == 3) {
-       return (com.assetmantle.schema.ids.base.CoinID) impl_;
-    }
-    return com.assetmantle.schema.ids.base.CoinID.getDefaultInstance();
-  }
-  /**
-   * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-   */
-  @java.lang.Override
-  public com.assetmantle.schema.ids.base.CoinIDOrBuilder getCoinIDOrBuilder() {
-    if (implCase_ == 3) {
-       return (com.assetmantle.schema.ids.base.CoinID) impl_;
-    }
-    return com.assetmantle.schema.ids.base.CoinID.getDefaultInstance();
-  }
-
-  public static final int DATA_I_D_FIELD_NUMBER = 4;
-  /**
-   * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+   * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
    * @return Whether the dataID field is set.
    */
   @java.lang.Override
   public boolean hasDataID() {
-    return implCase_ == 4;
+    return implCase_ == 3;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+   * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
    * @return The dataID.
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.DataID getDataID() {
-    if (implCase_ == 4) {
+    if (implCase_ == 3) {
        return (com.assetmantle.schema.ids.base.DataID) impl_;
     }
     return com.assetmantle.schema.ids.base.DataID.getDefaultInstance();
   }
   /**
-   * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+   * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.DataIDOrBuilder getDataIDOrBuilder() {
-    if (implCase_ == 4) {
+    if (implCase_ == 3) {
        return (com.assetmantle.schema.ids.base.DataID) impl_;
     }
     return com.assetmantle.schema.ids.base.DataID.getDefaultInstance();
   }
 
-  public static final int HASH_I_D_FIELD_NUMBER = 5;
+  public static final int HASH_I_D_FIELD_NUMBER = 4;
   /**
-   * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+   * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
    * @return Whether the hashID field is set.
    */
   @java.lang.Override
   public boolean hasHashID() {
-    return implCase_ == 5;
+    return implCase_ == 4;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+   * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
    * @return The hashID.
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.HashID getHashID() {
-    if (implCase_ == 5) {
+    if (implCase_ == 4) {
        return (com.assetmantle.schema.ids.base.HashID) impl_;
     }
     return com.assetmantle.schema.ids.base.HashID.getDefaultInstance();
   }
   /**
-   * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+   * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.HashIDOrBuilder getHashIDOrBuilder() {
-    if (implCase_ == 5) {
+    if (implCase_ == 4) {
        return (com.assetmantle.schema.ids.base.HashID) impl_;
     }
     return com.assetmantle.schema.ids.base.HashID.getDefaultInstance();
   }
 
-  public static final int IDENTITY_I_D_FIELD_NUMBER = 6;
+  public static final int IDENTITY_I_D_FIELD_NUMBER = 5;
   /**
-   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
    * @return Whether the identityID field is set.
    */
   @java.lang.Override
   public boolean hasIdentityID() {
-    return implCase_ == 6;
+    return implCase_ == 5;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
    * @return The identityID.
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.IdentityID getIdentityID() {
-    if (implCase_ == 6) {
+    if (implCase_ == 5) {
        return (com.assetmantle.schema.ids.base.IdentityID) impl_;
     }
     return com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance();
   }
   /**
-   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.IdentityIDOrBuilder getIdentityIDOrBuilder() {
-    if (implCase_ == 6) {
+    if (implCase_ == 5) {
        return (com.assetmantle.schema.ids.base.IdentityID) impl_;
     }
     return com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance();
   }
 
-  public static final int MAINTAINER_I_D_FIELD_NUMBER = 7;
+  public static final int MAINTAINER_I_D_FIELD_NUMBER = 6;
   /**
-   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
    * @return Whether the maintainerID field is set.
    */
   @java.lang.Override
   public boolean hasMaintainerID() {
-    return implCase_ == 7;
+    return implCase_ == 6;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
    * @return The maintainerID.
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.MaintainerID getMaintainerID() {
-    if (implCase_ == 7) {
+    if (implCase_ == 6) {
        return (com.assetmantle.schema.ids.base.MaintainerID) impl_;
     }
     return com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance();
   }
   /**
-   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.MaintainerIDOrBuilder getMaintainerIDOrBuilder() {
-    if (implCase_ == 7) {
+    if (implCase_ == 6) {
        return (com.assetmantle.schema.ids.base.MaintainerID) impl_;
     }
     return com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance();
   }
 
-  public static final int ORDER_I_D_FIELD_NUMBER = 8;
+  public static final int ORDER_I_D_FIELD_NUMBER = 7;
   /**
-   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
    * @return Whether the orderID field is set.
    */
   @java.lang.Override
   public boolean hasOrderID() {
-    return implCase_ == 8;
+    return implCase_ == 7;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
    * @return The orderID.
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.OrderID getOrderID() {
-    if (implCase_ == 8) {
+    if (implCase_ == 7) {
        return (com.assetmantle.schema.ids.base.OrderID) impl_;
     }
     return com.assetmantle.schema.ids.base.OrderID.getDefaultInstance();
   }
   /**
-   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.OrderIDOrBuilder getOrderIDOrBuilder() {
-    if (implCase_ == 8) {
+    if (implCase_ == 7) {
        return (com.assetmantle.schema.ids.base.OrderID) impl_;
     }
     return com.assetmantle.schema.ids.base.OrderID.getDefaultInstance();
   }
 
-  public static final int OWNABLE_I_D_FIELD_NUMBER = 9;
+  public static final int PROPERTY_I_D_FIELD_NUMBER = 8;
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-   * @return Whether the ownableID field is set.
-   */
-  @java.lang.Override
-  public boolean hasOwnableID() {
-    return implCase_ == 9;
-  }
-  /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-   * @return The ownableID.
-   */
-  @java.lang.Override
-  public com.assetmantle.schema.ids.base.AnyOwnableID getOwnableID() {
-    if (implCase_ == 9) {
-       return (com.assetmantle.schema.ids.base.AnyOwnableID) impl_;
-    }
-    return com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance();
-  }
-  /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-   */
-  @java.lang.Override
-  public com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder getOwnableIDOrBuilder() {
-    if (implCase_ == 9) {
-       return (com.assetmantle.schema.ids.base.AnyOwnableID) impl_;
-    }
-    return com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance();
-  }
-
-  public static final int PROPERTY_I_D_FIELD_NUMBER = 10;
-  /**
-   * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+   * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
    * @return Whether the propertyID field is set.
    */
   @java.lang.Override
   public boolean hasPropertyID() {
-    return implCase_ == 10;
+    return implCase_ == 8;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+   * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
    * @return The propertyID.
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.PropertyID getPropertyID() {
-    if (implCase_ == 10) {
+    if (implCase_ == 8) {
        return (com.assetmantle.schema.ids.base.PropertyID) impl_;
     }
     return com.assetmantle.schema.ids.base.PropertyID.getDefaultInstance();
   }
   /**
-   * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+   * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.PropertyIDOrBuilder getPropertyIDOrBuilder() {
-    if (implCase_ == 10) {
+    if (implCase_ == 8) {
        return (com.assetmantle.schema.ids.base.PropertyID) impl_;
     }
     return com.assetmantle.schema.ids.base.PropertyID.getDefaultInstance();
   }
 
-  public static final int SPLIT_I_D_FIELD_NUMBER = 11;
+  public static final int SPLIT_I_D_FIELD_NUMBER = 9;
   /**
-   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
    * @return Whether the splitID field is set.
    */
   @java.lang.Override
   public boolean hasSplitID() {
-    return implCase_ == 11;
+    return implCase_ == 9;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
    * @return The splitID.
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.SplitID getSplitID() {
-    if (implCase_ == 11) {
+    if (implCase_ == 9) {
        return (com.assetmantle.schema.ids.base.SplitID) impl_;
     }
     return com.assetmantle.schema.ids.base.SplitID.getDefaultInstance();
   }
   /**
-   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.SplitIDOrBuilder getSplitIDOrBuilder() {
-    if (implCase_ == 11) {
+    if (implCase_ == 9) {
        return (com.assetmantle.schema.ids.base.SplitID) impl_;
     }
     return com.assetmantle.schema.ids.base.SplitID.getDefaultInstance();
   }
 
-  public static final int STRING_I_D_FIELD_NUMBER = 12;
+  public static final int STRING_I_D_FIELD_NUMBER = 10;
   /**
-   * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+   * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
    * @return Whether the stringID field is set.
    */
   @java.lang.Override
   public boolean hasStringID() {
-    return implCase_ == 12;
+    return implCase_ == 10;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+   * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
    * @return The stringID.
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.StringID getStringID() {
-    if (implCase_ == 12) {
+    if (implCase_ == 10) {
        return (com.assetmantle.schema.ids.base.StringID) impl_;
     }
     return com.assetmantle.schema.ids.base.StringID.getDefaultInstance();
   }
   /**
-   * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+   * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.StringIDOrBuilder getStringIDOrBuilder() {
-    if (implCase_ == 12) {
+    if (implCase_ == 10) {
        return (com.assetmantle.schema.ids.base.StringID) impl_;
     }
     return com.assetmantle.schema.ids.base.StringID.getDefaultInstance();
@@ -493,34 +427,28 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(2, (com.assetmantle.schema.ids.base.ClassificationID) impl_);
     }
     if (implCase_ == 3) {
-      output.writeMessage(3, (com.assetmantle.schema.ids.base.CoinID) impl_);
+      output.writeMessage(3, (com.assetmantle.schema.ids.base.DataID) impl_);
     }
     if (implCase_ == 4) {
-      output.writeMessage(4, (com.assetmantle.schema.ids.base.DataID) impl_);
+      output.writeMessage(4, (com.assetmantle.schema.ids.base.HashID) impl_);
     }
     if (implCase_ == 5) {
-      output.writeMessage(5, (com.assetmantle.schema.ids.base.HashID) impl_);
+      output.writeMessage(5, (com.assetmantle.schema.ids.base.IdentityID) impl_);
     }
     if (implCase_ == 6) {
-      output.writeMessage(6, (com.assetmantle.schema.ids.base.IdentityID) impl_);
+      output.writeMessage(6, (com.assetmantle.schema.ids.base.MaintainerID) impl_);
     }
     if (implCase_ == 7) {
-      output.writeMessage(7, (com.assetmantle.schema.ids.base.MaintainerID) impl_);
+      output.writeMessage(7, (com.assetmantle.schema.ids.base.OrderID) impl_);
     }
     if (implCase_ == 8) {
-      output.writeMessage(8, (com.assetmantle.schema.ids.base.OrderID) impl_);
+      output.writeMessage(8, (com.assetmantle.schema.ids.base.PropertyID) impl_);
     }
     if (implCase_ == 9) {
-      output.writeMessage(9, (com.assetmantle.schema.ids.base.AnyOwnableID) impl_);
+      output.writeMessage(9, (com.assetmantle.schema.ids.base.SplitID) impl_);
     }
     if (implCase_ == 10) {
-      output.writeMessage(10, (com.assetmantle.schema.ids.base.PropertyID) impl_);
-    }
-    if (implCase_ == 11) {
-      output.writeMessage(11, (com.assetmantle.schema.ids.base.SplitID) impl_);
-    }
-    if (implCase_ == 12) {
-      output.writeMessage(12, (com.assetmantle.schema.ids.base.StringID) impl_);
+      output.writeMessage(10, (com.assetmantle.schema.ids.base.StringID) impl_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -541,43 +469,35 @@ private static final long serialVersionUID = 0L;
     }
     if (implCase_ == 3) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(3, (com.assetmantle.schema.ids.base.CoinID) impl_);
+        .computeMessageSize(3, (com.assetmantle.schema.ids.base.DataID) impl_);
     }
     if (implCase_ == 4) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, (com.assetmantle.schema.ids.base.DataID) impl_);
+        .computeMessageSize(4, (com.assetmantle.schema.ids.base.HashID) impl_);
     }
     if (implCase_ == 5) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, (com.assetmantle.schema.ids.base.HashID) impl_);
+        .computeMessageSize(5, (com.assetmantle.schema.ids.base.IdentityID) impl_);
     }
     if (implCase_ == 6) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, (com.assetmantle.schema.ids.base.IdentityID) impl_);
+        .computeMessageSize(6, (com.assetmantle.schema.ids.base.MaintainerID) impl_);
     }
     if (implCase_ == 7) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, (com.assetmantle.schema.ids.base.MaintainerID) impl_);
+        .computeMessageSize(7, (com.assetmantle.schema.ids.base.OrderID) impl_);
     }
     if (implCase_ == 8) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(8, (com.assetmantle.schema.ids.base.OrderID) impl_);
+        .computeMessageSize(8, (com.assetmantle.schema.ids.base.PropertyID) impl_);
     }
     if (implCase_ == 9) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(9, (com.assetmantle.schema.ids.base.AnyOwnableID) impl_);
+        .computeMessageSize(9, (com.assetmantle.schema.ids.base.SplitID) impl_);
     }
     if (implCase_ == 10) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(10, (com.assetmantle.schema.ids.base.PropertyID) impl_);
-    }
-    if (implCase_ == 11) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(11, (com.assetmantle.schema.ids.base.SplitID) impl_);
-    }
-    if (implCase_ == 12) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(12, (com.assetmantle.schema.ids.base.StringID) impl_);
+        .computeMessageSize(10, (com.assetmantle.schema.ids.base.StringID) impl_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -605,42 +525,34 @@ private static final long serialVersionUID = 0L;
             .equals(other.getClassificationID())) return false;
         break;
       case 3:
-        if (!getCoinID()
-            .equals(other.getCoinID())) return false;
-        break;
-      case 4:
         if (!getDataID()
             .equals(other.getDataID())) return false;
         break;
-      case 5:
+      case 4:
         if (!getHashID()
             .equals(other.getHashID())) return false;
         break;
-      case 6:
+      case 5:
         if (!getIdentityID()
             .equals(other.getIdentityID())) return false;
         break;
-      case 7:
+      case 6:
         if (!getMaintainerID()
             .equals(other.getMaintainerID())) return false;
         break;
-      case 8:
+      case 7:
         if (!getOrderID()
             .equals(other.getOrderID())) return false;
         break;
-      case 9:
-        if (!getOwnableID()
-            .equals(other.getOwnableID())) return false;
-        break;
-      case 10:
+      case 8:
         if (!getPropertyID()
             .equals(other.getPropertyID())) return false;
         break;
-      case 11:
+      case 9:
         if (!getSplitID()
             .equals(other.getSplitID())) return false;
         break;
-      case 12:
+      case 10:
         if (!getStringID()
             .equals(other.getStringID())) return false;
         break;
@@ -668,42 +580,34 @@ private static final long serialVersionUID = 0L;
         hash = (53 * hash) + getClassificationID().hashCode();
         break;
       case 3:
-        hash = (37 * hash) + COIN_I_D_FIELD_NUMBER;
-        hash = (53 * hash) + getCoinID().hashCode();
-        break;
-      case 4:
         hash = (37 * hash) + DATA_I_D_FIELD_NUMBER;
         hash = (53 * hash) + getDataID().hashCode();
         break;
-      case 5:
+      case 4:
         hash = (37 * hash) + HASH_I_D_FIELD_NUMBER;
         hash = (53 * hash) + getHashID().hashCode();
         break;
-      case 6:
+      case 5:
         hash = (37 * hash) + IDENTITY_I_D_FIELD_NUMBER;
         hash = (53 * hash) + getIdentityID().hashCode();
         break;
-      case 7:
+      case 6:
         hash = (37 * hash) + MAINTAINER_I_D_FIELD_NUMBER;
         hash = (53 * hash) + getMaintainerID().hashCode();
         break;
-      case 8:
+      case 7:
         hash = (37 * hash) + ORDER_I_D_FIELD_NUMBER;
         hash = (53 * hash) + getOrderID().hashCode();
         break;
-      case 9:
-        hash = (37 * hash) + OWNABLE_I_D_FIELD_NUMBER;
-        hash = (53 * hash) + getOwnableID().hashCode();
-        break;
-      case 10:
+      case 8:
         hash = (37 * hash) + PROPERTY_I_D_FIELD_NUMBER;
         hash = (53 * hash) + getPropertyID().hashCode();
         break;
-      case 11:
+      case 9:
         hash = (37 * hash) + SPLIT_I_D_FIELD_NUMBER;
         hash = (53 * hash) + getSplitID().hashCode();
         break;
-      case 12:
+      case 10:
         hash = (37 * hash) + STRING_I_D_FIELD_NUMBER;
         hash = (53 * hash) + getStringID().hashCode();
         break;
@@ -845,9 +749,6 @@ private static final long serialVersionUID = 0L;
       if (classificationIDBuilder_ != null) {
         classificationIDBuilder_.clear();
       }
-      if (coinIDBuilder_ != null) {
-        coinIDBuilder_.clear();
-      }
       if (dataIDBuilder_ != null) {
         dataIDBuilder_.clear();
       }
@@ -862,9 +763,6 @@ private static final long serialVersionUID = 0L;
       }
       if (orderIDBuilder_ != null) {
         orderIDBuilder_.clear();
-      }
-      if (ownableIDBuilder_ != null) {
-        ownableIDBuilder_.clear();
       }
       if (propertyIDBuilder_ != null) {
         propertyIDBuilder_.clear();
@@ -925,42 +823,34 @@ private static final long serialVersionUID = 0L;
         result.impl_ = classificationIDBuilder_.build();
       }
       if (implCase_ == 3 &&
-          coinIDBuilder_ != null) {
-        result.impl_ = coinIDBuilder_.build();
-      }
-      if (implCase_ == 4 &&
           dataIDBuilder_ != null) {
         result.impl_ = dataIDBuilder_.build();
       }
-      if (implCase_ == 5 &&
+      if (implCase_ == 4 &&
           hashIDBuilder_ != null) {
         result.impl_ = hashIDBuilder_.build();
       }
-      if (implCase_ == 6 &&
+      if (implCase_ == 5 &&
           identityIDBuilder_ != null) {
         result.impl_ = identityIDBuilder_.build();
       }
-      if (implCase_ == 7 &&
+      if (implCase_ == 6 &&
           maintainerIDBuilder_ != null) {
         result.impl_ = maintainerIDBuilder_.build();
       }
-      if (implCase_ == 8 &&
+      if (implCase_ == 7 &&
           orderIDBuilder_ != null) {
         result.impl_ = orderIDBuilder_.build();
       }
-      if (implCase_ == 9 &&
-          ownableIDBuilder_ != null) {
-        result.impl_ = ownableIDBuilder_.build();
-      }
-      if (implCase_ == 10 &&
+      if (implCase_ == 8 &&
           propertyIDBuilder_ != null) {
         result.impl_ = propertyIDBuilder_.build();
       }
-      if (implCase_ == 11 &&
+      if (implCase_ == 9 &&
           splitIDBuilder_ != null) {
         result.impl_ = splitIDBuilder_.build();
       }
-      if (implCase_ == 12 &&
+      if (implCase_ == 10 &&
           stringIDBuilder_ != null) {
         result.impl_ = stringIDBuilder_.build();
       }
@@ -1019,10 +909,6 @@ private static final long serialVersionUID = 0L;
           mergeClassificationID(other.getClassificationID());
           break;
         }
-        case COIN_I_D: {
-          mergeCoinID(other.getCoinID());
-          break;
-        }
         case DATA_I_D: {
           mergeDataID(other.getDataID());
           break;
@@ -1041,10 +927,6 @@ private static final long serialVersionUID = 0L;
         }
         case ORDER_I_D: {
           mergeOrderID(other.getOrderID());
-          break;
-        }
-        case OWNABLE_I_D: {
-          mergeOwnableID(other.getOwnableID());
           break;
         }
         case PROPERTY_I_D: {
@@ -1105,74 +987,60 @@ private static final long serialVersionUID = 0L;
             } // case 18
             case 26: {
               input.readMessage(
-                  getCoinIDFieldBuilder().getBuilder(),
+                  getDataIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               implCase_ = 3;
               break;
             } // case 26
             case 34: {
               input.readMessage(
-                  getDataIDFieldBuilder().getBuilder(),
+                  getHashIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               implCase_ = 4;
               break;
             } // case 34
             case 42: {
               input.readMessage(
-                  getHashIDFieldBuilder().getBuilder(),
+                  getIdentityIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               implCase_ = 5;
               break;
             } // case 42
             case 50: {
               input.readMessage(
-                  getIdentityIDFieldBuilder().getBuilder(),
+                  getMaintainerIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               implCase_ = 6;
               break;
             } // case 50
             case 58: {
               input.readMessage(
-                  getMaintainerIDFieldBuilder().getBuilder(),
+                  getOrderIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               implCase_ = 7;
               break;
             } // case 58
             case 66: {
               input.readMessage(
-                  getOrderIDFieldBuilder().getBuilder(),
+                  getPropertyIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               implCase_ = 8;
               break;
             } // case 66
             case 74: {
               input.readMessage(
-                  getOwnableIDFieldBuilder().getBuilder(),
+                  getSplitIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               implCase_ = 9;
               break;
             } // case 74
             case 82: {
               input.readMessage(
-                  getPropertyIDFieldBuilder().getBuilder(),
+                  getStringIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               implCase_ = 10;
               break;
             } // case 82
-            case 90: {
-              input.readMessage(
-                  getSplitIDFieldBuilder().getBuilder(),
-                  extensionRegistry);
-              implCase_ = 11;
-              break;
-            } // case 90
-            case 98: {
-              input.readMessage(
-                  getStringIDFieldBuilder().getBuilder(),
-                  extensionRegistry);
-              implCase_ = 12;
-              break;
-            } // case 98
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1490,177 +1358,35 @@ private static final long serialVersionUID = 0L;
     }
 
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.CoinID, com.assetmantle.schema.ids.base.CoinID.Builder, com.assetmantle.schema.ids.base.CoinIDOrBuilder> coinIDBuilder_;
-    /**
-     * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-     * @return Whether the coinID field is set.
-     */
-    @java.lang.Override
-    public boolean hasCoinID() {
-      return implCase_ == 3;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-     * @return The coinID.
-     */
-    @java.lang.Override
-    public com.assetmantle.schema.ids.base.CoinID getCoinID() {
-      if (coinIDBuilder_ == null) {
-        if (implCase_ == 3) {
-          return (com.assetmantle.schema.ids.base.CoinID) impl_;
-        }
-        return com.assetmantle.schema.ids.base.CoinID.getDefaultInstance();
-      } else {
-        if (implCase_ == 3) {
-          return coinIDBuilder_.getMessage();
-        }
-        return com.assetmantle.schema.ids.base.CoinID.getDefaultInstance();
-      }
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-     */
-    public Builder setCoinID(com.assetmantle.schema.ids.base.CoinID value) {
-      if (coinIDBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        impl_ = value;
-        onChanged();
-      } else {
-        coinIDBuilder_.setMessage(value);
-      }
-      implCase_ = 3;
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-     */
-    public Builder setCoinID(
-        com.assetmantle.schema.ids.base.CoinID.Builder builderForValue) {
-      if (coinIDBuilder_ == null) {
-        impl_ = builderForValue.build();
-        onChanged();
-      } else {
-        coinIDBuilder_.setMessage(builderForValue.build());
-      }
-      implCase_ = 3;
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-     */
-    public Builder mergeCoinID(com.assetmantle.schema.ids.base.CoinID value) {
-      if (coinIDBuilder_ == null) {
-        if (implCase_ == 3 &&
-            impl_ != com.assetmantle.schema.ids.base.CoinID.getDefaultInstance()) {
-          impl_ = com.assetmantle.schema.ids.base.CoinID.newBuilder((com.assetmantle.schema.ids.base.CoinID) impl_)
-              .mergeFrom(value).buildPartial();
-        } else {
-          impl_ = value;
-        }
-        onChanged();
-      } else {
-        if (implCase_ == 3) {
-          coinIDBuilder_.mergeFrom(value);
-        } else {
-          coinIDBuilder_.setMessage(value);
-        }
-      }
-      implCase_ = 3;
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-     */
-    public Builder clearCoinID() {
-      if (coinIDBuilder_ == null) {
-        if (implCase_ == 3) {
-          implCase_ = 0;
-          impl_ = null;
-          onChanged();
-        }
-      } else {
-        if (implCase_ == 3) {
-          implCase_ = 0;
-          impl_ = null;
-        }
-        coinIDBuilder_.clear();
-      }
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-     */
-    public com.assetmantle.schema.ids.base.CoinID.Builder getCoinIDBuilder() {
-      return getCoinIDFieldBuilder().getBuilder();
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-     */
-    @java.lang.Override
-    public com.assetmantle.schema.ids.base.CoinIDOrBuilder getCoinIDOrBuilder() {
-      if ((implCase_ == 3) && (coinIDBuilder_ != null)) {
-        return coinIDBuilder_.getMessageOrBuilder();
-      } else {
-        if (implCase_ == 3) {
-          return (com.assetmantle.schema.ids.base.CoinID) impl_;
-        }
-        return com.assetmantle.schema.ids.base.CoinID.getDefaultInstance();
-      }
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.CoinID coin_i_d = 3 [json_name = "coinID"];</code>
-     */
-    private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.CoinID, com.assetmantle.schema.ids.base.CoinID.Builder, com.assetmantle.schema.ids.base.CoinIDOrBuilder> 
-        getCoinIDFieldBuilder() {
-      if (coinIDBuilder_ == null) {
-        if (!(implCase_ == 3)) {
-          impl_ = com.assetmantle.schema.ids.base.CoinID.getDefaultInstance();
-        }
-        coinIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.assetmantle.schema.ids.base.CoinID, com.assetmantle.schema.ids.base.CoinID.Builder, com.assetmantle.schema.ids.base.CoinIDOrBuilder>(
-                (com.assetmantle.schema.ids.base.CoinID) impl_,
-                getParentForChildren(),
-                isClean());
-        impl_ = null;
-      }
-      implCase_ = 3;
-      onChanged();
-      return coinIDBuilder_;
-    }
-
-    private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.DataID, com.assetmantle.schema.ids.base.DataID.Builder, com.assetmantle.schema.ids.base.DataIDOrBuilder> dataIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
      * @return Whether the dataID field is set.
      */
     @java.lang.Override
     public boolean hasDataID() {
-      return implCase_ == 4;
+      return implCase_ == 3;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
      * @return The dataID.
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.DataID getDataID() {
       if (dataIDBuilder_ == null) {
-        if (implCase_ == 4) {
+        if (implCase_ == 3) {
           return (com.assetmantle.schema.ids.base.DataID) impl_;
         }
         return com.assetmantle.schema.ids.base.DataID.getDefaultInstance();
       } else {
-        if (implCase_ == 4) {
+        if (implCase_ == 3) {
           return dataIDBuilder_.getMessage();
         }
         return com.assetmantle.schema.ids.base.DataID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
      */
     public Builder setDataID(com.assetmantle.schema.ids.base.DataID value) {
       if (dataIDBuilder_ == null) {
@@ -1672,11 +1398,11 @@ private static final long serialVersionUID = 0L;
       } else {
         dataIDBuilder_.setMessage(value);
       }
-      implCase_ = 4;
+      implCase_ = 3;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
      */
     public Builder setDataID(
         com.assetmantle.schema.ids.base.DataID.Builder builderForValue) {
@@ -1686,15 +1412,15 @@ private static final long serialVersionUID = 0L;
       } else {
         dataIDBuilder_.setMessage(builderForValue.build());
       }
-      implCase_ = 4;
+      implCase_ = 3;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
      */
     public Builder mergeDataID(com.assetmantle.schema.ids.base.DataID value) {
       if (dataIDBuilder_ == null) {
-        if (implCase_ == 4 &&
+        if (implCase_ == 3 &&
             impl_ != com.assetmantle.schema.ids.base.DataID.getDefaultInstance()) {
           impl_ = com.assetmantle.schema.ids.base.DataID.newBuilder((com.assetmantle.schema.ids.base.DataID) impl_)
               .mergeFrom(value).buildPartial();
@@ -1703,27 +1429,27 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       } else {
-        if (implCase_ == 4) {
+        if (implCase_ == 3) {
           dataIDBuilder_.mergeFrom(value);
         } else {
           dataIDBuilder_.setMessage(value);
         }
       }
-      implCase_ = 4;
+      implCase_ = 3;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
      */
     public Builder clearDataID() {
       if (dataIDBuilder_ == null) {
-        if (implCase_ == 4) {
+        if (implCase_ == 3) {
           implCase_ = 0;
           impl_ = null;
           onChanged();
         }
       } else {
-        if (implCase_ == 4) {
+        if (implCase_ == 3) {
           implCase_ = 0;
           impl_ = null;
         }
@@ -1732,33 +1458,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
      */
     public com.assetmantle.schema.ids.base.DataID.Builder getDataIDBuilder() {
       return getDataIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.DataIDOrBuilder getDataIDOrBuilder() {
-      if ((implCase_ == 4) && (dataIDBuilder_ != null)) {
+      if ((implCase_ == 3) && (dataIDBuilder_ != null)) {
         return dataIDBuilder_.getMessageOrBuilder();
       } else {
-        if (implCase_ == 4) {
+        if (implCase_ == 3) {
           return (com.assetmantle.schema.ids.base.DataID) impl_;
         }
         return com.assetmantle.schema.ids.base.DataID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 4 [json_name = "dataID"];</code>
+     * <code>.assetmantle.schema.ids.base.DataID data_i_d = 3 [json_name = "dataID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.DataID, com.assetmantle.schema.ids.base.DataID.Builder, com.assetmantle.schema.ids.base.DataIDOrBuilder> 
         getDataIDFieldBuilder() {
       if (dataIDBuilder_ == null) {
-        if (!(implCase_ == 4)) {
+        if (!(implCase_ == 3)) {
           impl_ = com.assetmantle.schema.ids.base.DataID.getDefaultInstance();
         }
         dataIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1768,7 +1494,7 @@ private static final long serialVersionUID = 0L;
                 isClean());
         impl_ = null;
       }
-      implCase_ = 4;
+      implCase_ = 3;
       onChanged();
       return dataIDBuilder_;
     }
@@ -1776,33 +1502,33 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.HashID, com.assetmantle.schema.ids.base.HashID.Builder, com.assetmantle.schema.ids.base.HashIDOrBuilder> hashIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
      * @return Whether the hashID field is set.
      */
     @java.lang.Override
     public boolean hasHashID() {
-      return implCase_ == 5;
+      return implCase_ == 4;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
      * @return The hashID.
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.HashID getHashID() {
       if (hashIDBuilder_ == null) {
-        if (implCase_ == 5) {
+        if (implCase_ == 4) {
           return (com.assetmantle.schema.ids.base.HashID) impl_;
         }
         return com.assetmantle.schema.ids.base.HashID.getDefaultInstance();
       } else {
-        if (implCase_ == 5) {
+        if (implCase_ == 4) {
           return hashIDBuilder_.getMessage();
         }
         return com.assetmantle.schema.ids.base.HashID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
      */
     public Builder setHashID(com.assetmantle.schema.ids.base.HashID value) {
       if (hashIDBuilder_ == null) {
@@ -1814,11 +1540,11 @@ private static final long serialVersionUID = 0L;
       } else {
         hashIDBuilder_.setMessage(value);
       }
-      implCase_ = 5;
+      implCase_ = 4;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
      */
     public Builder setHashID(
         com.assetmantle.schema.ids.base.HashID.Builder builderForValue) {
@@ -1828,15 +1554,15 @@ private static final long serialVersionUID = 0L;
       } else {
         hashIDBuilder_.setMessage(builderForValue.build());
       }
-      implCase_ = 5;
+      implCase_ = 4;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
      */
     public Builder mergeHashID(com.assetmantle.schema.ids.base.HashID value) {
       if (hashIDBuilder_ == null) {
-        if (implCase_ == 5 &&
+        if (implCase_ == 4 &&
             impl_ != com.assetmantle.schema.ids.base.HashID.getDefaultInstance()) {
           impl_ = com.assetmantle.schema.ids.base.HashID.newBuilder((com.assetmantle.schema.ids.base.HashID) impl_)
               .mergeFrom(value).buildPartial();
@@ -1845,27 +1571,27 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       } else {
-        if (implCase_ == 5) {
+        if (implCase_ == 4) {
           hashIDBuilder_.mergeFrom(value);
         } else {
           hashIDBuilder_.setMessage(value);
         }
       }
-      implCase_ = 5;
+      implCase_ = 4;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
      */
     public Builder clearHashID() {
       if (hashIDBuilder_ == null) {
-        if (implCase_ == 5) {
+        if (implCase_ == 4) {
           implCase_ = 0;
           impl_ = null;
           onChanged();
         }
       } else {
-        if (implCase_ == 5) {
+        if (implCase_ == 4) {
           implCase_ = 0;
           impl_ = null;
         }
@@ -1874,33 +1600,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
      */
     public com.assetmantle.schema.ids.base.HashID.Builder getHashIDBuilder() {
       return getHashIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.HashIDOrBuilder getHashIDOrBuilder() {
-      if ((implCase_ == 5) && (hashIDBuilder_ != null)) {
+      if ((implCase_ == 4) && (hashIDBuilder_ != null)) {
         return hashIDBuilder_.getMessageOrBuilder();
       } else {
-        if (implCase_ == 5) {
+        if (implCase_ == 4) {
           return (com.assetmantle.schema.ids.base.HashID) impl_;
         }
         return com.assetmantle.schema.ids.base.HashID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 5 [json_name = "hashID"];</code>
+     * <code>.assetmantle.schema.ids.base.HashID hash_i_d = 4 [json_name = "hashID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.HashID, com.assetmantle.schema.ids.base.HashID.Builder, com.assetmantle.schema.ids.base.HashIDOrBuilder> 
         getHashIDFieldBuilder() {
       if (hashIDBuilder_ == null) {
-        if (!(implCase_ == 5)) {
+        if (!(implCase_ == 4)) {
           impl_ = com.assetmantle.schema.ids.base.HashID.getDefaultInstance();
         }
         hashIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1910,7 +1636,7 @@ private static final long serialVersionUID = 0L;
                 isClean());
         impl_ = null;
       }
-      implCase_ = 5;
+      implCase_ = 4;
       onChanged();
       return hashIDBuilder_;
     }
@@ -1918,33 +1644,33 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.IdentityID, com.assetmantle.schema.ids.base.IdentityID.Builder, com.assetmantle.schema.ids.base.IdentityIDOrBuilder> identityIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
      * @return Whether the identityID field is set.
      */
     @java.lang.Override
     public boolean hasIdentityID() {
-      return implCase_ == 6;
+      return implCase_ == 5;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
      * @return The identityID.
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.IdentityID getIdentityID() {
       if (identityIDBuilder_ == null) {
-        if (implCase_ == 6) {
+        if (implCase_ == 5) {
           return (com.assetmantle.schema.ids.base.IdentityID) impl_;
         }
         return com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance();
       } else {
-        if (implCase_ == 6) {
+        if (implCase_ == 5) {
           return identityIDBuilder_.getMessage();
         }
         return com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
      */
     public Builder setIdentityID(com.assetmantle.schema.ids.base.IdentityID value) {
       if (identityIDBuilder_ == null) {
@@ -1956,11 +1682,11 @@ private static final long serialVersionUID = 0L;
       } else {
         identityIDBuilder_.setMessage(value);
       }
-      implCase_ = 6;
+      implCase_ = 5;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
      */
     public Builder setIdentityID(
         com.assetmantle.schema.ids.base.IdentityID.Builder builderForValue) {
@@ -1970,15 +1696,15 @@ private static final long serialVersionUID = 0L;
       } else {
         identityIDBuilder_.setMessage(builderForValue.build());
       }
-      implCase_ = 6;
+      implCase_ = 5;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
      */
     public Builder mergeIdentityID(com.assetmantle.schema.ids.base.IdentityID value) {
       if (identityIDBuilder_ == null) {
-        if (implCase_ == 6 &&
+        if (implCase_ == 5 &&
             impl_ != com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance()) {
           impl_ = com.assetmantle.schema.ids.base.IdentityID.newBuilder((com.assetmantle.schema.ids.base.IdentityID) impl_)
               .mergeFrom(value).buildPartial();
@@ -1987,27 +1713,27 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       } else {
-        if (implCase_ == 6) {
+        if (implCase_ == 5) {
           identityIDBuilder_.mergeFrom(value);
         } else {
           identityIDBuilder_.setMessage(value);
         }
       }
-      implCase_ = 6;
+      implCase_ = 5;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
      */
     public Builder clearIdentityID() {
       if (identityIDBuilder_ == null) {
-        if (implCase_ == 6) {
+        if (implCase_ == 5) {
           implCase_ = 0;
           impl_ = null;
           onChanged();
         }
       } else {
-        if (implCase_ == 6) {
+        if (implCase_ == 5) {
           implCase_ = 0;
           impl_ = null;
         }
@@ -2016,33 +1742,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
      */
     public com.assetmantle.schema.ids.base.IdentityID.Builder getIdentityIDBuilder() {
       return getIdentityIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.IdentityIDOrBuilder getIdentityIDOrBuilder() {
-      if ((implCase_ == 6) && (identityIDBuilder_ != null)) {
+      if ((implCase_ == 5) && (identityIDBuilder_ != null)) {
         return identityIDBuilder_.getMessageOrBuilder();
       } else {
-        if (implCase_ == 6) {
+        if (implCase_ == 5) {
           return (com.assetmantle.schema.ids.base.IdentityID) impl_;
         }
         return com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 6 [json_name = "identityID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 5 [json_name = "identityID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.IdentityID, com.assetmantle.schema.ids.base.IdentityID.Builder, com.assetmantle.schema.ids.base.IdentityIDOrBuilder> 
         getIdentityIDFieldBuilder() {
       if (identityIDBuilder_ == null) {
-        if (!(implCase_ == 6)) {
+        if (!(implCase_ == 5)) {
           impl_ = com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance();
         }
         identityIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -2052,7 +1778,7 @@ private static final long serialVersionUID = 0L;
                 isClean());
         impl_ = null;
       }
-      implCase_ = 6;
+      implCase_ = 5;
       onChanged();
       return identityIDBuilder_;
     }
@@ -2060,33 +1786,33 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.MaintainerID, com.assetmantle.schema.ids.base.MaintainerID.Builder, com.assetmantle.schema.ids.base.MaintainerIDOrBuilder> maintainerIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
      * @return Whether the maintainerID field is set.
      */
     @java.lang.Override
     public boolean hasMaintainerID() {
-      return implCase_ == 7;
+      return implCase_ == 6;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
      * @return The maintainerID.
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.MaintainerID getMaintainerID() {
       if (maintainerIDBuilder_ == null) {
-        if (implCase_ == 7) {
+        if (implCase_ == 6) {
           return (com.assetmantle.schema.ids.base.MaintainerID) impl_;
         }
         return com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance();
       } else {
-        if (implCase_ == 7) {
+        if (implCase_ == 6) {
           return maintainerIDBuilder_.getMessage();
         }
         return com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
      */
     public Builder setMaintainerID(com.assetmantle.schema.ids.base.MaintainerID value) {
       if (maintainerIDBuilder_ == null) {
@@ -2098,11 +1824,11 @@ private static final long serialVersionUID = 0L;
       } else {
         maintainerIDBuilder_.setMessage(value);
       }
-      implCase_ = 7;
+      implCase_ = 6;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
      */
     public Builder setMaintainerID(
         com.assetmantle.schema.ids.base.MaintainerID.Builder builderForValue) {
@@ -2112,15 +1838,15 @@ private static final long serialVersionUID = 0L;
       } else {
         maintainerIDBuilder_.setMessage(builderForValue.build());
       }
-      implCase_ = 7;
+      implCase_ = 6;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
      */
     public Builder mergeMaintainerID(com.assetmantle.schema.ids.base.MaintainerID value) {
       if (maintainerIDBuilder_ == null) {
-        if (implCase_ == 7 &&
+        if (implCase_ == 6 &&
             impl_ != com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance()) {
           impl_ = com.assetmantle.schema.ids.base.MaintainerID.newBuilder((com.assetmantle.schema.ids.base.MaintainerID) impl_)
               .mergeFrom(value).buildPartial();
@@ -2129,27 +1855,27 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       } else {
-        if (implCase_ == 7) {
+        if (implCase_ == 6) {
           maintainerIDBuilder_.mergeFrom(value);
         } else {
           maintainerIDBuilder_.setMessage(value);
         }
       }
-      implCase_ = 7;
+      implCase_ = 6;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
      */
     public Builder clearMaintainerID() {
       if (maintainerIDBuilder_ == null) {
-        if (implCase_ == 7) {
+        if (implCase_ == 6) {
           implCase_ = 0;
           impl_ = null;
           onChanged();
         }
       } else {
-        if (implCase_ == 7) {
+        if (implCase_ == 6) {
           implCase_ = 0;
           impl_ = null;
         }
@@ -2158,33 +1884,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
      */
     public com.assetmantle.schema.ids.base.MaintainerID.Builder getMaintainerIDBuilder() {
       return getMaintainerIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.MaintainerIDOrBuilder getMaintainerIDOrBuilder() {
-      if ((implCase_ == 7) && (maintainerIDBuilder_ != null)) {
+      if ((implCase_ == 6) && (maintainerIDBuilder_ != null)) {
         return maintainerIDBuilder_.getMessageOrBuilder();
       } else {
-        if (implCase_ == 7) {
+        if (implCase_ == 6) {
           return (com.assetmantle.schema.ids.base.MaintainerID) impl_;
         }
         return com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 7 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 6 [json_name = "maintainerID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.MaintainerID, com.assetmantle.schema.ids.base.MaintainerID.Builder, com.assetmantle.schema.ids.base.MaintainerIDOrBuilder> 
         getMaintainerIDFieldBuilder() {
       if (maintainerIDBuilder_ == null) {
-        if (!(implCase_ == 7)) {
+        if (!(implCase_ == 6)) {
           impl_ = com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance();
         }
         maintainerIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -2194,7 +1920,7 @@ private static final long serialVersionUID = 0L;
                 isClean());
         impl_ = null;
       }
-      implCase_ = 7;
+      implCase_ = 6;
       onChanged();
       return maintainerIDBuilder_;
     }
@@ -2202,33 +1928,33 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.OrderID, com.assetmantle.schema.ids.base.OrderID.Builder, com.assetmantle.schema.ids.base.OrderIDOrBuilder> orderIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
      * @return Whether the orderID field is set.
      */
     @java.lang.Override
     public boolean hasOrderID() {
-      return implCase_ == 8;
+      return implCase_ == 7;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
      * @return The orderID.
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.OrderID getOrderID() {
       if (orderIDBuilder_ == null) {
-        if (implCase_ == 8) {
+        if (implCase_ == 7) {
           return (com.assetmantle.schema.ids.base.OrderID) impl_;
         }
         return com.assetmantle.schema.ids.base.OrderID.getDefaultInstance();
       } else {
-        if (implCase_ == 8) {
+        if (implCase_ == 7) {
           return orderIDBuilder_.getMessage();
         }
         return com.assetmantle.schema.ids.base.OrderID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
      */
     public Builder setOrderID(com.assetmantle.schema.ids.base.OrderID value) {
       if (orderIDBuilder_ == null) {
@@ -2240,11 +1966,11 @@ private static final long serialVersionUID = 0L;
       } else {
         orderIDBuilder_.setMessage(value);
       }
-      implCase_ = 8;
+      implCase_ = 7;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
      */
     public Builder setOrderID(
         com.assetmantle.schema.ids.base.OrderID.Builder builderForValue) {
@@ -2254,15 +1980,15 @@ private static final long serialVersionUID = 0L;
       } else {
         orderIDBuilder_.setMessage(builderForValue.build());
       }
-      implCase_ = 8;
+      implCase_ = 7;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
      */
     public Builder mergeOrderID(com.assetmantle.schema.ids.base.OrderID value) {
       if (orderIDBuilder_ == null) {
-        if (implCase_ == 8 &&
+        if (implCase_ == 7 &&
             impl_ != com.assetmantle.schema.ids.base.OrderID.getDefaultInstance()) {
           impl_ = com.assetmantle.schema.ids.base.OrderID.newBuilder((com.assetmantle.schema.ids.base.OrderID) impl_)
               .mergeFrom(value).buildPartial();
@@ -2271,27 +1997,27 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       } else {
-        if (implCase_ == 8) {
+        if (implCase_ == 7) {
           orderIDBuilder_.mergeFrom(value);
         } else {
           orderIDBuilder_.setMessage(value);
         }
       }
-      implCase_ = 8;
+      implCase_ = 7;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
      */
     public Builder clearOrderID() {
       if (orderIDBuilder_ == null) {
-        if (implCase_ == 8) {
+        if (implCase_ == 7) {
           implCase_ = 0;
           impl_ = null;
           onChanged();
         }
       } else {
-        if (implCase_ == 8) {
+        if (implCase_ == 7) {
           implCase_ = 0;
           impl_ = null;
         }
@@ -2300,33 +2026,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
      */
     public com.assetmantle.schema.ids.base.OrderID.Builder getOrderIDBuilder() {
       return getOrderIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.OrderIDOrBuilder getOrderIDOrBuilder() {
-      if ((implCase_ == 8) && (orderIDBuilder_ != null)) {
+      if ((implCase_ == 7) && (orderIDBuilder_ != null)) {
         return orderIDBuilder_.getMessageOrBuilder();
       } else {
-        if (implCase_ == 8) {
+        if (implCase_ == 7) {
           return (com.assetmantle.schema.ids.base.OrderID) impl_;
         }
         return com.assetmantle.schema.ids.base.OrderID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 8 [json_name = "orderID"];</code>
+     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 7 [json_name = "orderID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.OrderID, com.assetmantle.schema.ids.base.OrderID.Builder, com.assetmantle.schema.ids.base.OrderIDOrBuilder> 
         getOrderIDFieldBuilder() {
       if (orderIDBuilder_ == null) {
-        if (!(implCase_ == 8)) {
+        if (!(implCase_ == 7)) {
           impl_ = com.assetmantle.schema.ids.base.OrderID.getDefaultInstance();
         }
         orderIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -2336,183 +2062,41 @@ private static final long serialVersionUID = 0L;
                 isClean());
         impl_ = null;
       }
-      implCase_ = 8;
+      implCase_ = 7;
       onChanged();
       return orderIDBuilder_;
     }
 
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder> ownableIDBuilder_;
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-     * @return Whether the ownableID field is set.
-     */
-    @java.lang.Override
-    public boolean hasOwnableID() {
-      return implCase_ == 9;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-     * @return The ownableID.
-     */
-    @java.lang.Override
-    public com.assetmantle.schema.ids.base.AnyOwnableID getOwnableID() {
-      if (ownableIDBuilder_ == null) {
-        if (implCase_ == 9) {
-          return (com.assetmantle.schema.ids.base.AnyOwnableID) impl_;
-        }
-        return com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance();
-      } else {
-        if (implCase_ == 9) {
-          return ownableIDBuilder_.getMessage();
-        }
-        return com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance();
-      }
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-     */
-    public Builder setOwnableID(com.assetmantle.schema.ids.base.AnyOwnableID value) {
-      if (ownableIDBuilder_ == null) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        impl_ = value;
-        onChanged();
-      } else {
-        ownableIDBuilder_.setMessage(value);
-      }
-      implCase_ = 9;
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-     */
-    public Builder setOwnableID(
-        com.assetmantle.schema.ids.base.AnyOwnableID.Builder builderForValue) {
-      if (ownableIDBuilder_ == null) {
-        impl_ = builderForValue.build();
-        onChanged();
-      } else {
-        ownableIDBuilder_.setMessage(builderForValue.build());
-      }
-      implCase_ = 9;
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-     */
-    public Builder mergeOwnableID(com.assetmantle.schema.ids.base.AnyOwnableID value) {
-      if (ownableIDBuilder_ == null) {
-        if (implCase_ == 9 &&
-            impl_ != com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance()) {
-          impl_ = com.assetmantle.schema.ids.base.AnyOwnableID.newBuilder((com.assetmantle.schema.ids.base.AnyOwnableID) impl_)
-              .mergeFrom(value).buildPartial();
-        } else {
-          impl_ = value;
-        }
-        onChanged();
-      } else {
-        if (implCase_ == 9) {
-          ownableIDBuilder_.mergeFrom(value);
-        } else {
-          ownableIDBuilder_.setMessage(value);
-        }
-      }
-      implCase_ = 9;
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-     */
-    public Builder clearOwnableID() {
-      if (ownableIDBuilder_ == null) {
-        if (implCase_ == 9) {
-          implCase_ = 0;
-          impl_ = null;
-          onChanged();
-        }
-      } else {
-        if (implCase_ == 9) {
-          implCase_ = 0;
-          impl_ = null;
-        }
-        ownableIDBuilder_.clear();
-      }
-      return this;
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-     */
-    public com.assetmantle.schema.ids.base.AnyOwnableID.Builder getOwnableIDBuilder() {
-      return getOwnableIDFieldBuilder().getBuilder();
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-     */
-    @java.lang.Override
-    public com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder getOwnableIDOrBuilder() {
-      if ((implCase_ == 9) && (ownableIDBuilder_ != null)) {
-        return ownableIDBuilder_.getMessageOrBuilder();
-      } else {
-        if (implCase_ == 9) {
-          return (com.assetmantle.schema.ids.base.AnyOwnableID) impl_;
-        }
-        return com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance();
-      }
-    }
-    /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID ownable_i_d = 9 [json_name = "ownableID"];</code>
-     */
-    private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder> 
-        getOwnableIDFieldBuilder() {
-      if (ownableIDBuilder_ == null) {
-        if (!(implCase_ == 9)) {
-          impl_ = com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance();
-        }
-        ownableIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder>(
-                (com.assetmantle.schema.ids.base.AnyOwnableID) impl_,
-                getParentForChildren(),
-                isClean());
-        impl_ = null;
-      }
-      implCase_ = 9;
-      onChanged();
-      return ownableIDBuilder_;
-    }
-
-    private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.PropertyID, com.assetmantle.schema.ids.base.PropertyID.Builder, com.assetmantle.schema.ids.base.PropertyIDOrBuilder> propertyIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
      * @return Whether the propertyID field is set.
      */
     @java.lang.Override
     public boolean hasPropertyID() {
-      return implCase_ == 10;
+      return implCase_ == 8;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
      * @return The propertyID.
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.PropertyID getPropertyID() {
       if (propertyIDBuilder_ == null) {
-        if (implCase_ == 10) {
+        if (implCase_ == 8) {
           return (com.assetmantle.schema.ids.base.PropertyID) impl_;
         }
         return com.assetmantle.schema.ids.base.PropertyID.getDefaultInstance();
       } else {
-        if (implCase_ == 10) {
+        if (implCase_ == 8) {
           return propertyIDBuilder_.getMessage();
         }
         return com.assetmantle.schema.ids.base.PropertyID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
      */
     public Builder setPropertyID(com.assetmantle.schema.ids.base.PropertyID value) {
       if (propertyIDBuilder_ == null) {
@@ -2524,11 +2108,11 @@ private static final long serialVersionUID = 0L;
       } else {
         propertyIDBuilder_.setMessage(value);
       }
-      implCase_ = 10;
+      implCase_ = 8;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
      */
     public Builder setPropertyID(
         com.assetmantle.schema.ids.base.PropertyID.Builder builderForValue) {
@@ -2538,15 +2122,15 @@ private static final long serialVersionUID = 0L;
       } else {
         propertyIDBuilder_.setMessage(builderForValue.build());
       }
-      implCase_ = 10;
+      implCase_ = 8;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
      */
     public Builder mergePropertyID(com.assetmantle.schema.ids.base.PropertyID value) {
       if (propertyIDBuilder_ == null) {
-        if (implCase_ == 10 &&
+        if (implCase_ == 8 &&
             impl_ != com.assetmantle.schema.ids.base.PropertyID.getDefaultInstance()) {
           impl_ = com.assetmantle.schema.ids.base.PropertyID.newBuilder((com.assetmantle.schema.ids.base.PropertyID) impl_)
               .mergeFrom(value).buildPartial();
@@ -2555,27 +2139,27 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       } else {
-        if (implCase_ == 10) {
+        if (implCase_ == 8) {
           propertyIDBuilder_.mergeFrom(value);
         } else {
           propertyIDBuilder_.setMessage(value);
         }
       }
-      implCase_ = 10;
+      implCase_ = 8;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
      */
     public Builder clearPropertyID() {
       if (propertyIDBuilder_ == null) {
-        if (implCase_ == 10) {
+        if (implCase_ == 8) {
           implCase_ = 0;
           impl_ = null;
           onChanged();
         }
       } else {
-        if (implCase_ == 10) {
+        if (implCase_ == 8) {
           implCase_ = 0;
           impl_ = null;
         }
@@ -2584,33 +2168,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
      */
     public com.assetmantle.schema.ids.base.PropertyID.Builder getPropertyIDBuilder() {
       return getPropertyIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.PropertyIDOrBuilder getPropertyIDOrBuilder() {
-      if ((implCase_ == 10) && (propertyIDBuilder_ != null)) {
+      if ((implCase_ == 8) && (propertyIDBuilder_ != null)) {
         return propertyIDBuilder_.getMessageOrBuilder();
       } else {
-        if (implCase_ == 10) {
+        if (implCase_ == 8) {
           return (com.assetmantle.schema.ids.base.PropertyID) impl_;
         }
         return com.assetmantle.schema.ids.base.PropertyID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 10 [json_name = "propertyID"];</code>
+     * <code>.assetmantle.schema.ids.base.PropertyID property_i_d = 8 [json_name = "propertyID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.PropertyID, com.assetmantle.schema.ids.base.PropertyID.Builder, com.assetmantle.schema.ids.base.PropertyIDOrBuilder> 
         getPropertyIDFieldBuilder() {
       if (propertyIDBuilder_ == null) {
-        if (!(implCase_ == 10)) {
+        if (!(implCase_ == 8)) {
           impl_ = com.assetmantle.schema.ids.base.PropertyID.getDefaultInstance();
         }
         propertyIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -2620,7 +2204,7 @@ private static final long serialVersionUID = 0L;
                 isClean());
         impl_ = null;
       }
-      implCase_ = 10;
+      implCase_ = 8;
       onChanged();
       return propertyIDBuilder_;
     }
@@ -2628,33 +2212,33 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.SplitID, com.assetmantle.schema.ids.base.SplitID.Builder, com.assetmantle.schema.ids.base.SplitIDOrBuilder> splitIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
      * @return Whether the splitID field is set.
      */
     @java.lang.Override
     public boolean hasSplitID() {
-      return implCase_ == 11;
+      return implCase_ == 9;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
      * @return The splitID.
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.SplitID getSplitID() {
       if (splitIDBuilder_ == null) {
-        if (implCase_ == 11) {
+        if (implCase_ == 9) {
           return (com.assetmantle.schema.ids.base.SplitID) impl_;
         }
         return com.assetmantle.schema.ids.base.SplitID.getDefaultInstance();
       } else {
-        if (implCase_ == 11) {
+        if (implCase_ == 9) {
           return splitIDBuilder_.getMessage();
         }
         return com.assetmantle.schema.ids.base.SplitID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
      */
     public Builder setSplitID(com.assetmantle.schema.ids.base.SplitID value) {
       if (splitIDBuilder_ == null) {
@@ -2666,11 +2250,11 @@ private static final long serialVersionUID = 0L;
       } else {
         splitIDBuilder_.setMessage(value);
       }
-      implCase_ = 11;
+      implCase_ = 9;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
      */
     public Builder setSplitID(
         com.assetmantle.schema.ids.base.SplitID.Builder builderForValue) {
@@ -2680,15 +2264,15 @@ private static final long serialVersionUID = 0L;
       } else {
         splitIDBuilder_.setMessage(builderForValue.build());
       }
-      implCase_ = 11;
+      implCase_ = 9;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
      */
     public Builder mergeSplitID(com.assetmantle.schema.ids.base.SplitID value) {
       if (splitIDBuilder_ == null) {
-        if (implCase_ == 11 &&
+        if (implCase_ == 9 &&
             impl_ != com.assetmantle.schema.ids.base.SplitID.getDefaultInstance()) {
           impl_ = com.assetmantle.schema.ids.base.SplitID.newBuilder((com.assetmantle.schema.ids.base.SplitID) impl_)
               .mergeFrom(value).buildPartial();
@@ -2697,27 +2281,27 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       } else {
-        if (implCase_ == 11) {
+        if (implCase_ == 9) {
           splitIDBuilder_.mergeFrom(value);
         } else {
           splitIDBuilder_.setMessage(value);
         }
       }
-      implCase_ = 11;
+      implCase_ = 9;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
      */
     public Builder clearSplitID() {
       if (splitIDBuilder_ == null) {
-        if (implCase_ == 11) {
+        if (implCase_ == 9) {
           implCase_ = 0;
           impl_ = null;
           onChanged();
         }
       } else {
-        if (implCase_ == 11) {
+        if (implCase_ == 9) {
           implCase_ = 0;
           impl_ = null;
         }
@@ -2726,33 +2310,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
      */
     public com.assetmantle.schema.ids.base.SplitID.Builder getSplitIDBuilder() {
       return getSplitIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.SplitIDOrBuilder getSplitIDOrBuilder() {
-      if ((implCase_ == 11) && (splitIDBuilder_ != null)) {
+      if ((implCase_ == 9) && (splitIDBuilder_ != null)) {
         return splitIDBuilder_.getMessageOrBuilder();
       } else {
-        if (implCase_ == 11) {
+        if (implCase_ == 9) {
           return (com.assetmantle.schema.ids.base.SplitID) impl_;
         }
         return com.assetmantle.schema.ids.base.SplitID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 11 [json_name = "splitID"];</code>
+     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 9 [json_name = "splitID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.SplitID, com.assetmantle.schema.ids.base.SplitID.Builder, com.assetmantle.schema.ids.base.SplitIDOrBuilder> 
         getSplitIDFieldBuilder() {
       if (splitIDBuilder_ == null) {
-        if (!(implCase_ == 11)) {
+        if (!(implCase_ == 9)) {
           impl_ = com.assetmantle.schema.ids.base.SplitID.getDefaultInstance();
         }
         splitIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -2762,7 +2346,7 @@ private static final long serialVersionUID = 0L;
                 isClean());
         impl_ = null;
       }
-      implCase_ = 11;
+      implCase_ = 9;
       onChanged();
       return splitIDBuilder_;
     }
@@ -2770,33 +2354,33 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.StringID, com.assetmantle.schema.ids.base.StringID.Builder, com.assetmantle.schema.ids.base.StringIDOrBuilder> stringIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
      * @return Whether the stringID field is set.
      */
     @java.lang.Override
     public boolean hasStringID() {
-      return implCase_ == 12;
+      return implCase_ == 10;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
      * @return The stringID.
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.StringID getStringID() {
       if (stringIDBuilder_ == null) {
-        if (implCase_ == 12) {
+        if (implCase_ == 10) {
           return (com.assetmantle.schema.ids.base.StringID) impl_;
         }
         return com.assetmantle.schema.ids.base.StringID.getDefaultInstance();
       } else {
-        if (implCase_ == 12) {
+        if (implCase_ == 10) {
           return stringIDBuilder_.getMessage();
         }
         return com.assetmantle.schema.ids.base.StringID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
      */
     public Builder setStringID(com.assetmantle.schema.ids.base.StringID value) {
       if (stringIDBuilder_ == null) {
@@ -2808,11 +2392,11 @@ private static final long serialVersionUID = 0L;
       } else {
         stringIDBuilder_.setMessage(value);
       }
-      implCase_ = 12;
+      implCase_ = 10;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
      */
     public Builder setStringID(
         com.assetmantle.schema.ids.base.StringID.Builder builderForValue) {
@@ -2822,15 +2406,15 @@ private static final long serialVersionUID = 0L;
       } else {
         stringIDBuilder_.setMessage(builderForValue.build());
       }
-      implCase_ = 12;
+      implCase_ = 10;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
      */
     public Builder mergeStringID(com.assetmantle.schema.ids.base.StringID value) {
       if (stringIDBuilder_ == null) {
-        if (implCase_ == 12 &&
+        if (implCase_ == 10 &&
             impl_ != com.assetmantle.schema.ids.base.StringID.getDefaultInstance()) {
           impl_ = com.assetmantle.schema.ids.base.StringID.newBuilder((com.assetmantle.schema.ids.base.StringID) impl_)
               .mergeFrom(value).buildPartial();
@@ -2839,27 +2423,27 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       } else {
-        if (implCase_ == 12) {
+        if (implCase_ == 10) {
           stringIDBuilder_.mergeFrom(value);
         } else {
           stringIDBuilder_.setMessage(value);
         }
       }
-      implCase_ = 12;
+      implCase_ = 10;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
      */
     public Builder clearStringID() {
       if (stringIDBuilder_ == null) {
-        if (implCase_ == 12) {
+        if (implCase_ == 10) {
           implCase_ = 0;
           impl_ = null;
           onChanged();
         }
       } else {
-        if (implCase_ == 12) {
+        if (implCase_ == 10) {
           implCase_ = 0;
           impl_ = null;
         }
@@ -2868,33 +2452,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
      */
     public com.assetmantle.schema.ids.base.StringID.Builder getStringIDBuilder() {
       return getStringIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
      */
     @java.lang.Override
     public com.assetmantle.schema.ids.base.StringIDOrBuilder getStringIDOrBuilder() {
-      if ((implCase_ == 12) && (stringIDBuilder_ != null)) {
+      if ((implCase_ == 10) && (stringIDBuilder_ != null)) {
         return stringIDBuilder_.getMessageOrBuilder();
       } else {
-        if (implCase_ == 12) {
+        if (implCase_ == 10) {
           return (com.assetmantle.schema.ids.base.StringID) impl_;
         }
         return com.assetmantle.schema.ids.base.StringID.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 12 [json_name = "stringID"];</code>
+     * <code>.assetmantle.schema.ids.base.StringID string_i_d = 10 [json_name = "stringID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.StringID, com.assetmantle.schema.ids.base.StringID.Builder, com.assetmantle.schema.ids.base.StringIDOrBuilder> 
         getStringIDFieldBuilder() {
       if (stringIDBuilder_ == null) {
-        if (!(implCase_ == 12)) {
+        if (!(implCase_ == 10)) {
           impl_ = com.assetmantle.schema.ids.base.StringID.getDefaultInstance();
         }
         stringIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -2904,7 +2488,7 @@ private static final long serialVersionUID = 0L;
                 isClean());
         impl_ = null;
       }
-      implCase_ = 12;
+      implCase_ = 10;
       onChanged();
       return stringIDBuilder_;
     }

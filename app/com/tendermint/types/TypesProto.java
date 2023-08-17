@@ -168,12 +168,12 @@ public final class TypesProto {
       "_TYPE_PREVOTE\020\001\032\017\212\235 \013PrevoteType\0220\n\031SIGN" +
       "ED_MSG_TYPE_PRECOMMIT\020\002\032\021\212\235 \rPrecommitTy" +
       "pe\022.\n\030SIGNED_MSG_TYPE_PROPOSAL\020 \032\020\212\235 \014Pr" +
-      "oposalType\032\010\210\243\036\000\250\244\036\001B\264\001\n\024com.tendermint." +
-      "typesB\nTypesProtoP\001Z/github.com/AssetMan" +
-      "tle/modules/tendermint/types\242\002\003TTX\252\002\020Ten" +
-      "dermint.Types\312\002\020Tendermint\\Types\342\002\034Tende" +
-      "rmint\\Types\\GPBMetadata\352\002\021Tendermint::Ty" +
-      "pesb\006proto3"
+      "oposalType\032\010\210\243\036\000\250\244\036\001B\274\001\n\024com.tendermint." +
+      "typesB\nTypesProtoP\001Z7github.com/tendermi" +
+      "nt/tendermint/proto/tendermint/types\242\002\003T" +
+      "TX\252\002\020Tendermint.Types\312\002\020Tendermint\\Types" +
+      "\342\002\034Tendermint\\Types\\GPBMetadata\352\002\021Tender" +
+      "mint::Typesb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

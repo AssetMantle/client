@@ -92,13 +92,12 @@ public final class QueryProto {
       "v1beta1.QueryGranteeGrantsRequest\0320.cosm" +
       "os.authz.v1beta1.QueryGranteeGrantsRespo" +
       "nse\"6\202\323\344\223\0020\022./cosmos/authz/v1beta1/grant" +
-      "s/grantee/{grantee}B\332\001\n\030com.cosmos.authz" +
-      ".v1beta1B\nQueryProtoP\001Z@github.com/Asset" +
-      "Mantle/modules/cosmos/authz/v1beta1;auth" +
-      "zv1beta1\242\002\003CAX\252\002\024Cosmos.Authz.V1beta1\312\002\024" +
-      "Cosmos\\Authz\\V1beta1\342\002 Cosmos\\Authz\\V1be" +
-      "ta1\\GPBMetadata\352\002\026Cosmos::Authz::V1beta1" +
-      "b\006proto3"
+      "s/grantee/{grantee}B\276\001\n\030com.cosmos.authz" +
+      ".v1beta1B\nQueryProtoP\001Z$github.com/cosmo" +
+      "s/cosmos-sdk/x/authz\242\002\003CAX\252\002\024Cosmos.Auth" +
+      "z.V1beta1\312\002\024Cosmos\\Authz\\V1beta1\342\002 Cosmo" +
+      "s\\Authz\\V1beta1\\GPBMetadata\352\002\026Cosmos::Au" +
+      "thz::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

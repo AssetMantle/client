@@ -187,14 +187,14 @@ public final class SolomachineProto {
       "ENCE\020\007\032\030\212\235 \024PACKETRECEIPTABSENCE\0226\n\034DATA" +
       "_TYPE_NEXT_SEQUENCE_RECV\020\010\032\024\212\235 \020NEXTSEQU" +
       "ENCERECV\022 \n\020DATA_TYPE_HEADER\020\t\032\n\212\235 \006HEAD" +
-      "ER\032\004\210\243\036\000B\244\002\n#com.ibc.lightclients.soloma" +
-      "chine.v1B\020SolomachineProtoP\001ZLgithub.com" +
-      "/AssetMantle/modules/ibc/lightclients/so" +
-      "lomachine/v1;solomachinev1\242\002\003ILS\252\002\037Ibc.L" +
-      "ightclients.Solomachine.V1\312\002\037Ibc\\Lightcl" +
-      "ients\\Solomachine\\V1\342\002+Ibc\\Lightclients\\" +
-      "Solomachine\\V1\\GPBMetadata\352\002\"Ibc::Lightc" +
-      "lients::Solomachine::V1b\006proto3"
+      "ER\032\004\210\243\036\000B\226\002\n#com.ibc.lightclients.soloma" +
+      "chine.v1B\020SolomachineProtoP\001Z>github.com" +
+      "/cosmos/ibc-go/v4/modules/core/02-client" +
+      "/legacy/v100\242\002\003ILS\252\002\037Ibc.Lightclients.So" +
+      "lomachine.V1\312\002\037Ibc\\Lightclients\\Solomach" +
+      "ine\\V1\342\002+Ibc\\Lightclients\\Solomachine\\V1" +
+      "\\GPBMetadata\352\002\"Ibc::Lightclients::Soloma" +
+      "chine::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

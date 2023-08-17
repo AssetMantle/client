@@ -42,6 +42,21 @@ private static final long serialVersionUID = 0L;
             com.ibc.applications.transfer.v1.MsgTransferResponse.class, com.ibc.applications.transfer.v1.MsgTransferResponse.Builder.class);
   }
 
+  public static final int SEQUENCE_FIELD_NUMBER = 1;
+  private long sequence_ = 0L;
+  /**
+   * <pre>
+   * sequence number of the transfer packet sent
+   * </pre>
+   *
+   * <code>uint64 sequence = 1 [json_name = "sequence"];</code>
+   * @return The sequence.
+   */
+  @java.lang.Override
+  public long getSequence() {
+    return sequence_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -56,6 +71,9 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    if (sequence_ != 0L) {
+      output.writeUInt64(1, sequence_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -65,6 +83,10 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
+    if (sequence_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(1, sequence_);
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -80,6 +102,8 @@ private static final long serialVersionUID = 0L;
     }
     com.ibc.applications.transfer.v1.MsgTransferResponse other = (com.ibc.applications.transfer.v1.MsgTransferResponse) obj;
 
+    if (getSequence()
+        != other.getSequence()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -91,6 +115,9 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
+    hash = (37 * hash) + SEQUENCE_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getSequence());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -223,6 +250,8 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public Builder clear() {
       super.clear();
+      bitField0_ = 0;
+      sequence_ = 0L;
       return this;
     }
 
@@ -249,8 +278,16 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.ibc.applications.transfer.v1.MsgTransferResponse buildPartial() {
       com.ibc.applications.transfer.v1.MsgTransferResponse result = new com.ibc.applications.transfer.v1.MsgTransferResponse(this);
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartial0(com.ibc.applications.transfer.v1.MsgTransferResponse result) {
+      int from_bitField0_ = bitField0_;
+      if (((from_bitField0_ & 0x00000001) != 0)) {
+        result.sequence_ = sequence_;
+      }
     }
 
     @java.lang.Override
@@ -297,6 +334,9 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.ibc.applications.transfer.v1.MsgTransferResponse other) {
       if (other == com.ibc.applications.transfer.v1.MsgTransferResponse.getDefaultInstance()) return this;
+      if (other.getSequence() != 0L) {
+        setSequence(other.getSequence());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -323,6 +363,11 @@ private static final long serialVersionUID = 0L;
             case 0:
               done = true;
               break;
+            case 8: {
+              sequence_ = input.readUInt64();
+              bitField0_ |= 0x00000001;
+              break;
+            } // case 8
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -336,6 +381,51 @@ private static final long serialVersionUID = 0L;
       } finally {
         onChanged();
       } // finally
+      return this;
+    }
+    private int bitField0_;
+
+    private long sequence_ ;
+    /**
+     * <pre>
+     * sequence number of the transfer packet sent
+     * </pre>
+     *
+     * <code>uint64 sequence = 1 [json_name = "sequence"];</code>
+     * @return The sequence.
+     */
+    @java.lang.Override
+    public long getSequence() {
+      return sequence_;
+    }
+    /**
+     * <pre>
+     * sequence number of the transfer packet sent
+     * </pre>
+     *
+     * <code>uint64 sequence = 1 [json_name = "sequence"];</code>
+     * @param value The sequence to set.
+     * @return This builder for chaining.
+     */
+    public Builder setSequence(long value) {
+
+      sequence_ = value;
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * sequence number of the transfer packet sent
+     * </pre>
+     *
+     * <code>uint64 sequence = 1 [json_name = "sequence"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearSequence() {
+      bitField0_ = (bitField0_ & ~0x00000001);
+      sequence_ = 0L;
+      onChanged();
       return this;
     }
     @java.lang.Override

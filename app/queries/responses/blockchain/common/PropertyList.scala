@@ -3,8 +3,8 @@ package queries.responses.blockchain.common
 import play.api.libs.json.{Json, Reads}
 import queries.responses.blockchain.common.Property._
 
-case class PropertyList(property_list: Seq[AnyProperty]) {
-  def toPropertyList: schema.list.PropertyList = schema.list.PropertyList(this.property_list.map(_.toProperty))
+case class PropertyList(any_properties: Seq[AnyProperty]) {
+  def toPropertyList: schema.list.PropertyList = schema.list.PropertyList(this.any_properties.map(_.toProperty))
 }
 
 object PropertyList {

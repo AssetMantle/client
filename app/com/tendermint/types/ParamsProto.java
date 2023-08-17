@@ -74,12 +74,13 @@ public final class ParamsProto {
       "\037\001\350\240\037\001\":\n\rVersionParams\022\037\n\013app_version\030\001" +
       " \001(\004R\nappVersion:\010\270\240\037\001\350\240\037\001\"Z\n\014HashedPara" +
       "ms\022&\n\017block_max_bytes\030\001 \001(\003R\rblockMaxByt" +
-      "es\022\"\n\rblock_max_gas\030\002 \001(\003R\013blockMaxGasB\271" +
-      "\001\n\024com.tendermint.typesB\013ParamsProtoP\001Z/" +
-      "github.com/AssetMantle/modules/tendermin" +
-      "t/types\242\002\003TTX\252\002\020Tendermint.Types\312\002\020Tende" +
-      "rmint\\Types\342\002\034Tendermint\\Types\\GPBMetada" +
-      "ta\352\002\021Tendermint::Types\250\342\036\001b\006proto3"
+      "es\022\"\n\rblock_max_gas\030\002 \001(\003R\013blockMaxGasB\301" +
+      "\001\n\024com.tendermint.typesB\013ParamsProtoP\001Z7" +
+      "github.com/tendermint/tendermint/proto/t" +
+      "endermint/types\242\002\003TTX\252\002\020Tendermint.Types" +
+      "\312\002\020Tendermint\\Types\342\002\034Tendermint\\Types\\G" +
+      "PBMetadata\352\002\021Tendermint::Types\250\342\036\001b\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

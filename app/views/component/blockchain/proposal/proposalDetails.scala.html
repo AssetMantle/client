@@ -164,8 +164,8 @@
     }
 }
 <script>
-        convertUTCDateToLocalDate("@proposal.submitTime.toString", "proposalSubmitTime");
-        convertUTCDateToLocalDate("@proposal.depositEndTime.toString", "proposalDepositEndTime");
-        convertUTCDateToLocalDate("@proposal.votingStartTime.toString", "proposalVotingStartTime");
-        convertUTCDateToLocalDate("@proposal.votingEndTime.toString", "proposalVotingEndTime");
+        fromEpochDateToLocal("@proposal.submitTime.epoch", 'proposalSubmitTime');
+        fromEpochDateToLocal("@proposal.depositEndTime.epoch", 'proposalDepositEndTime');
+        fromEpochDateToLocal("@proposal.votingStartTime.epoch", 'proposalVotingStartTime');
+        fromEpochDateToLocal("@proposal.votingEndTime.epoch", 'proposalVotingEndTime');
 </script>

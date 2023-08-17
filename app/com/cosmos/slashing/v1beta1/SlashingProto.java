@@ -62,13 +62,13 @@ public final class SlashingProto {
       "Sign\022\210\001\n\027slash_fraction_downtime\030\005 \001(\014BP" +
       "\310\336\037\000\332\336\037&github.com/cosmos/cosmos-sdk/typ" +
       "es.Dec\362\336\037\036yaml:\"slash_fraction_downtime\"" +
-      "R\025slashFractionDowntimeB\366\001\n\033com.cosmos.s" +
-      "lashing.v1beta1B\rSlashingProtoP\001ZFgithub" +
-      ".com/AssetMantle/modules/cosmos/slashing" +
-      "/v1beta1;slashingv1beta1\242\002\003CSX\252\002\027Cosmos." +
-      "Slashing.V1beta1\312\002\027Cosmos\\Slashing\\V1bet" +
-      "a1\342\002#Cosmos\\Slashing\\V1beta1\\GPBMetadata" +
-      "\352\002\031Cosmos::Slashing::V1beta1\250\342\036\001b\006proto3"
+      "R\025slashFractionDowntimeB\335\001\n\033com.cosmos.s" +
+      "lashing.v1beta1B\rSlashingProtoP\001Z-github" +
+      ".com/cosmos/cosmos-sdk/x/slashing/types\242" +
+      "\002\003CSX\252\002\027Cosmos.Slashing.V1beta1\312\002\027Cosmos" +
+      "\\Slashing\\V1beta1\342\002#Cosmos\\Slashing\\V1be" +
+      "ta1\\GPBMetadata\352\002\031Cosmos::Slashing::V1be" +
+      "ta1\250\342\036\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

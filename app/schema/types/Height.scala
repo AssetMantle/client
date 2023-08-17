@@ -16,6 +16,13 @@ case class Height(value: Long) {
 
   def getProtoBytes: Array[Byte] = this.asProtoHeight.toByteString.toByteArray
 
+  def compare(that: Height): Int = {
+    val difference = this.value - that.value
+    if (difference == 0) 0
+    else if (difference > 0) 1
+    else -1
+  }
+
 }
 
 object Height {

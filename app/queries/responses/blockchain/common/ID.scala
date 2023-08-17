@@ -6,7 +6,7 @@ import schema.id.{base => baseSchemaID}
 object ID {
 
   case class HashID(i_d_bytes: Option[String]) {
-    def toHashID: baseSchemaID.HashID = if(this.i_d_bytes.isDefined)baseSchemaID.HashID(utilities.Secrets.base64Decoder(this.i_d_bytes.get))
+    def toHashID: baseSchemaID.HashID = if (this.i_d_bytes.isDefined) baseSchemaID.HashID(utilities.Secrets.base64Decoder(this.i_d_bytes.get))
     else baseSchemaID.HashID(Array[Byte]())
   }
 
@@ -66,7 +66,9 @@ object ID {
 
   implicit val PropertyIDReads: Reads[PropertyID] = Json.reads[PropertyID]
 
-  case class AnyOwnableID(asset_i_d: Option[AssetID], coin_i_d: Option[CoinID]) {
+  case class AnyOwnableID(
+                           asset_i_d: Option[AssetID],
+                           coin_i_d: Option[CoinID]) {
     def toOwnableID: schema.id.OwnableID = {
       if (this.asset_i_d.isDefined) this.asset_i_d.get.toAssetID
       else this.coin_i_d.get.toCoinID
@@ -82,9 +84,10 @@ object ID {
   implicit val SplitIDReads: Reads[SplitID] = Json.reads[SplitID]
 
   case class AnyID(
-                    any_ownable_i_d: Option[AnyOwnableID],
+                    ownable_i_d: Option[AnyOwnableID],
                     asset_i_d: Option[AssetID],
                     classification_i_d: Option[ClassificationID],
+                    coin_i_d: Option[CoinID],
                     data_i_d: Option[DataID],
                     hash_i_d: Option[HashID],
                     identity_i_d: Option[IdentityID],
@@ -95,9 +98,10 @@ object ID {
                     string_i_d: Option[StringID]) {
 
     def toID: schema.id.ID = {
-      if (this.any_ownable_i_d.isDefined) this.any_ownable_i_d.get.toOwnableID
+      if (this.ownable_i_d.isDefined) this.ownable_i_d.get.toOwnableID
       else if (this.asset_i_d.isDefined) this.asset_i_d.get.toAssetID
       else if (this.classification_i_d.isDefined) this.classification_i_d.get.toClassificationID
+      else if (this.coin_i_d.isDefined) this.coin_i_d.get.toCoinID
       else if (this.data_i_d.isDefined) this.data_i_d.get.toDataID
       else if (this.hash_i_d.isDefined) this.hash_i_d.get.toHashID
       else if (this.identity_i_d.isDefined) this.identity_i_d.get.toIdentityID

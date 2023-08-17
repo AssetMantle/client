@@ -36,13 +36,13 @@ public final class EvidenceProto {
       "ampB\010\310\336\037\000\220\337\037\001R\004time\022\024\n\005power\030\003 \001(\003R\005powe" +
       "r\022I\n\021consensus_address\030\004 \001(\tB\034\362\336\037\030yaml:\"" +
       "consensus_address\"R\020consensusAddress:\014\210\240" +
-      "\037\000\230\240\037\000\350\240\037\000B\366\001\n\033com.cosmos.evidence.v1bet" +
-      "a1B\rEvidenceProtoP\001ZFgithub.com/AssetMan" +
-      "tle/modules/cosmos/evidence/v1beta1;evid" +
-      "encev1beta1\242\002\003CEX\252\002\027Cosmos.Evidence.V1be" +
-      "ta1\312\002\027Cosmos\\Evidence\\V1beta1\342\002#Cosmos\\E" +
-      "vidence\\V1beta1\\GPBMetadata\352\002\031Cosmos::Ev" +
-      "idence::V1beta1\250\342\036\001b\006proto3"
+      "\037\000\230\240\037\000\350\240\037\000B\335\001\n\033com.cosmos.evidence.v1bet" +
+      "a1B\rEvidenceProtoP\001Z-github.com/cosmos/c" +
+      "osmos-sdk/x/evidence/types\242\002\003CEX\252\002\027Cosmo" +
+      "s.Evidence.V1beta1\312\002\027Cosmos\\Evidence\\V1b" +
+      "eta1\342\002#Cosmos\\Evidence\\V1beta1\\GPBMetada" +
+      "ta\352\002\031Cosmos::Evidence::V1beta1\250\342\036\001b\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

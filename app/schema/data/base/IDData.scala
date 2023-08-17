@@ -14,7 +14,7 @@ case class IDData(value: ID) extends ListableData {
 
   def getType: StringID = this.value.getType
 
-  def getDataID: DataID = base.DataID(typeID = this.getType, hashID = this.generateHashID)
+  def compare(listableData: ListableData): Int = this.value.compare(listableData.asInstanceOf[ID])
 
   def getBytes: Array[Byte] = this.getID.getBytes
 

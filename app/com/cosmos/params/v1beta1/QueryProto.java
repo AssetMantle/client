@@ -44,13 +44,12 @@ public final class QueryProto {
       "ms\022).cosmos.params.v1beta1.QueryParamsRe" +
       "quest\032*.cosmos.params.v1beta1.QueryParam" +
       "sResponse\"%\202\323\344\223\002\037\022\035/cosmos/params/v1beta" +
-      "1/paramsB\341\001\n\031com.cosmos.params.v1beta1B\n" +
-      "QueryProtoP\001ZBgithub.com/AssetMantle/mod" +
-      "ules/cosmos/params/v1beta1;paramsv1beta1" +
-      "\242\002\003CPX\252\002\025Cosmos.Params.V1beta1\312\002\025Cosmos\\" +
-      "Params\\V1beta1\342\002!Cosmos\\Params\\V1beta1\\G" +
-      "PBMetadata\352\002\027Cosmos::Params::V1beta1b\006pr" +
-      "oto3"
+      "1/paramsB\323\001\n\031com.cosmos.params.v1beta1B\n" +
+      "QueryProtoP\001Z4github.com/cosmos/cosmos-s" +
+      "dk/x/params/types/proposal\242\002\003CPX\252\002\025Cosmo" +
+      "s.Params.V1beta1\312\002\025Cosmos\\Params\\V1beta1" +
+      "\342\002!Cosmos\\Params\\V1beta1\\GPBMetadata\352\002\027C" +
+      "osmos::Params::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

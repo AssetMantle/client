@@ -34,13 +34,12 @@ public final class GenesisProto {
       "1beta1/auth.proto\"{\n\014GenesisState\0229\n\006par" +
       "ams\030\001 \001(\0132\033.cosmos.auth.v1beta1.ParamsB\004" +
       "\310\336\037\000R\006params\0220\n\010accounts\030\002 \003(\0132\024.google." +
-      "protobuf.AnyR\010accountsB\325\001\n\027com.cosmos.au" +
-      "th.v1beta1B\014GenesisProtoP\001Z>github.com/A" +
-      "ssetMantle/modules/cosmos/auth/v1beta1;a" +
-      "uthv1beta1\242\002\003CAX\252\002\023Cosmos.Auth.V1beta1\312\002" +
-      "\023Cosmos\\Auth\\V1beta1\342\002\037Cosmos\\Auth\\V1bet" +
-      "a1\\GPBMetadata\352\002\025Cosmos::Auth::V1beta1b\006" +
-      "proto3"
+      "protobuf.AnyR\010accountsB\300\001\n\027com.cosmos.au" +
+      "th.v1beta1B\014GenesisProtoP\001Z)github.com/c" +
+      "osmos/cosmos-sdk/x/auth/types\242\002\003CAX\252\002\023Co" +
+      "smos.Auth.V1beta1\312\002\023Cosmos\\Auth\\V1beta1\342" +
+      "\002\037Cosmos\\Auth\\V1beta1\\GPBMetadata\352\002\025Cosm" +
+      "os::Auth::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

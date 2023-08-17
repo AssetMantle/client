@@ -61,13 +61,12 @@ public final class UpgradeProto {
       "le\022 \n\013description\030\002 \001(\tR\013description:\010\230\240" +
       "\037\000\350\240\037\001\"G\n\rModuleVersion\022\022\n\004name\030\001 \001(\tR\004n" +
       "ame\022\030\n\007version\030\002 \001(\004R\007version:\010\230\240\037\001\350\240\037\001B" +
-      "\356\001\n\032com.cosmos.upgrade.v1beta1B\014UpgradeP" +
-      "rotoP\001ZDgithub.com/AssetMantle/modules/c" +
-      "osmos/upgrade/v1beta1;upgradev1beta1\242\002\003C" +
-      "UX\252\002\026Cosmos.Upgrade.V1beta1\312\002\026Cosmos\\Upg" +
-      "rade\\V1beta1\342\002\"Cosmos\\Upgrade\\V1beta1\\GP" +
-      "BMetadata\352\002\030Cosmos::Upgrade::V1beta1\310\341\036\000" +
-      "b\006proto3"
+      "\326\001\n\032com.cosmos.upgrade.v1beta1B\014UpgradeP" +
+      "rotoP\001Z,github.com/cosmos/cosmos-sdk/x/u" +
+      "pgrade/types\242\002\003CUX\252\002\026Cosmos.Upgrade.V1be" +
+      "ta1\312\002\026Cosmos\\Upgrade\\V1beta1\342\002\"Cosmos\\Up" +
+      "grade\\V1beta1\\GPBMetadata\352\002\030Cosmos::Upgr" +
+      "ade::V1beta1\310\341\036\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

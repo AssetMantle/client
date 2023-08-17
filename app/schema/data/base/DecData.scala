@@ -2,7 +2,7 @@ package schema.data.base
 
 import com.assetmantle.schema.data.base.{AnyData, AnyListableData, DecData => protoDecData}
 import schema.data._
-import schema.id.base.{DataID, HashID, StringID}
+import schema.id.base.{HashID, StringID}
 
 case class DecData(value: BigDecimal) extends ListableData {
 
@@ -14,11 +14,16 @@ case class DecData(value: BigDecimal) extends ListableData {
 
   def getValue: BigDecimal = this.value
 
-  def getDataID: DataID = DataID(typeID = constants.DecDataTypeID, hashID = this.generateHashID)
+  def compare(listableData: ListableData): Int = {
+    val difference = this.value - listableData.asInstanceOf[DecData].value
+    if (difference == 0) 0
+    else if (difference > 0) 1
+    else -1
+  }
 
   def zeroValue: DecData = DecData(BigDecimal(0))
 
-  def getBytes: Array[Byte] = this.toPlainString.getBytes
+  def getBytes: Array[Byte] = this.getSortableDecBytes
 
   def generateHashID: HashID = if (this.value == this.zeroValue.value) schema.utilities.ID.generateHashID() else schema.utilities.ID.generateHashID(this.getBytes)
 

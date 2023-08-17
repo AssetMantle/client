@@ -36,7 +36,7 @@ public final class TxProto {
       "\n%ibc/applications/transfer/v1/tx.proto\022" +
       "\034ibc.applications.transfer.v1\032\024gogoproto" +
       "/gogo.proto\032\036cosmos/base/v1beta1/coin.pr" +
-      "oto\032\037ibc/core/client/v1/client.proto\"\252\003\n" +
+      "oto\032\037ibc/core/client/v1/client.proto\"\276\003\n" +
       "\013MsgTransfer\0227\n\013source_port\030\001 \001(\tB\026\362\336\037\022y" +
       "aml:\"source_port\"R\nsourcePort\022@\n\016source_" +
       "channel\030\002 \001(\tB\031\362\336\037\025yaml:\"source_channel\"" +
@@ -47,17 +47,18 @@ public final class TxProto {
       "ient.v1.HeightB\035\310\336\037\000\362\336\037\025yaml:\"timeout_he" +
       "ight\"R\rtimeoutHeight\022I\n\021timeout_timestam" +
       "p\030\007 \001(\004B\034\362\336\037\030yaml:\"timeout_timestamp\"R\020t" +
-      "imeoutTimestamp:\010\210\240\037\000\350\240\037\000\"\025\n\023MsgTransfer" +
-      "Response2o\n\003Msg\022h\n\010Transfer\022).ibc.applic" +
-      "ations.transfer.v1.MsgTransfer\0321.ibc.app" +
-      "lications.transfer.v1.MsgTransferRespons" +
-      "eB\206\002\n com.ibc.applications.transfer.v1B\007" +
-      "TxProtoP\001ZFgithub.com/AssetMantle/module" +
-      "s/ibc/applications/transfer/v1;transferv" +
-      "1\242\002\003IAT\252\002\034Ibc.Applications.Transfer.V1\312\002" +
-      "\034Ibc\\Applications\\Transfer\\V1\342\002(Ibc\\Appl" +
-      "ications\\Transfer\\V1\\GPBMetadata\352\002\037Ibc::" +
-      "Applications::Transfer::V1b\006proto3"
+      "imeoutTimestamp\022\022\n\004memo\030\010 \001(\tR\004memo:\010\210\240\037" +
+      "\000\350\240\037\000\"1\n\023MsgTransferResponse\022\032\n\010sequence" +
+      "\030\001 \001(\004R\010sequence2o\n\003Msg\022h\n\010Transfer\022).ib" +
+      "c.applications.transfer.v1.MsgTransfer\0321" +
+      ".ibc.applications.transfer.v1.MsgTransfe" +
+      "rResponseB\367\001\n com.ibc.applications.trans" +
+      "fer.v1B\007TxProtoP\001Z7github.com/cosmos/ibc" +
+      "-go/v4/modules/apps/transfer/types\242\002\003IAT" +
+      "\252\002\034Ibc.Applications.Transfer.V1\312\002\034Ibc\\Ap" +
+      "plications\\Transfer\\V1\342\002(Ibc\\Application" +
+      "s\\Transfer\\V1\\GPBMetadata\352\002\037Ibc::Applica" +
+      "tions::Transfer::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -71,13 +72,13 @@ public final class TxProto {
     internal_static_ibc_applications_transfer_v1_MsgTransfer_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ibc_applications_transfer_v1_MsgTransfer_descriptor,
-        new java.lang.String[] { "SourcePort", "SourceChannel", "Token", "Sender", "Receiver", "TimeoutHeight", "TimeoutTimestamp", });
+        new java.lang.String[] { "SourcePort", "SourceChannel", "Token", "Sender", "Receiver", "TimeoutHeight", "TimeoutTimestamp", "Memo", });
     internal_static_ibc_applications_transfer_v1_MsgTransferResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_ibc_applications_transfer_v1_MsgTransferResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ibc_applications_transfer_v1_MsgTransferResponse_descriptor,
-        new java.lang.String[] { });
+        new java.lang.String[] { "Sequence", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.equal);

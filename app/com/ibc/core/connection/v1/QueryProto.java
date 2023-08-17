@@ -144,13 +144,13 @@ public final class QueryProto {
       "StateResponse\"\177\202\323\344\223\002y\022w/ibc/core/connect" +
       "ion/v1/connections/{connection_id}/conse" +
       "nsus_state/revision/{revision_number}/he" +
-      "ight/{revision_height}B\347\001\n\032com.ibc.core." +
-      "connection.v1B\nQueryProtoP\001ZBgithub.com/" +
-      "AssetMantle/modules/ibc/core/connection/" +
-      "v1;connectionv1\242\002\003ICC\252\002\026Ibc.Core.Connect" +
-      "ion.V1\312\002\026Ibc\\Core\\Connection\\V1\342\002\"Ibc\\Co" +
-      "re\\Connection\\V1\\GPBMetadata\352\002\031Ibc::Core" +
-      "::Connection::V1b\006proto3"
+      "ight/{revision_height}B\341\001\n\032com.ibc.core." +
+      "connection.v1B\nQueryProtoP\001Z<github.com/" +
+      "cosmos/ibc-go/v4/modules/core/03-connect" +
+      "ion/types\242\002\003ICC\252\002\026Ibc.Core.Connection.V1" +
+      "\312\002\026Ibc\\Core\\Connection\\V1\342\002\"Ibc\\Core\\Con" +
+      "nection\\V1\\GPBMetadata\352\002\031Ibc::Core::Conn" +
+      "ection::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

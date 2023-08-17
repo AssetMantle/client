@@ -37,12 +37,13 @@ public final class TypesProto {
       "mint.version\032\024gogoproto/gogo.proto\"=\n\003Ap" +
       "p\022\032\n\010protocol\030\001 \001(\004R\010protocol\022\032\n\010softwar" +
       "e\030\002 \001(\tR\010software\"9\n\tConsensus\022\024\n\005block\030" +
-      "\001 \001(\004R\005block\022\020\n\003app\030\002 \001(\004R\003app:\004\350\240\037\001B\300\001\n" +
-      "\026com.tendermint.versionB\nTypesProtoP\001Z1g" +
-      "ithub.com/AssetMantle/modules/tendermint" +
-      "/version\242\002\003TVX\252\002\022Tendermint.Version\312\002\022Te" +
-      "ndermint\\Version\342\002\036Tendermint\\Version\\GP" +
-      "BMetadata\352\002\023Tendermint::Versionb\006proto3"
+      "\001 \001(\004R\005block\022\020\n\003app\030\002 \001(\004R\003app:\004\350\240\037\001B\310\001\n" +
+      "\026com.tendermint.versionB\nTypesProtoP\001Z9g" +
+      "ithub.com/tendermint/tendermint/proto/te" +
+      "ndermint/version\242\002\003TVX\252\002\022Tendermint.Vers" +
+      "ion\312\002\022Tendermint\\Version\342\002\036Tendermint\\Ve" +
+      "rsion\\GPBMetadata\352\002\023Tendermint::Versionb" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

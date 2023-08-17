@@ -33,13 +33,12 @@ public final class GenesisProto {
       "to\032\036cosmos/base/v1beta1/coin.proto\"i\n\014Ge" +
       "nesisState\022Y\n\014constant_fee\030\003 \001(\0132\031.cosmo" +
       "s.base.v1beta1.CoinB\033\310\336\037\000\362\336\037\023yaml:\"const" +
-      "ant_fee\"R\013constantFeeB\343\001\n\031com.cosmos.cri" +
-      "sis.v1beta1B\014GenesisProtoP\001ZBgithub.com/" +
-      "AssetMantle/modules/cosmos/crisis/v1beta" +
-      "1;crisisv1beta1\242\002\003CCX\252\002\025Cosmos.Crisis.V1" +
-      "beta1\312\002\025Cosmos\\Crisis\\V1beta1\342\002!Cosmos\\C" +
-      "risis\\V1beta1\\GPBMetadata\352\002\027Cosmos::Cris" +
-      "is::V1beta1b\006proto3"
+      "ant_fee\"R\013constantFeeB\314\001\n\031com.cosmos.cri" +
+      "sis.v1beta1B\014GenesisProtoP\001Z+github.com/" +
+      "cosmos/cosmos-sdk/x/crisis/types\242\002\003CCX\252\002" +
+      "\025Cosmos.Crisis.V1beta1\312\002\025Cosmos\\Crisis\\V" +
+      "1beta1\342\002!Cosmos\\Crisis\\V1beta1\\GPBMetada" +
+      "ta\352\002\027Cosmos::Crisis::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

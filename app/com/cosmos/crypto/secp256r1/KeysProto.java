@@ -37,13 +37,13 @@ public final class KeysProto {
       "smos.crypto.secp256r1\032\024gogoproto/gogo.pr" +
       "oto\"\'\n\006PubKey\022\035\n\003key\030\001 \001(\014B\013\332\336\037\007ecdsaPKR" +
       "\003key\".\n\007PrivKey\022#\n\006secret\030\001 \001(\014B\013\332\336\037\007ecd" +
-      "saSKR\006secretB\352\001\n\033com.cosmos.crypto.secp2" +
-      "56r1B\tKeysProtoP\001Z6github.com/AssetMantl" +
-      "e/modules/cosmos/crypto/secp256r1\242\002\003CCS\252" +
-      "\002\027Cosmos.Crypto.Secp256r1\312\002\027Cosmos\\Crypt" +
-      "o\\Secp256r1\342\002#Cosmos\\Crypto\\Secp256r1\\GP" +
-      "BMetadata\352\002\031Cosmos::Crypto::Secp256r1\310\341\036" +
-      "\000\330\341\036\000\310\343\036\001b\006proto3"
+      "saSKR\006secretB\346\001\n\033com.cosmos.crypto.secp2" +
+      "56r1B\tKeysProtoP\001Z2github.com/cosmos/cos" +
+      "mos-sdk/crypto/keys/secp256r1\242\002\003CCS\252\002\027Co" +
+      "smos.Crypto.Secp256r1\312\002\027Cosmos\\Crypto\\Se" +
+      "cp256r1\342\002#Cosmos\\Crypto\\Secp256r1\\GPBMet" +
+      "adata\352\002\031Cosmos::Crypto::Secp256r1\310\341\036\000\330\341\036" +
+      "\000\310\343\036\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

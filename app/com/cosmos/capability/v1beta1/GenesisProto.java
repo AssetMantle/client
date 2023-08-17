@@ -42,14 +42,13 @@ public final class GenesisProto {
       "sB\033\310\336\037\000\362\336\037\023yaml:\"index_owners\"R\013indexOwn" +
       "ers\"l\n\014GenesisState\022\024\n\005index\030\001 \001(\004R\005inde" +
       "x\022F\n\006owners\030\002 \003(\0132(.cosmos.capability.v1" +
-      "beta1.GenesisOwnersB\004\310\336\037\000R\006ownersB\377\001\n\035co" +
+      "beta1.GenesisOwnersB\004\310\336\037\000R\006ownersB\344\001\n\035co" +
       "m.cosmos.capability.v1beta1B\014GenesisProt" +
-      "oP\001ZJgithub.com/AssetMantle/modules/cosm" +
-      "os/capability/v1beta1;capabilityv1beta1\242" +
-      "\002\003CCX\252\002\031Cosmos.Capability.V1beta1\312\002\031Cosm" +
-      "os\\Capability\\V1beta1\342\002%Cosmos\\Capabilit" +
-      "y\\V1beta1\\GPBMetadata\352\002\033Cosmos::Capabili" +
-      "ty::V1beta1b\006proto3"
+      "oP\001Z/github.com/cosmos/cosmos-sdk/x/capa" +
+      "bility/types\242\002\003CCX\252\002\031Cosmos.Capability.V" +
+      "1beta1\312\002\031Cosmos\\Capability\\V1beta1\342\002%Cos" +
+      "mos\\Capability\\V1beta1\\GPBMetadata\352\002\033Cos" +
+      "mos::Capability::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

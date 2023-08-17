@@ -30,7 +30,14 @@ class Parameters @Inject()(
                             getDistributionParams: GetDistribution,
                             getMintParams: GetMint,
                             getSlashingParams: GetSlashing,
-                            getStakingParams: GetStaking
+                            getStakingParams: GetStaking,
+                            getClassificationParams: GetClassification,
+                            getAssetParams: GetAsset,
+                            getIdentityParams: GetIdentity,
+                            getMaintainerParams: GetMaintainer,
+                            getMetaParams: GetMeta,
+                            getOrderParams: GetOrder,
+                            getSplitParams: GetSplit,
                           )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -168,6 +175,42 @@ class Parameters @Inject()(
           case constants.Blockchain.ParameterType.CRISIS => Future(CrisisParameter(Coin(denom = "", amount = MicroNumber.zero)))
           case constants.Blockchain.ParameterType.IBC => Future(IBCParameter(allowedClients = Seq.empty))
           case constants.Blockchain.ParameterType.TRANSFER => Future(TransferParameter(receiveEnabled = true, sendEnabled = true))
+          case constants.Blockchain.ParameterType.ASSETS =>
+            val response = getAssetParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.CLASSIFICATIONS =>
+            val response = getClassificationParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.IDENTITIES =>
+            val response = getIdentityParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.MAINTAINERS =>
+            val response = getMaintainerParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.METAS =>
+            val response = getMetaParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.ORDERS =>
+            val response = getOrderParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.SPLITS =>
+            val response = getSplitParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case _ => constants.Response.PARAMETER_TYPE_NOT_FOUND.throwBaseException()
         }
 
         def upsertParameter(parameterValue: abstractParameter) = if (parameterValue.parameterType != constants.Blockchain.ParameterType.CRISIS || parameterValue.parameterType != constants.Blockchain.ParameterType.IBC || parameterValue.parameterType != constants.Blockchain.ParameterType.TRANSFER)
@@ -179,9 +222,12 @@ class Parameters @Inject()(
         } yield ()
       })
 
-      for {
+      (for {
         _ <- update
       } yield ()
+        ).recover {
+        case _: BaseException => logger.error("FAILED_TO_UPDATE_BLOCKCHAIN_PARAMETER")
+      }
     }
   }
 

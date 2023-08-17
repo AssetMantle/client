@@ -73,14 +73,13 @@ public final class FeegrantProto {
       "\037\000\322\264-\rFeeAllowanceI\"\202\001\n\005Grant\022\030\n\007granter" +
       "\030\001 \001(\tR\007granter\022\030\n\007grantee\030\002 \001(\tR\007grante" +
       "e\022E\n\tallowance\030\003 \001(\0132\024.google.protobuf.A" +
-      "nyB\021\312\264-\rFeeAllowanceIR\tallowanceB\362\001\n\033com" +
+      "nyB\021\312\264-\rFeeAllowanceIR\tallowanceB\323\001\n\033com" +
       ".cosmos.feegrant.v1beta1B\rFeegrantProtoP" +
-      "\001ZFgithub.com/AssetMantle/modules/cosmos" +
-      "/feegrant/v1beta1;feegrantv1beta1\242\002\003CFX\252" +
-      "\002\027Cosmos.Feegrant.V1beta1\312\002\027Cosmos\\Feegr" +
-      "ant\\V1beta1\342\002#Cosmos\\Feegrant\\V1beta1\\GP" +
-      "BMetadata\352\002\031Cosmos::Feegrant::V1beta1b\006p" +
-      "roto3"
+      "\001Z\'github.com/cosmos/cosmos-sdk/x/feegra" +
+      "nt\242\002\003CFX\252\002\027Cosmos.Feegrant.V1beta1\312\002\027Cos" +
+      "mos\\Feegrant\\V1beta1\342\002#Cosmos\\Feegrant\\V" +
+      "1beta1\\GPBMetadata\352\002\031Cosmos::Feegrant::V" +
+      "1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

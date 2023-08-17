@@ -107,14 +107,14 @@ public final class TendermintProto {
       "ypes.ValidatorSetB\035\362\336\037\031yaml:\"trusted_val" +
       "idators\"R\021trustedValidators\"J\n\010Fraction\022" +
       "\034\n\tnumerator\030\001 \001(\004R\tnumerator\022 \n\013denomin" +
-      "ator\030\002 \001(\004R\013denominatorB\234\002\n\"com.ibc.ligh" +
+      "ator\030\002 \001(\004R\013denominatorB\227\002\n\"com.ibc.ligh" +
       "tclients.tendermint.v1B\017TendermintProtoP" +
-      "\001ZJgithub.com/AssetMantle/modules/ibc/li" +
-      "ghtclients/tendermint/v1;tendermintv1\242\002\003" +
-      "ILT\252\002\036Ibc.Lightclients.Tendermint.V1\312\002\036I" +
-      "bc\\Lightclients\\Tendermint\\V1\342\002*Ibc\\Ligh" +
-      "tclients\\Tendermint\\V1\\GPBMetadata\352\002!Ibc" +
-      "::Lightclients::Tendermint::V1b\006proto3"
+      "\001ZEgithub.com/cosmos/ibc-go/v4/modules/l" +
+      "ight-clients/07-tendermint/types\242\002\003ILT\252\002" +
+      "\036Ibc.Lightclients.Tendermint.V1\312\002\036Ibc\\Li" +
+      "ghtclients\\Tendermint\\V1\342\002*Ibc\\Lightclie" +
+      "nts\\Tendermint\\V1\\GPBMetadata\352\002!Ibc::Lig" +
+      "htclients::Tendermint::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

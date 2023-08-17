@@ -76,13 +76,12 @@ object Data {
       else if (this.string_data.isDefined) this.string_data.get.toStringData
       else this.number_data.get.toNumberData
     }
-
   }
 
   implicit val AnyDataWithoutListDataReads: Reads[AnyListableData] = Json.reads[AnyListableData]
 
-  case class ListData(any_listable_data: Seq[AnyListableData]) {
-    def toListData: baseSchemaData.ListData = baseSchemaData.ListData(this.any_listable_data.map(_.toListableData))
+  case class ListData(value: Seq[AnyListableData]) {
+    def toListData: baseSchemaData.ListData = baseSchemaData.ListData(this.value.map(_.toListableData))
   }
 
   implicit val ListDataReads: Reads[ListData] = Json.reads[ListData]

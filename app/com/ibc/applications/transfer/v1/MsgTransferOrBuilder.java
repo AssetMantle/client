@@ -154,4 +154,24 @@ public interface MsgTransferOrBuilder extends
    * @return The timeoutTimestamp.
    */
   long getTimeoutTimestamp();
+
+  /**
+   * <pre>
+   * optional memo
+   * </pre>
+   *
+   * <code>string memo = 8 [json_name = "memo"];</code>
+   * @return The memo.
+   */
+  java.lang.String getMemo();
+  /**
+   * <pre>
+   * optional memo
+   * </pre>
+   *
+   * <code>string memo = 8 [json_name = "memo"];</code>
+   * @return The bytes for memo.
+   */
+  com.google.protobuf.ByteString
+      getMemoBytes();
 }

@@ -334,12 +334,12 @@ public final class QueryProto {
       "annel.v1.QueryNextSequenceReceiveRespons" +
       "e\"P\202\323\344\223\002J\022H/ibc/core/channel/v1/channels" +
       "/{channel_id}/ports/{port_id}/next_seque" +
-      "nceB\322\001\n\027com.ibc.core.channel.v1B\nQueryPr" +
-      "otoP\001Z<github.com/AssetMantle/modules/ib" +
-      "c/core/channel/v1;channelv1\242\002\003ICC\252\002\023Ibc." +
-      "Core.Channel.V1\312\002\023Ibc\\Core\\Channel\\V1\342\002\037" +
-      "Ibc\\Core\\Channel\\V1\\GPBMetadata\352\002\026Ibc::C" +
-      "ore::Channel::V1b\006proto3"
+      "nceB\317\001\n\027com.ibc.core.channel.v1B\nQueryPr" +
+      "otoP\001Z9github.com/cosmos/ibc-go/v4/modul" +
+      "es/core/04-channel/types\242\002\003ICC\252\002\023Ibc.Cor" +
+      "e.Channel.V1\312\002\023Ibc\\Core\\Channel\\V1\342\002\037Ibc" +
+      "\\Core\\Channel\\V1\\GPBMetadata\352\002\026Ibc::Core" +
+      "::Channel::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

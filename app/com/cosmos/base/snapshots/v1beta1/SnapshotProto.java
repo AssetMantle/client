@@ -82,14 +82,13 @@ public final class SnapshotProto {
       "\006height\"C\n\025SnapshotExtensionMeta\022\022\n\004name" +
       "\030\001 \001(\tR\004name\022\026\n\006format\030\002 \001(\rR\006format\"4\n\030" +
       "SnapshotExtensionPayload\022\030\n\007payload\030\001 \001(" +
-      "\014R\007payloadB\230\002\n!com.cosmos.base.snapshots" +
-      ".v1beta1B\rSnapshotProtoP\001ZMgithub.com/As" +
-      "setMantle/modules/cosmos/base/snapshots/" +
-      "v1beta1;snapshotsv1beta1\242\002\003CBS\252\002\035Cosmos." +
-      "Base.Snapshots.V1beta1\312\002\035Cosmos\\Base\\Sna" +
-      "pshots\\V1beta1\342\002)Cosmos\\Base\\Snapshots\\V" +
-      "1beta1\\GPBMetadata\352\002 Cosmos::Base::Snaps" +
-      "hots::V1beta1b\006proto3"
+      "\014R\007payloadB\367\001\n!com.cosmos.base.snapshots" +
+      ".v1beta1B\rSnapshotProtoP\001Z,github.com/co" +
+      "smos/cosmos-sdk/snapshots/types\242\002\003CBS\252\002\035" +
+      "Cosmos.Base.Snapshots.V1beta1\312\002\035Cosmos\\B" +
+      "ase\\Snapshots\\V1beta1\342\002)Cosmos\\Base\\Snap" +
+      "shots\\V1beta1\\GPBMetadata\352\002 Cosmos::Base" +
+      "::Snapshots::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

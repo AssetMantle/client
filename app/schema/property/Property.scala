@@ -1,6 +1,7 @@
 package schema.property
 
 import com.assetmantle.schema.properties.base.AnyProperty
+import schema.data.Data
 import schema.id.base.{DataID, PropertyID, StringID}
 import schema.property.base.{MesaProperty, MetaProperty}
 
@@ -18,11 +19,15 @@ abstract class Property {
 
   def isMeta: Boolean
 
+  def isMesa: Boolean
+
   def toAnyProperty: AnyProperty
 
   def getProtoBytes: Array[Byte]
 
   def scrub(): MesaProperty
+
+  def mutate(data: Data): Property
 
 }
 

@@ -13,7 +13,7 @@ function onOpen(event) {
 }
 
 function onClose(event) {
-    init();
+    setTimeout(init, 1000);
 }
 
 function onError(event) {

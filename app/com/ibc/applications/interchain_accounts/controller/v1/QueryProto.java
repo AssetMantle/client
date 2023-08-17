@@ -69,17 +69,17 @@ public final class QueryProto {
       "st\032G.ibc.applications.interchain_account" +
       "s.controller.v1.QueryParamsResponse\":\202\323\344" +
       "\223\0024\0222/ibc/apps/interchain_accounts/contr" +
-      "oller/v1/paramsB\215\003\n6com.ibc.applications" +
+      "oller/v1/paramsB\377\002\n6com.ibc.applications" +
       ".interchain_accounts.controller.v1B\nQuer" +
-      "yProtoP\001Z^github.com/AssetMantle/modules" +
-      "/ibc/applications/interchain_accounts/co" +
-      "ntroller/v1;controllerv1\242\002\004IAIC\252\0021Ibc.Ap" +
-      "plications.InterchainAccounts.Controller" +
-      ".V1\312\0021Ibc\\Applications\\InterchainAccount" +
-      "s\\Controller\\V1\342\002=Ibc\\Applications\\Inter" +
-      "chainAccounts\\Controller\\V1\\GPBMetadata\352" +
-      "\0025Ibc::Applications::InterchainAccounts:" +
-      ":Controller::V1b\006proto3"
+      "yProtoP\001ZPgithub.com/cosmos/ibc-go/v4/mo" +
+      "dules/apps/27-interchain-accounts/contro" +
+      "ller/types\242\002\004IAIC\252\0021Ibc.Applications.Int" +
+      "erchainAccounts.Controller.V1\312\0021Ibc\\Appl" +
+      "ications\\InterchainAccounts\\Controller\\V" +
+      "1\342\002=Ibc\\Applications\\InterchainAccounts\\" +
+      "Controller\\V1\\GPBMetadata\352\0025Ibc::Applica" +
+      "tions::InterchainAccounts::Controller::V" +
+      "1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

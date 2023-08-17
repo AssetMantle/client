@@ -43,16 +43,16 @@ public final class PacketProto {
       "emo\"<\n\010CosmosTx\0220\n\010messages\030\001 \003(\0132\024.goog" +
       "le.protobuf.AnyR\010messages*X\n\004Type\022%\n\020TYP" +
       "E_UNSPECIFIED\020\000\032\017\212\235 \013UNSPECIFIED\022#\n\017TYPE" +
-      "_EXECUTE_TX\020\001\032\016\212\235 \nEXECUTE_TX\032\004\210\243\036\000B\323\002\n+" +
+      "_EXECUTE_TX\020\001\032\016\212\235 \nEXECUTE_TX\032\004\210\243\036\000B\274\002\n+" +
       "com.ibc.applications.interchain_accounts" +
-      ".v1B\013PacketProtoP\001Z\\github.com/AssetMant" +
-      "le/modules/ibc/applications/interchain_a" +
-      "ccounts/v1;interchain_accountsv1\242\002\003IAI\252\002" +
-      "&Ibc.Applications.InterchainAccounts.V1\312" +
-      "\002&Ibc\\Applications\\InterchainAccounts\\V1" +
-      "\342\0022Ibc\\Applications\\InterchainAccounts\\V" +
-      "1\\GPBMetadata\352\002)Ibc::Applications::Inter" +
-      "chainAccounts::V1b\006proto3"
+      ".v1B\013PacketProtoP\001ZEgithub.com/cosmos/ib" +
+      "c-go/v4/modules/apps/27-interchain-accou" +
+      "nts/types\242\002\003IAI\252\002&Ibc.Applications.Inter" +
+      "chainAccounts.V1\312\002&Ibc\\Applications\\Inte" +
+      "rchainAccounts\\V1\342\0022Ibc\\Applications\\Int" +
+      "erchainAccounts\\V1\\GPBMetadata\352\002)Ibc::Ap" +
+      "plications::InterchainAccounts::V1b\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

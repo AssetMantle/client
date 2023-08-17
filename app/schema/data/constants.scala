@@ -8,7 +8,7 @@ import java.text.DecimalFormat
 object constants {
 
   val TypeAndValueSeparator = "|"
-  val ListSeparator = "\\#"
+  val ListBytesSeparator = "\\#"
 
   val DecFactor: Long = 1000000000000000000L
   val DecStringFormat = new DecimalFormat("#0.000000000000000000")
@@ -22,8 +22,9 @@ object constants {
   val DecDataTypeID: StringID = StringID("D")
   val HeightDataTypeID: StringID = StringID("H")
   val ListDataTypeID: StringID = StringID("L")
-  val StringDataTypeID: StringID = StringID("S")
+  val LinkedDataTypeID: StringID = StringID("U")
   val NumberDataTypeID: StringID = StringID("N")
+  val StringDataTypeID: StringID = StringID("S")
 
   val AccAddressBondWeight = 90
   val BooleanBondWeight = 1
@@ -31,6 +32,7 @@ object constants {
   val HeightDataWeight = 8
   val IDDataWeight = 64
   val ListDataWeight = 1024
+  val LinkedDataWeight = 384
   val NumberDataWeight = 8
   val StringDataWeight = 256
   val AnyDataWeight = 0

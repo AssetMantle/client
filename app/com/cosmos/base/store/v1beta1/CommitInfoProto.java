@@ -47,14 +47,13 @@ public final class CommitInfoProto {
       "name\022F\n\tcommit_id\030\002 \001(\0132#.cosmos.base.st" +
       "ore.v1beta1.CommitIDB\004\310\336\037\000R\010commitId\">\n\010" +
       "CommitID\022\030\n\007version\030\001 \001(\003R\007version\022\022\n\004ha" +
-      "sh\030\002 \001(\014R\004hash:\004\230\240\037\000B\376\001\n\035com.cosmos.base" +
-      ".store.v1beta1B\017CommitInfoProtoP\001ZEgithu" +
-      "b.com/AssetMantle/modules/cosmos/base/st" +
-      "ore/v1beta1;storev1beta1\242\002\003CBS\252\002\031Cosmos." +
-      "Base.Store.V1beta1\312\002\031Cosmos\\Base\\Store\\V" +
-      "1beta1\342\002%Cosmos\\Base\\Store\\V1beta1\\GPBMe" +
-      "tadata\352\002\034Cosmos::Base::Store::V1beta1b\006p" +
-      "roto3"
+      "sh\030\002 \001(\014R\004hash:\004\230\240\037\000B\341\001\n\035com.cosmos.base" +
+      ".store.v1beta1B\017CommitInfoProtoP\001Z(githu" +
+      "b.com/cosmos/cosmos-sdk/store/types\242\002\003CB" +
+      "S\252\002\031Cosmos.Base.Store.V1beta1\312\002\031Cosmos\\B" +
+      "ase\\Store\\V1beta1\342\002%Cosmos\\Base\\Store\\V1" +
+      "beta1\\GPBMetadata\352\002\034Cosmos::Base::Store:" +
+      ":V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

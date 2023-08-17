@@ -180,14 +180,13 @@ public final class QueryProto {
       "base.tendermint.v1beta1.GetValidatorSetB" +
       "yHeightResponse\">\202\323\344\223\0028\0226/cosmos/base/te" +
       "ndermint/v1beta1/validatorsets/{height}B" +
-      "\234\002\n\"com.cosmos.base.tendermint.v1beta1B\n" +
-      "QueryProtoP\001ZOgithub.com/AssetMantle/mod" +
-      "ules/cosmos/base/tendermint/v1beta1;tend" +
-      "ermintv1beta1\242\002\003CBT\252\002\036Cosmos.Base.Tender" +
-      "mint.V1beta1\312\002\036Cosmos\\Base\\Tendermint\\V1" +
-      "beta1\342\002*Cosmos\\Base\\Tendermint\\V1beta1\\G" +
-      "PBMetadata\352\002!Cosmos::Base::Tendermint::V" +
-      "1beta1b\006proto3"
+      "\377\001\n\"com.cosmos.base.tendermint.v1beta1B\n" +
+      "QueryProtoP\001Z2github.com/cosmos/cosmos-s" +
+      "dk/client/grpc/tmservice\242\002\003CBT\252\002\036Cosmos." +
+      "Base.Tendermint.V1beta1\312\002\036Cosmos\\Base\\Te" +
+      "ndermint\\V1beta1\342\002*Cosmos\\Base\\Tendermin" +
+      "t\\V1beta1\\GPBMetadata\352\002!Cosmos::Base::Te" +
+      "ndermint::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

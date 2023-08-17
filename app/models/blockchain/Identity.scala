@@ -176,8 +176,8 @@ class Identities @Inject()(
     def onNub(msg: identityTransactions.nub.Message): Future[String] = {
       val immutables = Immutables(PropertyList(Seq(schema.constants.Properties.NubProperty.copy(data = IDData(StringID(msg.getNubID))))))
       val mutables = Mutables(PropertyList(Seq(schema.constants.Properties.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(msg.getFrom)))))))
-      val identityID = schema.utilities.ID.getIdentityID(classificationID = schema.constants.Document.NubClassificationID, immutables = immutables)
-      val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = schema.constants.Document.NubClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val identityID = schema.utilities.ID.getIdentityID(classificationID = schema.document.NameIdentity.NameIdentityClassificationID, immutables = immutables)
+      val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = schema.document.NameIdentity.NameIdentityClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(identity)
 
       for {

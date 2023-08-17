@@ -37,12 +37,12 @@ public final class BlockProto {
       "\336\037\000R\004data\022@\n\010evidence\030\003 \001(\0132\036.tendermint" +
       ".types.EvidenceListB\004\310\336\037\000R\010evidence\0229\n\013l" +
       "ast_commit\030\004 \001(\0132\030.tendermint.types.Comm" +
-      "itR\nlastCommitB\264\001\n\024com.tendermint.typesB" +
-      "\nBlockProtoP\001Z/github.com/AssetMantle/mo" +
-      "dules/tendermint/types\242\002\003TTX\252\002\020Tendermin" +
-      "t.Types\312\002\020Tendermint\\Types\342\002\034Tendermint\\" +
-      "Types\\GPBMetadata\352\002\021Tendermint::Typesb\006p" +
-      "roto3"
+      "itR\nlastCommitB\274\001\n\024com.tendermint.typesB" +
+      "\nBlockProtoP\001Z7github.com/tendermint/ten" +
+      "dermint/proto/tendermint/types\242\002\003TTX\252\002\020T" +
+      "endermint.Types\312\002\020Tendermint\\Types\342\002\034Ten" +
+      "dermint\\Types\\GPBMetadata\352\002\021Tendermint::" +
+      "Typesb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

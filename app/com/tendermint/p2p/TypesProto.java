@@ -60,11 +60,12 @@ public final class TypesProto {
       "nt.p2p.DefaultNodeInfoOtherB\004\310\336\037\000R\005other" +
       "\"b\n\024DefaultNodeInfoOther\022\031\n\010tx_index\030\001 \001" +
       "(\tR\007txIndex\022/\n\013rpc_address\030\002 \001(\tB\016\342\336\037\nRP" +
-      "CAddressR\nrpcAddressB\250\001\n\022com.tendermint." +
-      "p2pB\nTypesProtoP\001Z-github.com/AssetMantl" +
-      "e/modules/tendermint/p2p\242\002\003TPX\252\002\016Tenderm" +
-      "int.P2p\312\002\016Tendermint\\P2p\342\002\032Tendermint\\P2" +
-      "p\\GPBMetadata\352\002\017Tendermint::P2pb\006proto3"
+      "CAddressR\nrpcAddressB\260\001\n\022com.tendermint." +
+      "p2pB\nTypesProtoP\001Z5github.com/tendermint" +
+      "/tendermint/proto/tendermint/p2p\242\002\003TPX\252\002" +
+      "\016Tendermint.P2p\312\002\016Tendermint\\P2p\342\002\032Tende" +
+      "rmint\\P2p\\GPBMetadata\352\002\017Tendermint::P2pb" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

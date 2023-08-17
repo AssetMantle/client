@@ -1,26 +1,23 @@
 package schema.id.base
 
-import com.assetmantle.schema.ids.base.{AnyID, AnyOwnableID, AssetID => protoAssetID}
+import com.assetmantle.schema.ids.base.{AnyID, AssetID => protoAssetID}
 import schema.id._
 
-case class AssetID(hashID: HashID) extends OwnableID {
+case class AssetID(hashID: HashID) extends ID {
 
   def getBytes: Array[Byte] = this.hashID.getBytes
 
   def getType: StringID = constants.AssetIDType
 
-  def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
+  def asString: String = schema.utilities.common.base64URLEncoder(this.getBytes)
 
   def asProtoAssetID: protoAssetID = protoAssetID.newBuilder().setHashID(this.hashID.asProtoHashID).build()
-
-  def toAnyOwnableID: AnyOwnableID = AnyOwnableID.newBuilder().setAssetID(this.asProtoAssetID).build()
 
   def toAnyID: AnyID = AnyID.newBuilder().setAssetID(this.asProtoAssetID).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoAssetID.toByteString.toByteArray
 
-  def isCoinId: Boolean = false
-
+  def compare(id: ID): Int = schema.utilities.common.byteArraysCompare(this.getBytes, id.asInstanceOf[AssetID].getBytes)
 }
 
 object AssetID {

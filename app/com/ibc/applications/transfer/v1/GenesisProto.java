@@ -37,14 +37,14 @@ public final class GenesisProto {
       "ions.transfer.v1.DenomTraceB%\310\336\037\000\362\336\037\023yam" +
       "l:\"denom_traces\"\252\337\037\006TracesR\013denomTraces\022" +
       "B\n\006params\030\003 \001(\0132$.ibc.applications.trans" +
-      "fer.v1.ParamsB\004\310\336\037\000R\006paramsB\213\002\n com.ibc." +
+      "fer.v1.ParamsB\004\310\336\037\000R\006paramsB\374\001\n com.ibc." +
       "applications.transfer.v1B\014GenesisProtoP\001" +
-      "ZFgithub.com/AssetMantle/modules/ibc/app" +
-      "lications/transfer/v1;transferv1\242\002\003IAT\252\002" +
-      "\034Ibc.Applications.Transfer.V1\312\002\034Ibc\\Appl" +
-      "ications\\Transfer\\V1\342\002(Ibc\\Applications\\" +
-      "Transfer\\V1\\GPBMetadata\352\002\037Ibc::Applicati" +
-      "ons::Transfer::V1b\006proto3"
+      "Z7github.com/cosmos/ibc-go/v4/modules/ap" +
+      "ps/transfer/types\242\002\003IAT\252\002\034Ibc.Applicatio" +
+      "ns.Transfer.V1\312\002\034Ibc\\Applications\\Transf" +
+      "er\\V1\342\002(Ibc\\Applications\\Transfer\\V1\\GPB" +
+      "Metadata\352\002\037Ibc::Applications::Transfer::" +
+      "V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

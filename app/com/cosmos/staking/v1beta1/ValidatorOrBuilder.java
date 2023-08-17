@@ -233,4 +233,43 @@ public interface ValidatorOrBuilder extends
    */
   com.google.protobuf.ByteString
       getMinSelfDelegationBytes();
+
+  /**
+   * <pre>
+   * strictly positive if this validator's unbonding has been stopped by external modules
+   * </pre>
+   *
+   * <code>int64 unbonding_on_hold_ref_count = 12 [json_name = "unbondingOnHoldRefCount"];</code>
+   * @return The unbondingOnHoldRefCount.
+   */
+  long getUnbondingOnHoldRefCount();
+
+  /**
+   * <pre>
+   * list of unbonding ids, each uniquely identifing an unbonding of this validator
+   * </pre>
+   *
+   * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+   * @return A list containing the unbondingIds.
+   */
+  java.util.List<java.lang.Long> getUnbondingIdsList();
+  /**
+   * <pre>
+   * list of unbonding ids, each uniquely identifing an unbonding of this validator
+   * </pre>
+   *
+   * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+   * @return The count of unbondingIds.
+   */
+  int getUnbondingIdsCount();
+  /**
+   * <pre>
+   * list of unbonding ids, each uniquely identifing an unbonding of this validator
+   * </pre>
+   *
+   * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+   * @param index The index of the element to return.
+   * @return The unbondingIds at the given index.
+   */
+  long getUnbondingIds(int index);
 }

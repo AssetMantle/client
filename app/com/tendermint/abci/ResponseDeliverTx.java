@@ -185,6 +185,10 @@ private static final long serialVersionUID = 0L;
   @SuppressWarnings("serial")
   private java.util.List<com.tendermint.abci.Event> events_;
   /**
+   * <pre>
+   * nondeterministic
+   * </pre>
+   *
    * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
    */
   @java.lang.Override
@@ -192,6 +196,10 @@ private static final long serialVersionUID = 0L;
     return events_;
   }
   /**
+   * <pre>
+   * nondeterministic
+   * </pre>
+   *
    * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
    */
   @java.lang.Override
@@ -200,6 +208,10 @@ private static final long serialVersionUID = 0L;
     return events_;
   }
   /**
+   * <pre>
+   * nondeterministic
+   * </pre>
+   *
    * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
    */
   @java.lang.Override
@@ -207,6 +219,10 @@ private static final long serialVersionUID = 0L;
     return events_.size();
   }
   /**
+   * <pre>
+   * nondeterministic
+   * </pre>
+   *
    * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
    */
   @java.lang.Override
@@ -214,6 +230,10 @@ private static final long serialVersionUID = 0L;
     return events_.get(index);
   }
   /**
+   * <pre>
+   * nondeterministic
+   * </pre>
+   *
    * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
    */
   @java.lang.Override
@@ -1124,6 +1144,10 @@ private static final long serialVersionUID = 0L;
         com.tendermint.abci.Event, com.tendermint.abci.Event.Builder, com.tendermint.abci.EventOrBuilder> eventsBuilder_;
 
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public java.util.List<com.tendermint.abci.Event> getEventsList() {
@@ -1134,6 +1158,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public int getEventsCount() {
@@ -1144,6 +1172,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public com.tendermint.abci.Event getEvents(int index) {
@@ -1154,6 +1186,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public Builder setEvents(
@@ -1171,6 +1207,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public Builder setEvents(
@@ -1185,6 +1225,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public Builder addEvents(com.tendermint.abci.Event value) {
@@ -1201,6 +1245,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public Builder addEvents(
@@ -1218,6 +1266,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public Builder addEvents(
@@ -1232,6 +1284,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public Builder addEvents(
@@ -1246,6 +1302,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public Builder addAllEvents(
@@ -1261,6 +1321,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public Builder clearEvents() {
@@ -1274,6 +1338,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public Builder removeEvents(int index) {
@@ -1287,6 +1355,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public com.tendermint.abci.Event.Builder getEventsBuilder(
@@ -1294,6 +1366,10 @@ private static final long serialVersionUID = 0L;
       return getEventsFieldBuilder().getBuilder(index);
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public com.tendermint.abci.EventOrBuilder getEventsOrBuilder(
@@ -1304,6 +1380,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public java.util.List<? extends com.tendermint.abci.EventOrBuilder> 
@@ -1315,6 +1395,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public com.tendermint.abci.Event.Builder addEventsBuilder() {
@@ -1322,6 +1406,10 @@ private static final long serialVersionUID = 0L;
           com.tendermint.abci.Event.getDefaultInstance());
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public com.tendermint.abci.Event.Builder addEventsBuilder(
@@ -1330,6 +1418,10 @@ private static final long serialVersionUID = 0L;
           index, com.tendermint.abci.Event.getDefaultInstance());
     }
     /**
+     * <pre>
+     * nondeterministic
+     * </pre>
+     *
      * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
      */
     public java.util.List<com.tendermint.abci.Event.Builder> 

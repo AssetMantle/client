@@ -34,16 +34,16 @@ public final class HostProto {
       "proto\"\206\001\n\006Params\022:\n\014host_enabled\030\001 \001(\010B\027" +
       "\362\336\037\023yaml:\"host_enabled\"R\013hostEnabled\022@\n\016" +
       "allow_messages\030\002 \003(\tB\031\362\336\037\025yaml:\"allow_me" +
-      "ssages\"R\rallowMessagesB\342\002\n0com.ibc.appli" +
+      "ssages\"R\rallowMessagesB\332\002\n0com.ibc.appli" +
       "cations.interchain_accounts.host.v1B\tHos" +
-      "tProtoP\001ZRgithub.com/AssetMantle/modules" +
-      "/ibc/applications/interchain_accounts/ho" +
-      "st/v1;hostv1\242\002\004IAIH\252\002+Ibc.Applications.I" +
-      "nterchainAccounts.Host.V1\312\002+Ibc\\Applicat" +
-      "ions\\InterchainAccounts\\Host\\V1\342\0027Ibc\\Ap" +
-      "plications\\InterchainAccounts\\Host\\V1\\GP" +
-      "BMetadata\352\002/Ibc::Applications::Interchai" +
-      "nAccounts::Host::V1b\006proto3"
+      "tProtoP\001ZJgithub.com/cosmos/ibc-go/v4/mo" +
+      "dules/apps/27-interchain-accounts/host/t" +
+      "ypes\242\002\004IAIH\252\002+Ibc.Applications.Interchai" +
+      "nAccounts.Host.V1\312\002+Ibc\\Applications\\Int" +
+      "erchainAccounts\\Host\\V1\342\0027Ibc\\Applicatio" +
+      "ns\\InterchainAccounts\\Host\\V1\\GPBMetadat" +
+      "a\352\002/Ibc::Applications::InterchainAccount" +
+      "s::Host::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

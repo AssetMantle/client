@@ -333,13 +333,12 @@ public final class QueryProto {
       "smos.staking.v1beta1.QueryParamsRequest\032" +
       "+.cosmos.staking.v1beta1.QueryParamsResp" +
       "onse\"&\202\323\344\223\002 \022\036/cosmos/staking/v1beta1/pa" +
-      "ramsB\350\001\n\032com.cosmos.staking.v1beta1B\nQue" +
-      "ryProtoP\001ZDgithub.com/AssetMantle/module" +
-      "s/cosmos/staking/v1beta1;stakingv1beta1\242" +
-      "\002\003CSX\252\002\026Cosmos.Staking.V1beta1\312\002\026Cosmos\\" +
-      "Staking\\V1beta1\342\002\"Cosmos\\Staking\\V1beta1" +
-      "\\GPBMetadata\352\002\030Cosmos::Staking::V1beta1b" +
-      "\006proto3"
+      "ramsB\320\001\n\032com.cosmos.staking.v1beta1B\nQue" +
+      "ryProtoP\001Z,github.com/cosmos/cosmos-sdk/" +
+      "x/staking/types\242\002\003CSX\252\002\026Cosmos.Staking.V" +
+      "1beta1\312\002\026Cosmos\\Staking\\V1beta1\342\002\"Cosmos" +
+      "\\Staking\\V1beta1\\GPBMetadata\352\002\030Cosmos::S" +
+      "taking::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

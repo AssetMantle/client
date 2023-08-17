@@ -140,7 +140,7 @@ object Parameters {
 
   implicit val OrderParameterReads: Reads[OrderParameter] = Json.reads[OrderParameter]
 
-  case class SplitParameter(wrapAllowedCoins: Seq[String]) extends Parameter {
+  case class SplitParameter(wrapAllowedCoins: Seq[String], unwrapAllowedCoins: Seq[String]) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.SPLITS
   }
 

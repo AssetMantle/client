@@ -18,6 +18,8 @@ case class StringID(value: String) extends ID {
   def toAnyID: AnyID = AnyID.newBuilder().setStringID(this.asProtoStringID).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoStringID.toByteString.toByteArray
+
+  def compare(id: ID): Int = this.value.compare(id.asInstanceOf[StringID].value)
 }
 
 object StringID {

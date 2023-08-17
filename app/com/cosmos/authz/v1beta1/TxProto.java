@@ -75,13 +75,12 @@ public final class TxProto {
       "uthz.v1beta1.MsgExec\032%.cosmos.authz.v1be" +
       "ta1.MsgExecResponse\022R\n\006Revoke\022\037.cosmos.a" +
       "uthz.v1beta1.MsgRevoke\032\'.cosmos.authz.v1" +
-      "beta1.MsgRevokeResponseB\333\001\n\030com.cosmos.a" +
-      "uthz.v1beta1B\007TxProtoP\001Z@github.com/Asse" +
-      "tMantle/modules/cosmos/authz/v1beta1;aut" +
-      "hzv1beta1\242\002\003CAX\252\002\024Cosmos.Authz.V1beta1\312\002" +
-      "\024Cosmos\\Authz\\V1beta1\342\002 Cosmos\\Authz\\V1b" +
-      "eta1\\GPBMetadata\352\002\026Cosmos::Authz::V1beta" +
-      "1\310\341\036\000b\006proto3"
+      "beta1.MsgRevokeResponseB\277\001\n\030com.cosmos.a" +
+      "uthz.v1beta1B\007TxProtoP\001Z$github.com/cosm" +
+      "os/cosmos-sdk/x/authz\242\002\003CAX\252\002\024Cosmos.Aut" +
+      "hz.V1beta1\312\002\024Cosmos\\Authz\\V1beta1\342\002 Cosm" +
+      "os\\Authz\\V1beta1\\GPBMetadata\352\002\026Cosmos::A" +
+      "uthz::V1beta1\310\341\036\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -38,12 +38,12 @@ public final class KeysProto {
       ">\n\006PubKey\022.\n\003key\030\001 \001(\014B\034\372\336\037\030crypto/ed255" +
       "19.PublicKeyR\003key:\004\230\240\037\000\":\n\007PrivKey\022/\n\003ke" +
       "y\030\001 \001(\014B\035\372\336\037\031crypto/ed25519.PrivateKeyR\003" +
-      "keyB\322\001\n\031com.cosmos.crypto.ed25519B\tKeysP" +
-      "rotoP\001Z4github.com/AssetMantle/modules/c" +
-      "osmos/crypto/ed25519\242\002\003CCE\252\002\025Cosmos.Cryp" +
-      "to.Ed25519\312\002\025Cosmos\\Crypto\\Ed25519\342\002!Cos" +
-      "mos\\Crypto\\Ed25519\\GPBMetadata\352\002\027Cosmos:" +
-      ":Crypto::Ed25519b\006proto3"
+      "keyB\316\001\n\031com.cosmos.crypto.ed25519B\tKeysP" +
+      "rotoP\001Z0github.com/cosmos/cosmos-sdk/cry" +
+      "pto/keys/ed25519\242\002\003CCE\252\002\025Cosmos.Crypto.E" +
+      "d25519\312\002\025Cosmos\\Crypto\\Ed25519\342\002!Cosmos\\" +
+      "Crypto\\Ed25519\\GPBMetadata\352\002\027Cosmos::Cry" +
+      "pto::Ed25519b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -39,14 +39,13 @@ public final class PaginationProto {
       "\004R\006offset\022\024\n\005limit\030\003 \001(\004R\005limit\022\037\n\013count" +
       "_total\030\004 \001(\010R\ncountTotal\022\030\n\007reverse\030\005 \001(" +
       "\010R\007reverse\"?\n\014PageResponse\022\031\n\010next_key\030\001" +
-      " \001(\014R\007nextKey\022\024\n\005total\030\002 \001(\004R\005totalB\376\001\n\035" +
+      " \001(\014R\007nextKey\022\024\n\005total\030\002 \001(\004R\005totalB\341\001\n\035" +
       "com.cosmos.base.query.v1beta1B\017Paginatio" +
-      "nProtoP\001ZEgithub.com/AssetMantle/modules" +
-      "/cosmos/base/query/v1beta1;queryv1beta1\242" +
-      "\002\003CBQ\252\002\031Cosmos.Base.Query.V1beta1\312\002\031Cosm" +
-      "os\\Base\\Query\\V1beta1\342\002%Cosmos\\Base\\Quer" +
-      "y\\V1beta1\\GPBMetadata\352\002\034Cosmos::Base::Qu" +
-      "ery::V1beta1b\006proto3"
+      "nProtoP\001Z(github.com/cosmos/cosmos-sdk/t" +
+      "ypes/query\242\002\003CBQ\252\002\031Cosmos.Base.Query.V1b" +
+      "eta1\312\002\031Cosmos\\Base\\Query\\V1beta1\342\002%Cosmo" +
+      "s\\Base\\Query\\V1beta1\\GPBMetadata\352\002\034Cosmo" +
+      "s::Base::Query::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

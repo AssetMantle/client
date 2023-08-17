@@ -260,15 +260,14 @@ public final class ReflectionProto {
       "equest\0328.cosmos.base.reflection.v2alpha1" +
       ".GetTxDescriptorResponse\"D\202\323\344\223\002>\022</cosmo" +
       "s/base/reflection/v1beta1/app_descriptor" +
-      "/tx_descriptorB\250\002\n#com.cosmos.base.refle" +
-      "ction.v2alpha1B\017ReflectionProtoP\001ZQgithu" +
-      "b.com/AssetMantle/modules/cosmos/base/re" +
-      "flection/v2alpha1;reflectionv2alpha1\242\002\003C" +
-      "BR\252\002\037Cosmos.Base.Reflection.V2alpha1\312\002\037C" +
-      "osmos\\Base\\Reflection\\V2alpha1\342\002+Cosmos\\" +
-      "Base\\Reflection\\V2alpha1\\GPBMetadata\352\002\"C" +
-      "osmos::Base::Reflection::V2alpha1b\006proto" +
-      "3"
+      "/tx_descriptorB\223\002\n#com.cosmos.base.refle" +
+      "ction.v2alpha1B\017ReflectionProtoP\001Z<githu" +
+      "b.com/cosmos/cosmos-sdk/server/grpc/refl" +
+      "ection/v2alpha1\242\002\003CBR\252\002\037Cosmos.Base.Refl" +
+      "ection.V2alpha1\312\002\037Cosmos\\Base\\Reflection" +
+      "\\V2alpha1\342\002+Cosmos\\Base\\Reflection\\V2alp" +
+      "ha1\\GPBMetadata\352\002\"Cosmos::Base::Reflecti" +
+      "on::V2alpha1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

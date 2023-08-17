@@ -9,13 +9,15 @@ case class IdentityID(hashID: HashID) extends ID {
 
   def getType: StringID = constants.IdentityIDType
 
-  def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
+  def asString: String = schema.utilities.common.base64URLEncoder(this.getBytes)
 
   def asProtoIdentityID: protoIdentityID = protoIdentityID.newBuilder().setHashID(this.hashID.asProtoHashID).build()
 
   def toAnyID: AnyID = AnyID.newBuilder().setIdentityID(this.asProtoIdentityID).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoIdentityID.toByteString.toByteArray
+
+  def compare(id: ID): Int = schema.utilities.common.byteArraysCompare(this.getBytes, id.asInstanceOf[IdentityID].getBytes)
 
 }
 

@@ -41,13 +41,13 @@ public final class GenesisProto {
       "B#\362\336\037\037yaml:\"next_connection_sequence\"R\026n" +
       "extConnectionSequence\022<\n\006params\030\004 \001(\0132\036." +
       "ibc.core.connection.v1.ParamsB\004\310\336\037\000R\006par" +
-      "amsB\351\001\n\032com.ibc.core.connection.v1B\014Gene" +
-      "sisProtoP\001ZBgithub.com/AssetMantle/modul" +
-      "es/ibc/core/connection/v1;connectionv1\242\002" +
-      "\003ICC\252\002\026Ibc.Core.Connection.V1\312\002\026Ibc\\Core" +
-      "\\Connection\\V1\342\002\"Ibc\\Core\\Connection\\V1\\" +
-      "GPBMetadata\352\002\031Ibc::Core::Connection::V1b" +
-      "\006proto3"
+      "amsB\343\001\n\032com.ibc.core.connection.v1B\014Gene" +
+      "sisProtoP\001Z<github.com/cosmos/ibc-go/v4/" +
+      "modules/core/03-connection/types\242\002\003ICC\252\002" +
+      "\026Ibc.Core.Connection.V1\312\002\026Ibc\\Core\\Conne" +
+      "ction\\V1\342\002\"Ibc\\Core\\Connection\\V1\\GPBMet" +
+      "adata\352\002\031Ibc::Core::Connection::V1b\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

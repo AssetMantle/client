@@ -21,9 +21,9 @@ case class Maintainer(id: Array[Byte], idString: String, maintainedClassificatio
 
   def getID: MaintainerID = MaintainerID(HashID(this.id))
 
-  def getClassificationIDString: String = schema.constants.Document.MaintainerClassificationID.asString
+  def getClassificationIDString: String = schema.document.Maintainer.MaintainerClassificationID.asString
 
-  def getClassificationID: ClassificationID = schema.constants.Document.MaintainerClassificationID
+  def getClassificationID: ClassificationID = schema.document.Maintainer.MaintainerClassificationID
 
   def getMaintainedClassificationID: ClassificationID = ClassificationID(this.maintainedClassificationID)
 
@@ -134,13 +134,13 @@ class Maintainers @Inject()(
 
     def deputizeAuxiliary(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID, maintainedProperties: PropertyList, canMintAsset: Boolean, canBurnAsset: Boolean, canRenumerateAsset: Boolean, canAddMaintainer: Boolean, canRemoveMaintainer: Boolean, canMutateMaintainer: Boolean): Future[Unit] = {
       val fromMaintainerID = schema.utilities.ID.getMaintainerID(
-        classificationID = schema.constants.Document.MaintainerClassificationID,
+        classificationID = schema.document.Maintainer.MaintainerClassificationID,
         immutables = Immutables(PropertyList(Seq(
           MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
           MetaProperty(id = schema.constants.Properties.IdentityIDProperty.id, data = IDData(fromID)),
         ))))
       val toMaintainerID = schema.utilities.ID.getMaintainerID(
-        classificationID = schema.constants.Document.MaintainerClassificationID,
+        classificationID = schema.document.Maintainer.MaintainerClassificationID,
         immutables = Immutables(PropertyList(Seq(
           MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
           MetaProperty(id = schema.constants.Properties.IdentityIDProperty.id, data = IDData(toID)),
@@ -181,16 +181,9 @@ class Maintainers @Inject()(
     }
 
     private def newMaintainer(identityID: IdentityID, maintainedClassificationID: ClassificationID, maintainedPropertyIDList: IDList, permissions: IDList): Maintainer = {
-      val immutables = Immutables(PropertyList(Seq(
-        MetaProperty(id = schema.constants.Properties.IdentityIDProperty.id, data = IDData(identityID)),
-        MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
-      )))
-      val mutables = Mutables(PropertyList(Seq(
-        MetaProperty(id = schema.constants.Properties.MaintainedPropertiesProperty.id, data = ListData(maintainedPropertyIDList.idList.map(x => IDData(x)))),
-        MetaProperty(id = schema.constants.Properties.PermissionsProperty.id, data = ListData(permissions.idList.map(x => IDData(x)))),
-      )))
-      val maintainerID = schema.utilities.ID.getMaintainerID(classificationID = schema.constants.Document.MaintainerClassificationID, immutables = immutables)
-      Maintainer(id = maintainerID.getBytes, idString = maintainerID.asString, maintainedClassificationID = maintainedClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val document = schema.document.Maintainer.getMaintainerDocument(identityID = identityID, maintainedPropertyIDList = maintainedPropertyIDList, maintainedClassificationID = maintainedClassificationID, permissions = permissions)
+      val maintainerID = schema.utilities.ID.getMaintainerID(classificationID = schema.document.Maintainer.MaintainerClassificationID, immutables = document.immutables)
+      Maintainer(id = maintainerID.getBytes, idString = maintainerID.asString, maintainedClassificationID = maintainedClassificationID.getBytes, immutables = document.immutables.getProtoBytes, mutables = document.mutables.getProtoBytes)
     }
 
     private def getPermissions(canAdd: Boolean, canMutate: Boolean, canBurn: Boolean, canMint: Boolean, canRemove: Boolean, canRenumerate: Boolean) = {

@@ -70,12 +70,12 @@ public final class EvidenceProto {
       "\001(\0132\032.google.protobuf.TimestampB\010\310\336\037\000\220\337\037" +
       "\001R\ttimestamp\"L\n\014EvidenceList\022<\n\010evidence" +
       "\030\001 \003(\0132\032.tendermint.types.EvidenceB\004\310\336\037\000" +
-      "R\010evidenceB\267\001\n\024com.tendermint.typesB\rEvi" +
-      "denceProtoP\001Z/github.com/AssetMantle/mod" +
-      "ules/tendermint/types\242\002\003TTX\252\002\020Tendermint" +
-      ".Types\312\002\020Tendermint\\Types\342\002\034Tendermint\\T" +
-      "ypes\\GPBMetadata\352\002\021Tendermint::Typesb\006pr" +
-      "oto3"
+      "R\010evidenceB\277\001\n\024com.tendermint.typesB\rEvi" +
+      "denceProtoP\001Z7github.com/tendermint/tend" +
+      "ermint/proto/tendermint/types\242\002\003TTX\252\002\020Te" +
+      "ndermint.Types\312\002\020Tendermint\\Types\342\002\034Tend" +
+      "ermint\\Types\\GPBMetadata\352\002\021Tendermint::T" +
+      "ypesb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

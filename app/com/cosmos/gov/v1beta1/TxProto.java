@@ -103,12 +103,11 @@ public final class TxProto {
       "mos.gov.v1beta1.MsgVoteWeightedResponse\022" +
       "Q\n\007Deposit\022\036.cosmos.gov.v1beta1.MsgDepos" +
       "it\032&.cosmos.gov.v1beta1.MsgDepositRespon" +
-      "seB\311\001\n\026com.cosmos.gov.v1beta1B\007TxProtoP\001" +
-      "Z<github.com/AssetMantle/modules/cosmos/" +
-      "gov/v1beta1;govv1beta1\242\002\003CGX\252\002\022Cosmos.Go" +
-      "v.V1beta1\312\002\022Cosmos\\Gov\\V1beta1\342\002\036Cosmos\\" +
-      "Gov\\V1beta1\\GPBMetadata\352\002\024Cosmos::Gov::V" +
-      "1beta1b\006proto3"
+      "seB\265\001\n\026com.cosmos.gov.v1beta1B\007TxProtoP\001" +
+      "Z(github.com/cosmos/cosmos-sdk/x/gov/typ" +
+      "es\242\002\003CGX\252\002\022Cosmos.Gov.V1beta1\312\002\022Cosmos\\G" +
+      "ov\\V1beta1\342\002\036Cosmos\\Gov\\V1beta1\\GPBMetad" +
+      "ata\352\002\024Cosmos::Gov::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

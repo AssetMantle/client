@@ -63,13 +63,13 @@ public final class GenesisProto {
       " \003(\0132$.cosmos.slashing.v1beta1.MissedBlo" +
       "ckB\034\310\336\037\000\362\336\037\024yaml:\"missed_blocks\"R\014missed" +
       "Blocks\";\n\013MissedBlock\022\024\n\005index\030\001 \001(\003R\005in" +
-      "dex\022\026\n\006missed\030\002 \001(\010R\006missedB\361\001\n\033com.cosm" +
-      "os.slashing.v1beta1B\014GenesisProtoP\001ZFgit" +
-      "hub.com/AssetMantle/modules/cosmos/slash" +
-      "ing/v1beta1;slashingv1beta1\242\002\003CSX\252\002\027Cosm" +
-      "os.Slashing.V1beta1\312\002\027Cosmos\\Slashing\\V1" +
-      "beta1\342\002#Cosmos\\Slashing\\V1beta1\\GPBMetad" +
-      "ata\352\002\031Cosmos::Slashing::V1beta1b\006proto3"
+      "dex\022\026\n\006missed\030\002 \001(\010R\006missedB\330\001\n\033com.cosm" +
+      "os.slashing.v1beta1B\014GenesisProtoP\001Z-git" +
+      "hub.com/cosmos/cosmos-sdk/x/slashing/typ" +
+      "es\242\002\003CSX\252\002\027Cosmos.Slashing.V1beta1\312\002\027Cos" +
+      "mos\\Slashing\\V1beta1\342\002#Cosmos\\Slashing\\V" +
+      "1beta1\\GPBMetadata\352\002\031Cosmos::Slashing::V" +
+      "1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -29,17 +29,18 @@ public final class PacketProto {
   static {
     java.lang.String[] descriptorData = {
       "\n)ibc/applications/transfer/v2/packet.pr" +
-      "oto\022\034ibc.applications.transfer.v2\"{\n\027Fun" +
-      "gibleTokenPacketData\022\024\n\005denom\030\001 \001(\tR\005den" +
-      "om\022\026\n\006amount\030\002 \001(\tR\006amount\022\026\n\006sender\030\003 \001" +
-      "(\tR\006sender\022\032\n\010receiver\030\004 \001(\tR\010receiverB\212" +
-      "\002\n com.ibc.applications.transfer.v2B\013Pac" +
-      "ketProtoP\001ZFgithub.com/AssetMantle/modul" +
-      "es/ibc/applications/transfer/v2;transfer" +
-      "v2\242\002\003IAT\252\002\034Ibc.Applications.Transfer.V2\312" +
-      "\002\034Ibc\\Applications\\Transfer\\V2\342\002(Ibc\\App" +
-      "lications\\Transfer\\V2\\GPBMetadata\352\002\037Ibc:" +
-      ":Applications::Transfer::V2b\006proto3"
+      "oto\022\034ibc.applications.transfer.v2\"\217\001\n\027Fu" +
+      "ngibleTokenPacketData\022\024\n\005denom\030\001 \001(\tR\005de" +
+      "nom\022\026\n\006amount\030\002 \001(\tR\006amount\022\026\n\006sender\030\003 " +
+      "\001(\tR\006sender\022\032\n\010receiver\030\004 \001(\tR\010receiver\022" +
+      "\022\n\004memo\030\005 \001(\tR\004memoB\373\001\n com.ibc.applicat" +
+      "ions.transfer.v2B\013PacketProtoP\001Z7github." +
+      "com/cosmos/ibc-go/v4/modules/apps/transf" +
+      "er/types\242\002\003IAT\252\002\034Ibc.Applications.Transf" +
+      "er.V2\312\002\034Ibc\\Applications\\Transfer\\V2\342\002(I" +
+      "bc\\Applications\\Transfer\\V2\\GPBMetadata\352" +
+      "\002\037Ibc::Applications::Transfer::V2b\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -50,7 +51,7 @@ public final class PacketProto {
     internal_static_ibc_applications_transfer_v2_FungibleTokenPacketData_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ibc_applications_transfer_v2_FungibleTokenPacketData_descriptor,
-        new java.lang.String[] { "Denom", "Amount", "Sender", "Receiver", });
+        new java.lang.String[] { "Denom", "Amount", "Sender", "Receiver", "Memo", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

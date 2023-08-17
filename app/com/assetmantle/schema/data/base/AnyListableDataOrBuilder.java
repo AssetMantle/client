@@ -83,32 +83,47 @@ public interface AnyListableDataOrBuilder extends
   com.assetmantle.schema.data.base.IDDataOrBuilder getIDDataOrBuilder();
 
   /**
-   * <code>.assetmantle.schema.data.base.NumberData number_data = 6 [json_name = "numberData"];</code>
+   * <code>.assetmantle.schema.data.base.LinkedData linked_data = 6 [json_name = "linkedData"];</code>
+   * @return Whether the linkedData field is set.
+   */
+  boolean hasLinkedData();
+  /**
+   * <code>.assetmantle.schema.data.base.LinkedData linked_data = 6 [json_name = "linkedData"];</code>
+   * @return The linkedData.
+   */
+  com.assetmantle.schema.data.base.LinkedData getLinkedData();
+  /**
+   * <code>.assetmantle.schema.data.base.LinkedData linked_data = 6 [json_name = "linkedData"];</code>
+   */
+  com.assetmantle.schema.data.base.LinkedDataOrBuilder getLinkedDataOrBuilder();
+
+  /**
+   * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
    * @return Whether the numberData field is set.
    */
   boolean hasNumberData();
   /**
-   * <code>.assetmantle.schema.data.base.NumberData number_data = 6 [json_name = "numberData"];</code>
+   * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
    * @return The numberData.
    */
   com.assetmantle.schema.data.base.NumberData getNumberData();
   /**
-   * <code>.assetmantle.schema.data.base.NumberData number_data = 6 [json_name = "numberData"];</code>
+   * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
    */
   com.assetmantle.schema.data.base.NumberDataOrBuilder getNumberDataOrBuilder();
 
   /**
-   * <code>.assetmantle.schema.data.base.StringData string_data = 7 [json_name = "stringData"];</code>
+   * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
    * @return Whether the stringData field is set.
    */
   boolean hasStringData();
   /**
-   * <code>.assetmantle.schema.data.base.StringData string_data = 7 [json_name = "stringData"];</code>
+   * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
    * @return The stringData.
    */
   com.assetmantle.schema.data.base.StringData getStringData();
   /**
-   * <code>.assetmantle.schema.data.base.StringData string_data = 7 [json_name = "stringData"];</code>
+   * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
    */
   com.assetmantle.schema.data.base.StringDataOrBuilder getStringDataOrBuilder();
 

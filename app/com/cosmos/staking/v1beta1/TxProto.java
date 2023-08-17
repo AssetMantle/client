@@ -144,13 +144,12 @@ public final class TxProto {
       "staking.v1beta1.MsgBeginRedelegateRespon" +
       "se\022b\n\nUndelegate\022%.cosmos.staking.v1beta" +
       "1.MsgUndelegate\032-.cosmos.staking.v1beta1" +
-      ".MsgUndelegateResponseB\345\001\n\032com.cosmos.st" +
-      "aking.v1beta1B\007TxProtoP\001ZDgithub.com/Ass" +
-      "etMantle/modules/cosmos/staking/v1beta1;" +
-      "stakingv1beta1\242\002\003CSX\252\002\026Cosmos.Staking.V1" +
-      "beta1\312\002\026Cosmos\\Staking\\V1beta1\342\002\"Cosmos\\" +
-      "Staking\\V1beta1\\GPBMetadata\352\002\030Cosmos::St" +
-      "aking::V1beta1b\006proto3"
+      ".MsgUndelegateResponseB\315\001\n\032com.cosmos.st" +
+      "aking.v1beta1B\007TxProtoP\001Z,github.com/cos" +
+      "mos/cosmos-sdk/x/staking/types\242\002\003CSX\252\002\026C" +
+      "osmos.Staking.V1beta1\312\002\026Cosmos\\Staking\\V" +
+      "1beta1\342\002\"Cosmos\\Staking\\V1beta1\\GPBMetad" +
+      "ata\352\002\030Cosmos::Staking::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

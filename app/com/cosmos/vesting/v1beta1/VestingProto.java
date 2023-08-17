@@ -94,13 +94,12 @@ public final class VestingProto {
       "manentLockedAccount\022b\n\024base_vesting_acco" +
       "unt\030\001 \001(\0132*.cosmos.vesting.v1beta1.BaseV" +
       "estingAccountB\004\320\336\037\001R\022baseVestingAccount:" +
-      "\010\210\240\037\000\230\240\037\000B\352\001\n\032com.cosmos.vesting.v1beta1" +
-      "B\014VestingProtoP\001ZDgithub.com/AssetMantle" +
-      "/modules/cosmos/vesting/v1beta1;vestingv" +
-      "1beta1\242\002\003CVX\252\002\026Cosmos.Vesting.V1beta1\312\002\026" +
-      "Cosmos\\Vesting\\V1beta1\342\002\"Cosmos\\Vesting\\" +
-      "V1beta1\\GPBMetadata\352\002\030Cosmos::Vesting::V" +
-      "1beta1b\006proto3"
+      "\010\210\240\037\000\230\240\037\000B\327\001\n\032com.cosmos.vesting.v1beta1" +
+      "B\014VestingProtoP\001Z1github.com/cosmos/cosm" +
+      "os-sdk/x/auth/vesting/types\242\002\003CVX\252\002\026Cosm" +
+      "os.Vesting.V1beta1\312\002\026Cosmos\\Vesting\\V1be" +
+      "ta1\342\002\"Cosmos\\Vesting\\V1beta1\\GPBMetadata" +
+      "\352\002\030Cosmos::Vesting::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

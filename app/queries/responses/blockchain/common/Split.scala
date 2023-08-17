@@ -11,4 +11,20 @@ case class Split(owner_i_d: IdentityID, ownable_i_d: AnyOwnableID, value: String
 
 object Split {
   implicit val SplitReads: Reads[Split] = Json.reads[Split]
+
+  case class Key(split_i_d: SplitID)
+
+  implicit val keyReads: Reads[Key] = Json.reads[Key]
+
+  case class Mappable(split: Split)
+
+  implicit val metaMappableReads: Reads[Mappable] = Json.reads[Mappable]
+
+  case class Record(key: Key, mappable: Mappable)
+
+  implicit val recordReads: Reads[Record] = Json.reads[Record]
+
+  case class Module(records: Seq[Record], parameter_list: ParameterList)
+
+  implicit val metaReads: Reads[Module] = Json.reads[Module]
 }

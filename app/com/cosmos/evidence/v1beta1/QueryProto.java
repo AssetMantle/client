@@ -67,13 +67,12 @@ public final class QueryProto {
       "e.v1beta1.QueryAllEvidenceRequest\0321.cosm" +
       "os.evidence.v1beta1.QueryAllEvidenceResp" +
       "onse\")\202\323\344\223\002#\022!/cosmos/evidence/v1beta1/e" +
-      "videnceB\357\001\n\033com.cosmos.evidence.v1beta1B" +
-      "\nQueryProtoP\001ZFgithub.com/AssetMantle/mo" +
-      "dules/cosmos/evidence/v1beta1;evidencev1" +
-      "beta1\242\002\003CEX\252\002\027Cosmos.Evidence.V1beta1\312\002\027" +
-      "Cosmos\\Evidence\\V1beta1\342\002#Cosmos\\Evidenc" +
-      "e\\V1beta1\\GPBMetadata\352\002\031Cosmos::Evidence" +
-      "::V1beta1b\006proto3"
+      "videnceB\326\001\n\033com.cosmos.evidence.v1beta1B" +
+      "\nQueryProtoP\001Z-github.com/cosmos/cosmos-" +
+      "sdk/x/evidence/types\242\002\003CEX\252\002\027Cosmos.Evid" +
+      "ence.V1beta1\312\002\027Cosmos\\Evidence\\V1beta1\342\002" +
+      "#Cosmos\\Evidence\\V1beta1\\GPBMetadata\352\002\031C" +
+      "osmos::Evidence::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

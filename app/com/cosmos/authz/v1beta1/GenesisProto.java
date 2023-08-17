@@ -33,13 +33,12 @@ public final class GenesisProto {
       "\032 cosmos/authz/v1beta1/authz.proto\"d\n\014Ge" +
       "nesisState\022T\n\rauthorization\030\001 \003(\0132(.cosm" +
       "os.authz.v1beta1.GrantAuthorizationB\004\310\336\037" +
-      "\000R\rauthorizationB\334\001\n\030com.cosmos.authz.v1" +
-      "beta1B\014GenesisProtoP\001Z@github.com/AssetM" +
-      "antle/modules/cosmos/authz/v1beta1;authz" +
-      "v1beta1\242\002\003CAX\252\002\024Cosmos.Authz.V1beta1\312\002\024C" +
-      "osmos\\Authz\\V1beta1\342\002 Cosmos\\Authz\\V1bet" +
-      "a1\\GPBMetadata\352\002\026Cosmos::Authz::V1beta1b" +
-      "\006proto3"
+      "\000R\rauthorizationB\300\001\n\030com.cosmos.authz.v1" +
+      "beta1B\014GenesisProtoP\001Z$github.com/cosmos" +
+      "/cosmos-sdk/x/authz\242\002\003CAX\252\002\024Cosmos.Authz" +
+      ".V1beta1\312\002\024Cosmos\\Authz\\V1beta1\342\002 Cosmos" +
+      "\\Authz\\V1beta1\\GPBMetadata\352\002\026Cosmos::Aut" +
+      "hz::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
