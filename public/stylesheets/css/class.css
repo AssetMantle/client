@@ -4569,7 +4569,10 @@ figure .block:hover {
 #validatorsList table.cmuk-table tbody td .statusCheck .icon,
 #validatorTransactions table.cmuk-table tbody td .statusCheck .icon,
 #accountTransactions table.cmuk-table tbody td .statusCheck .icon,
-#distributionParameters table.cmuk-table tbody td .statusCheck .icon
+#distributionParameters table.cmuk-table tbody td .statusCheck .icon,
+#assetsParameters table.cmuk-table tbody td .statusCheck .icon,
+#maintainersParameters table.cmuk-table tbody td .statusCheck .icon,
+#metasParameters table.cmuk-table tbody td .statusCheck .icon
 {
     height: 16px;
     width: 16px;
@@ -4582,7 +4585,10 @@ figure .block:hover {
 #validatorsList table.cmuk-table tbody td .statusClose .icon,
 #validatorTransactions table.cmuk-table tbody td .statusClose .icon,
 #accountTransactions table.cmuk-table tbody td .statusClose .icon,
-#distributionParameters table.cmuk-table tbody td .statusClose .icon
+#distributionParameters table.cmuk-table tbody td .statusClose .icon,
+#assetsParameters table.cmuk-table tbody td .statusClose .icon,
+#maintainersParameters table.cmuk-table tbody td .statusClose .icon,
+#metasParameters table.cmuk-table tbody td .statusClose .icon
 {
     height: 16px;
     width: 16px;
