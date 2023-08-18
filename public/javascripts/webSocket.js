@@ -162,7 +162,11 @@ function updateMissedBlocksCounter(message) {
         for (let i = missingBlocksBox.children().length - 1; i >= 0; i--) {
             let previousBlockHeight = $('#missingBlocksCounter_' + (i - 1)).children('.block').attr("id");
             if (i === 0) {
-                $('#missingBlocksCounter_' + i).children('.block').html("<div class=\"empty\"></div>");
+                $('#missingBlocksCounter_' + i).children('.block').html(`
+                <div class="empty">
+                    <span class="emptyBlock"><svg class="icon"><use xlink:href="/assets/images/icons/icons.svg#emptyBlock"></use></svg>
+                    </span>
+                </div>`);
                 $('#missingBlocksCounter_' + i).children('.block').attr("cmuk-tooltip", message.block.height);
                 $('#missingBlocksCounter_' + i).children('.block').attr("id", message.block.height);
             } else {
