@@ -314,11 +314,14 @@ class Startup @Inject()(
     //Should be run only after classifications
     def identities = blockchainIdentities.Utility.beforeRun
 
-    for {
+    (for {
       _ <- updateParameters
       _ <- classifications
       _ <- identities
-    } yield ()
+    } yield ()).recover{
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        beforeStartRan = true
+    }
   } else {
     beforeStartRan = true
     Future()

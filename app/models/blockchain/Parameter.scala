@@ -234,17 +234,7 @@ class Parameters @Inject()(
       } yield ()
     }
 
-    def updateParameters(parameterTypes: Seq[String]): Future[Seq[Unit]] = {
-      utilitiesOperations.traverse(parameterTypes) { parameterType => {
-        val update = parameterUpdate(parameterType)
-        (for {
-          _ <- update
-        } yield ()).recover {
-          case _: Exception => logger.error("FAILED_TO_UPDATE_BLOCKCHAIN_PARAMETERS")
-        }
-      }
-      }
+    def updateParameters(parameterTypes: Seq[String]): Future[Seq[Unit]] = utilitiesOperations.traverse(parameterTypes) { parameterType => parameterUpdate(parameterType)
     }
   }
-
 }
