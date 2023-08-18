@@ -465,8 +465,8 @@ object View {
     schema.constants.Messages.ASSET_RENUMERATE -> "MESSAGE_ASSET_RENUMERATE",
     schema.constants.Messages.ASSET_REVOKE -> "MESSAGE_ASSET_REVOKE",
     schema.constants.Messages.ASSET_SEND -> "MESSAGE_ASSET_SEND",
-    schema.constants.Messages.ASSET_WRAP -> "MESSAGE_SPLIT_WRAP",
-    schema.constants.Messages.ASSET_UNWRAP -> "MESSAGE_SPLIT_UNWRAP",
+    schema.constants.Messages.ASSET_WRAP -> "MESSAGE_ASSET_WRAP",
+    schema.constants.Messages.ASSET_UNWRAP -> "MESSAGE_ASSET_UNWRAP",
     //identities
     schema.constants.Messages.IDENTITY_DEFINE -> "MESSAGE_IDENTITY_DEFINE",
     schema.constants.Messages.IDENTITY_DEPUTIZE -> "MESSAGE_IDENTITY_DEPUTIZE",

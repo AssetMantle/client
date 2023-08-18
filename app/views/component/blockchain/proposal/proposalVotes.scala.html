@@ -11,7 +11,6 @@
         <thead>
             <tr>
                 <th>@Messages(constants.View.VALIDATOR_NAME)</th>
-                <th>@Messages(constants.View.TRANSACTION_HASH)</th>
                 <th>@Messages(constants.View.TRANSACTION_ANSWER)</th>
             </tr>
         </thead>
@@ -19,7 +18,6 @@
         @proposalVotes.map { proposalVote =>
             <tr>
                 <td>@allValidators.getOrElse(proposalVote.voter, utilities.Crypto.convertAccountAddressToOperatorAddress(proposalVote.voter))</td>
-                <td class="blockHeightItem">@commonJavascriptLink(proposalVote.voter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${proposalVote.voter}'))"))</td>
                 <td>@Messages(proposalVote.option)</td>
             </tr>
         }

@@ -110,6 +110,8 @@ class Assets @Inject()(
 
     def add(assets: Seq[Asset]): Future[Int] = create(assets)
 
+    def insertOrUpdate(asset: Asset): Future[Int] = upsert(asset)
+
     def update(asset: Asset): Future[Unit] = updateById(asset)
 
     def get(id: String): Future[Option[Asset]] = getById(utilities.Secrets.base64URLDecode(id))
@@ -236,7 +238,17 @@ class Assets @Inject()(
 
     def onWrap(msg: assetsTransactions.wrap.Message): Future[String] = {
       val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(msg.getFrom)
-      val add = utilitiesOperations.traverse(msg.getCoinsList.asScala.toSeq.map(x => Coin(x))) { coin => blockchainSplits.Utility.addSplit(ownerId = IdentityID(msg.getFromID), assetID = schema.document.CoinAsset.getCoinAssetID(coin.denom), value = coin.amount.value) }
+      val add = utilitiesOperations.traverse(msg.getCoinsList.asScala.toSeq.map(x => Coin(x))) { coin => {
+        val document = schema.document.CoinAsset.getCoinAssetDocument(coin.denom)
+        val addAsset = Service.insertOrUpdate(Asset(id = schema.document.CoinAsset.getCoinAssetID(coin.denom).getBytes, idString = schema.document.CoinAsset.getCoinAssetID(coin.denom).asString, classificationID = schema.document.CoinAsset.DocumentClassificationID.getBytes, immutables = document.immutables.getProtoBytes, mutables = document.mutables.getProtoBytes))
+        val split = blockchainSplits.Utility.addSplit(ownerId = IdentityID(msg.getFromID), assetID = schema.document.CoinAsset.getCoinAssetID(coin.denom), value = coin.amount.value)
+
+        for {
+          _ <- addAsset
+          _ <- split
+        } yield ()
+      }
+      }
       for {
         _ <- updateBalance
         _ <- add
