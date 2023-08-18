@@ -28,20 +28,20 @@ public final class ServiceProto {
       "ons.revoke\032\034google/api/annotations.proto" +
       "\032(orders/transactions/revoke/message.pro" +
       "to\0325orders/transactions/revoke/transacti" +
-      "on_response.proto2\261\001\n\007Service\022\245\001\n\006Handle" +
-      "\0227.assetmantle.modules.orders.transactio" +
-      "ns.revoke.Message\032C.assetmantle.modules." +
-      "orders.transactions.revoke.TransactionRe" +
-      "sponse\"\035\202\323\344\223\002\027\"\025/mantle/orders/revokeB\335\002" +
-      "\n2com.assetmantle.modules.orders.transac" +
-      "tions.revokeB\014ServiceProtoP\001Z;github.com" +
-      "/AssetMantle/modules/x/orders/transactio" +
-      "ns/revoke\242\002\005AMOTR\252\002.Assetmantle.Modules." +
-      "Orders.Transactions.Revoke\312\002.Assetmantle" +
-      "\\Modules\\Orders\\Transactions\\Revoke\342\002:As" +
-      "setmantle\\Modules\\Orders\\Transactions\\Re" +
-      "voke\\GPBMetadata\352\0022Assetmantle::Modules:" +
-      ":Orders::Transactions::Revokeb\006proto3"
+      "on_response.proto2\255\001\n\003Msg\022\245\001\n\006Handle\0227.a" +
+      "ssetmantle.modules.orders.transactions.r" +
+      "evoke.Message\032C.assetmantle.modules.orde" +
+      "rs.transactions.revoke.TransactionRespon" +
+      "se\"\035\202\323\344\223\002\027\"\025/mantle/orders/revokeB\335\002\n2co" +
+      "m.assetmantle.modules.orders.transaction" +
+      "s.revokeB\014ServiceProtoP\001Z;github.com/Ass" +
+      "etMantle/modules/x/orders/transactions/r" +
+      "evoke\242\002\005AMOTR\252\002.Assetmantle.Modules.Orde" +
+      "rs.Transactions.Revoke\312\002.Assetmantle\\Mod" +
+      "ules\\Orders\\Transactions\\Revoke\342\002:Assetm" +
+      "antle\\Modules\\Orders\\Transactions\\Revoke" +
+      "\\GPBMetadata\352\0022Assetmantle::Modules::Ord" +
+      "ers::Transactions::Revokeb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

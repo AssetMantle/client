@@ -28,20 +28,20 @@ public final class ServiceProto {
       "s.mint\032\034google/api/annotations.proto\032&as" +
       "sets/transactions/mint/message.proto\0323as" +
       "sets/transactions/mint/transaction_respo" +
-      "nse.proto2\253\001\n\007Service\022\237\001\n\006Handle\0225.asset" +
-      "mantle.modules.assets.transactions.mint." +
-      "Message\032A.assetmantle.modules.assets.tra" +
-      "nsactions.mint.TransactionResponse\"\033\202\323\344\223" +
-      "\002\025\"\023/mantle/assets/mintB\321\002\n0com.assetman" +
-      "tle.modules.assets.transactions.mintB\014Se" +
-      "rviceProtoP\001Z9github.com/AssetMantle/mod" +
-      "ules/x/assets/transactions/mint\242\002\005AMATM\252" +
-      "\002,Assetmantle.Modules.Assets.Transaction" +
-      "s.Mint\312\002,Assetmantle\\Modules\\Assets\\Tran" +
-      "sactions\\Mint\342\0028Assetmantle\\Modules\\Asse" +
-      "ts\\Transactions\\Mint\\GPBMetadata\352\0020Asset" +
-      "mantle::Modules::Assets::Transactions::M" +
-      "intb\006proto3"
+      "nse.proto2\247\001\n\003Msg\022\237\001\n\006Handle\0225.assetmant" +
+      "le.modules.assets.transactions.mint.Mess" +
+      "age\032A.assetmantle.modules.assets.transac" +
+      "tions.mint.TransactionResponse\"\033\202\323\344\223\002\025\"\023" +
+      "/mantle/assets/mintB\321\002\n0com.assetmantle." +
+      "modules.assets.transactions.mintB\014Servic" +
+      "eProtoP\001Z9github.com/AssetMantle/modules" +
+      "/x/assets/transactions/mint\242\002\005AMATM\252\002,As" +
+      "setmantle.Modules.Assets.Transactions.Mi" +
+      "nt\312\002,Assetmantle\\Modules\\Assets\\Transact" +
+      "ions\\Mint\342\0028Assetmantle\\Modules\\Assets\\T" +
+      "ransactions\\Mint\\GPBMetadata\352\0020Assetmant" +
+      "le::Modules::Assets::Transactions::Mintb" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

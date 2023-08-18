@@ -64,13 +64,12 @@ public final class AuthProto {
       "yCostEd25519\022y\n\031sig_verify_cost_secp256k" +
       "1\030\005 \001(\004B>\342\336\037\026SigVerifyCostSecp256k1\362\336\037 y" +
       "aml:\"sig_verify_cost_secp256k1\"R\026sigVeri" +
-      "fyCostSecp256k1:\010\230\240\037\000\350\240\037\001B\322\001\n\027com.cosmos" +
-      ".auth.v1beta1B\tAuthProtoP\001Z>github.com/A" +
-      "ssetMantle/modules/cosmos/auth/v1beta1;a" +
-      "uthv1beta1\242\002\003CAX\252\002\023Cosmos.Auth.V1beta1\312\002" +
-      "\023Cosmos\\Auth\\V1beta1\342\002\037Cosmos\\Auth\\V1bet" +
-      "a1\\GPBMetadata\352\002\025Cosmos::Auth::V1beta1b\006" +
-      "proto3"
+      "fyCostSecp256k1:\010\230\240\037\000\350\240\037\001B\275\001\n\027com.cosmos" +
+      ".auth.v1beta1B\tAuthProtoP\001Z)github.com/c" +
+      "osmos/cosmos-sdk/x/auth/types\242\002\003CAX\252\002\023Co" +
+      "smos.Auth.V1beta1\312\002\023Cosmos\\Auth\\V1beta1\342" +
+      "\002\037Cosmos\\Auth\\V1beta1\\GPBMetadata\352\002\025Cosm" +
+      "os::Auth::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

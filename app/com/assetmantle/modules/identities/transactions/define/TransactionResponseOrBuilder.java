@@ -8,14 +8,17 @@ public interface TransactionResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string classification_i_d = 1 [json_name = "classificationID"];</code>
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+   * @return Whether the classificationID field is set.
+   */
+  boolean hasClassificationID();
+  /**
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
    * @return The classificationID.
    */
-  java.lang.String getClassificationID();
+  com.assetmantle.schema.ids.base.ClassificationID getClassificationID();
   /**
-   * <code>string classification_i_d = 1 [json_name = "classificationID"];</code>
-   * @return The bytes for classificationID.
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
    */
-  com.google.protobuf.ByteString
-      getClassificationIDBytes();
+  com.assetmantle.schema.ids.base.ClassificationIDOrBuilder getClassificationIDOrBuilder();
 }

@@ -2,11 +2,10 @@
 @import com.assetmantle.modules.orders.transactions.take.Message
 @import schema.id.base._
 @import views.html.base.buttons.commonJavascriptLink
-@import schema.data.base.DecData
 
 @(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
 @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
 @commonTextInfo(constants.View.ORDER_ID, OrderID(msg.getOrderID).asString)
-@commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, msg.getTakerOwnableSplit)
+@commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, msg.getTakerSplit)

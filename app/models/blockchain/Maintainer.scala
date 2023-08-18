@@ -21,9 +21,9 @@ case class Maintainer(id: Array[Byte], idString: String, maintainedClassificatio
 
   def getID: MaintainerID = MaintainerID(HashID(this.id))
 
-  def getClassificationIDString: String = schema.constants.Document.MaintainerClassificationID.asString
+  def getClassificationIDString: String = schema.document.Maintainer.DocumentClassificationID.asString
 
-  def getClassificationID: ClassificationID = schema.constants.Document.MaintainerClassificationID
+  def getClassificationID: ClassificationID = schema.document.Maintainer.DocumentClassificationID
 
   def getMaintainedClassificationID: ClassificationID = ClassificationID(this.maintainedClassificationID)
 
@@ -50,18 +50,6 @@ case class Maintainer(id: Array[Byte], idString: String, maintainedClassificatio
   def mutate(properties: Seq[Property]): Maintainer = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
 
   def maintainsProperty(id: PropertyID): Boolean = this.getMaintainedProperties.getDataList.exists(_.getBytes.sameElements(IDData(id).getBytes))
-
-  def canAdd: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Add).getBytes))
-
-  def canMutate: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Mutate).getBytes))
-
-  def canBurn: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Burn).getBytes))
-
-  def canMint: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Mint).getBytes))
-
-  def canRemove: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Remove).getBytes))
-
-  def canRenumerate: Boolean = this.getPermissions.getDataList.exists(_.getBytes.sameElements(IDData(schema.constants.Properties.Renumerate).getBytes))
 }
 
 private[blockchain] object Maintainers {
@@ -127,23 +115,24 @@ class Maintainers @Inject()(
 
   object Utility {
 
-    def superAuxiliary(maintainedClassificationID: ClassificationID, toID: IdentityID, maintainedMutables: Mutables): Future[String] = {
-      val permissions = getPermissions(canAdd = true, canMutate = true, canBurn = true, canMint = true, canRemove = true, canRenumerate = true)
-      Service.add(newMaintainer(identityID = toID, maintainedClassificationID = maintainedClassificationID, maintainedPropertyIDList = maintainedMutables.propertyList.getPropertyIDList, permissions = permissions))
+    def superAuxiliary(maintainedClassificationID: ClassificationID, toID: IdentityID, maintainedMutables: Mutables, permissionIDs: Seq[StringID]): Future[String] = {
+      val updatedMutableIDList = IDList(maintainedMutables.remove(Seq(schema.constants.Properties.BondAmountProperty, schema.constants.Properties.AuthenticationProperty)).getProperties.map(_.getID))
+      val document = schema.document.Maintainer.getMaintainerDocument(identityID = toID, maintainedClassificationID = maintainedClassificationID, maintainedPropertyIDList = updatedMutableIDList, permissions = IDList(schema.utilities.Permissions.getMaintainersPermissions(true, true, true)).add(permissionIDs))
+      Service.add(newMaintainer(document, maintainedClassificationID))
     }
 
-    def deputizeAuxiliary(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID, maintainedProperties: PropertyList, canMintAsset: Boolean, canBurnAsset: Boolean, canRenumerateAsset: Boolean, canAddMaintainer: Boolean, canRemoveMaintainer: Boolean, canMutateMaintainer: Boolean): Future[Unit] = {
+    def deputizeAuxiliary(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID, maintainedProperties: PropertyList, permissionIDs: Seq[StringID], canAddMaintainer: Boolean, canRemoveMaintainer: Boolean, canMutateMaintainer: Boolean): Future[Unit] = {
       val fromMaintainerID = schema.utilities.ID.getMaintainerID(
-        classificationID = schema.constants.Document.MaintainerClassificationID,
+        classificationID = schema.document.Maintainer.DocumentClassificationID,
         immutables = Immutables(PropertyList(Seq(
-          MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
-          MetaProperty(id = schema.constants.Properties.IdentityIDProperty.id, data = IDData(fromID)),
+          schema.constants.Properties.MaintainedClassificationIDProperty.mutate(IDData(maintainedClassificationID)),
+          schema.constants.Properties.IdentityIDProperty.mutate(IDData(fromID))
         ))))
       val toMaintainerID = schema.utilities.ID.getMaintainerID(
-        classificationID = schema.constants.Document.MaintainerClassificationID,
+        classificationID = schema.document.Maintainer.DocumentClassificationID,
         immutables = Immutables(PropertyList(Seq(
-          MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
-          MetaProperty(id = schema.constants.Properties.IdentityIDProperty.id, data = IDData(toID)),
+          schema.constants.Properties.MaintainedClassificationIDProperty.mutate(IDData(maintainedClassificationID)),
+          schema.constants.Properties.IdentityIDProperty.mutate(IDData(toID))
         ))))
       val fromMaintainer = Service.tryGet(fromMaintainerID)
       val toMaintainer = Service.get(toMaintainerID)
@@ -151,15 +140,15 @@ class Maintainers @Inject()(
       //def getRemoveMaintainedPropertyList(fromMaintainer: Maintainer) = fromMaintainer.getMutables.remove(maintainedProperties.getProperties)
 
       def addOrUpdate(fromMaintainer: Maintainer, toMaintainer: Option[Maintainer]) = {
-        val permissions = getPermissions(canAdd = canAddMaintainer, canMutate = canMutateMaintainer, canBurn = canBurnAsset, canMint = canMintAsset, canRemove = canRemoveMaintainer, canRenumerate = canRenumerateAsset)
-        if (toMaintainer.isEmpty) {
-          Service.add(newMaintainer(identityID = toID, maintainedClassificationID = maintainedClassificationID, maintainedPropertyIDList = maintainedProperties.getPropertyIDList, permissions = permissions))
-        } else {
-          val updatedMaintainedProperties = toMaintainer.get.getMutables.propertyList
-            .add(maintainedProperties.getProperties)
-            .remove(fromMaintainer.getMutables.remove(maintainedProperties.getProperties).getProperties)
-          Service.update(newMaintainer(identityID = toID, maintainedClassificationID = maintainedClassificationID, maintainedPropertyIDList = updatedMaintainedProperties.getPropertyIDList, permissions = permissions))
-        }
+//        if (toMaintainer.isEmpty) {
+//          Service.add(newMaintainer(identityID = toID, maintainedClassificationID = maintainedClassificationID, maintainedPropertyIDList = maintainedProperties.getPropertyIDList, permissions = permissions))
+//        } else {
+//          val updatedMaintainedProperties = toMaintainer.get.getMutables.propertyList
+//            .add(maintainedProperties.getProperties)
+//            .remove(fromMaintainer.getMutables.remove(maintainedProperties.getProperties).getProperties)
+//          Service.update(newMaintainer(identityID = toID, maintainedClassificationID = maintainedClassificationID, maintainedPropertyIDList = updatedMaintainedProperties.getPropertyIDList, permissions = permissions))
+//        }
+        Future()
       }
 
       for {
@@ -180,29 +169,9 @@ class Maintainers @Inject()(
       } yield ()
     }
 
-    private def newMaintainer(identityID: IdentityID, maintainedClassificationID: ClassificationID, maintainedPropertyIDList: IDList, permissions: IDList): Maintainer = {
-      val immutables = Immutables(PropertyList(Seq(
-        MetaProperty(id = schema.constants.Properties.IdentityIDProperty.id, data = IDData(identityID)),
-        MetaProperty(id = schema.constants.Properties.MaintainedClassificationIDProperty.id, data = IDData(maintainedClassificationID)),
-      )))
-      val mutables = Mutables(PropertyList(Seq(
-        MetaProperty(id = schema.constants.Properties.MaintainedPropertiesProperty.id, data = ListData(maintainedPropertyIDList.idList.map(x => IDData(x)))),
-        MetaProperty(id = schema.constants.Properties.PermissionsProperty.id, data = ListData(permissions.idList.map(x => IDData(x)))),
-      )))
-      val maintainerID = schema.utilities.ID.getMaintainerID(classificationID = schema.constants.Document.MaintainerClassificationID, immutables = immutables)
-      Maintainer(id = maintainerID.getBytes, idString = maintainerID.asString, maintainedClassificationID = maintainedClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+    private def newMaintainer(document: Document, maintainedClassificationID: ClassificationID): Maintainer = {
+      val maintainerID = schema.utilities.ID.getMaintainerID(classificationID = schema.document.Maintainer.DocumentClassificationID, immutables = document.immutables)
+      Maintainer(id = maintainerID.getBytes, idString = maintainerID.asString, maintainedClassificationID = maintainedClassificationID.getBytes, immutables = document.immutables.getProtoBytes, mutables = document.mutables.getProtoBytes)
     }
-
-    private def getPermissions(canAdd: Boolean, canMutate: Boolean, canBurn: Boolean, canMint: Boolean, canRemove: Boolean, canRenumerate: Boolean) = {
-      var permissions: Seq[StringID] = Seq()
-      if (canAdd) permissions = permissions :+ schema.constants.Properties.Add
-      if (canMutate) permissions = permissions :+ schema.constants.Properties.Mutate
-      if (canBurn) permissions = permissions :+ schema.constants.Properties.Burn
-      if (canMint) permissions = permissions :+ schema.constants.Properties.Mint
-      if (canRemove) permissions = permissions :+ schema.constants.Properties.Remove
-      if (canRenumerate) permissions = permissions :+ schema.constants.Properties.Renumerate
-      IDList(permissions)
-    }
-
   }
 }

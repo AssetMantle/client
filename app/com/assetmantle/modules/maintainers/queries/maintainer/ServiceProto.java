@@ -28,22 +28,22 @@ public final class ServiceProto {
       "queries.maintainer\032\034google/api/annotatio" +
       "ns.proto\0322maintainers/queries/maintainer" +
       "/query_request.proto\0323maintainers/querie" +
-      "s/maintainer/query_response.proto2\311\001\n\007Se" +
-      "rvice\022\275\001\n\006Handle\022@.assetmantle.modules.m" +
-      "aintainers.queries.maintainer.QueryReque" +
-      "st\032A.assetmantle.modules.maintainers.que" +
-      "ries.maintainer.QueryResponse\".\202\323\344\223\002(\022&/" +
-      "mantle/maintainers/v1beta1/maintainerB\365\002" +
-      "\n6com.assetmantle.modules.maintainers.qu" +
-      "eries.maintainerB\014ServiceProtoP\001Z?github" +
-      ".com/AssetMantle/modules/x/maintainers/q" +
-      "ueries/maintainer\242\002\005AMMQM\252\0022Assetmantle." +
-      "Modules.Maintainers.Queries.Maintainer\312\002" +
-      "2Assetmantle\\Modules\\Maintainers\\Queries" +
-      "\\Maintainer\342\002>Assetmantle\\Modules\\Mainta" +
-      "iners\\Queries\\Maintainer\\GPBMetadata\352\0026A" +
-      "ssetmantle::Modules::Maintainers::Querie" +
-      "s::Maintainerb\006proto3"
+      "s/maintainer/query_response.proto2\307\001\n\005Qu" +
+      "ery\022\275\001\n\006Handle\022@.assetmantle.modules.mai" +
+      "ntainers.queries.maintainer.QueryRequest" +
+      "\032A.assetmantle.modules.maintainers.queri" +
+      "es.maintainer.QueryResponse\".\202\323\344\223\002(\022&/ma" +
+      "ntle/maintainers/v1beta1/maintainerB\365\002\n6" +
+      "com.assetmantle.modules.maintainers.quer" +
+      "ies.maintainerB\014ServiceProtoP\001Z?github.c" +
+      "om/AssetMantle/modules/x/maintainers/que" +
+      "ries/maintainer\242\002\005AMMQM\252\0022Assetmantle.Mo" +
+      "dules.Maintainers.Queries.Maintainer\312\0022A" +
+      "ssetmantle\\Modules\\Maintainers\\Queries\\M" +
+      "aintainer\342\002>Assetmantle\\Modules\\Maintain" +
+      "ers\\Queries\\Maintainer\\GPBMetadata\352\0026Ass" +
+      "etmantle::Modules::Maintainers::Queries:" +
+      ":Maintainerb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

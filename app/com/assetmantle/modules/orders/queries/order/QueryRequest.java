@@ -38,30 +38,30 @@ private static final long serialVersionUID = 0L;
             com.assetmantle.modules.orders.queries.order.QueryRequest.class, com.assetmantle.modules.orders.queries.order.QueryRequest.Builder.class);
   }
 
-  public static final int ORDER_I_D_FIELD_NUMBER = 1;
-  private com.assetmantle.schema.ids.base.OrderID orderID_;
+  public static final int KEY_FIELD_NUMBER = 1;
+  private com.assetmantle.modules.orders.key.Key key_;
   /**
-   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
-   * @return Whether the orderID field is set.
+   * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
+   * @return Whether the key field is set.
    */
   @java.lang.Override
-  public boolean hasOrderID() {
-    return orderID_ != null;
+  public boolean hasKey() {
+    return key_ != null;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
-   * @return The orderID.
+   * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.OrderID getOrderID() {
-    return orderID_ == null ? com.assetmantle.schema.ids.base.OrderID.getDefaultInstance() : orderID_;
+  public com.assetmantle.modules.orders.key.Key getKey() {
+    return key_ == null ? com.assetmantle.modules.orders.key.Key.getDefaultInstance() : key_;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
+   * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.OrderIDOrBuilder getOrderIDOrBuilder() {
-    return orderID_ == null ? com.assetmantle.schema.ids.base.OrderID.getDefaultInstance() : orderID_;
+  public com.assetmantle.modules.orders.key.KeyOrBuilder getKeyOrBuilder() {
+    return key_ == null ? com.assetmantle.modules.orders.key.Key.getDefaultInstance() : key_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -78,8 +78,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (orderID_ != null) {
-      output.writeMessage(1, getOrderID());
+    if (key_ != null) {
+      output.writeMessage(1, getKey());
     }
     getUnknownFields().writeTo(output);
   }
@@ -90,9 +90,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (orderID_ != null) {
+    if (key_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getOrderID());
+        .computeMessageSize(1, getKey());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -109,10 +109,10 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.modules.orders.queries.order.QueryRequest other = (com.assetmantle.modules.orders.queries.order.QueryRequest) obj;
 
-    if (hasOrderID() != other.hasOrderID()) return false;
-    if (hasOrderID()) {
-      if (!getOrderID()
-          .equals(other.getOrderID())) return false;
+    if (hasKey() != other.hasKey()) return false;
+    if (hasKey()) {
+      if (!getKey()
+          .equals(other.getKey())) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -125,9 +125,9 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasOrderID()) {
-      hash = (37 * hash) + ORDER_I_D_FIELD_NUMBER;
-      hash = (53 * hash) + getOrderID().hashCode();
+    if (hasKey()) {
+      hash = (37 * hash) + KEY_FIELD_NUMBER;
+      hash = (53 * hash) + getKey().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -258,10 +258,10 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      orderID_ = null;
-      if (orderIDBuilder_ != null) {
-        orderIDBuilder_.dispose();
-        orderIDBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
       return this;
     }
@@ -297,9 +297,9 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(com.assetmantle.modules.orders.queries.order.QueryRequest result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.orderID_ = orderIDBuilder_ == null
-            ? orderID_
-            : orderIDBuilder_.build();
+        result.key_ = keyBuilder_ == null
+            ? key_
+            : keyBuilder_.build();
       }
     }
 
@@ -347,8 +347,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.modules.orders.queries.order.QueryRequest other) {
       if (other == com.assetmantle.modules.orders.queries.order.QueryRequest.getDefaultInstance()) return this;
-      if (other.hasOrderID()) {
-        mergeOrderID(other.getOrderID());
+      if (other.hasKey()) {
+        mergeKey(other.getKey());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -378,7 +378,7 @@ private static final long serialVersionUID = 0L;
               break;
             case 10: {
               input.readMessage(
-                  getOrderIDFieldBuilder().getBuilder(),
+                  getKeyFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
@@ -400,123 +400,123 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private com.assetmantle.schema.ids.base.OrderID orderID_;
+    private com.assetmantle.modules.orders.key.Key key_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.OrderID, com.assetmantle.schema.ids.base.OrderID.Builder, com.assetmantle.schema.ids.base.OrderIDOrBuilder> orderIDBuilder_;
+        com.assetmantle.modules.orders.key.Key, com.assetmantle.modules.orders.key.Key.Builder, com.assetmantle.modules.orders.key.KeyOrBuilder> keyBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
-     * @return Whether the orderID field is set.
+     * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
+     * @return Whether the key field is set.
      */
-    public boolean hasOrderID() {
+    public boolean hasKey() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
-     * @return The orderID.
+     * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
+     * @return The key.
      */
-    public com.assetmantle.schema.ids.base.OrderID getOrderID() {
-      if (orderIDBuilder_ == null) {
-        return orderID_ == null ? com.assetmantle.schema.ids.base.OrderID.getDefaultInstance() : orderID_;
+    public com.assetmantle.modules.orders.key.Key getKey() {
+      if (keyBuilder_ == null) {
+        return key_ == null ? com.assetmantle.modules.orders.key.Key.getDefaultInstance() : key_;
       } else {
-        return orderIDBuilder_.getMessage();
+        return keyBuilder_.getMessage();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
+     * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setOrderID(com.assetmantle.schema.ids.base.OrderID value) {
-      if (orderIDBuilder_ == null) {
+    public Builder setKey(com.assetmantle.modules.orders.key.Key value) {
+      if (keyBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        orderID_ = value;
+        key_ = value;
       } else {
-        orderIDBuilder_.setMessage(value);
+        keyBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
+     * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setOrderID(
-        com.assetmantle.schema.ids.base.OrderID.Builder builderForValue) {
-      if (orderIDBuilder_ == null) {
-        orderID_ = builderForValue.build();
+    public Builder setKey(
+        com.assetmantle.modules.orders.key.Key.Builder builderForValue) {
+      if (keyBuilder_ == null) {
+        key_ = builderForValue.build();
       } else {
-        orderIDBuilder_.setMessage(builderForValue.build());
+        keyBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
+     * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder mergeOrderID(com.assetmantle.schema.ids.base.OrderID value) {
-      if (orderIDBuilder_ == null) {
+    public Builder mergeKey(com.assetmantle.modules.orders.key.Key value) {
+      if (keyBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0) &&
-          orderID_ != null &&
-          orderID_ != com.assetmantle.schema.ids.base.OrderID.getDefaultInstance()) {
-          getOrderIDBuilder().mergeFrom(value);
+          key_ != null &&
+          key_ != com.assetmantle.modules.orders.key.Key.getDefaultInstance()) {
+          getKeyBuilder().mergeFrom(value);
         } else {
-          orderID_ = value;
+          key_ = value;
         }
       } else {
-        orderIDBuilder_.mergeFrom(value);
+        keyBuilder_.mergeFrom(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
+     * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder clearOrderID() {
+    public Builder clearKey() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      orderID_ = null;
-      if (orderIDBuilder_ != null) {
-        orderIDBuilder_.dispose();
-        orderIDBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
+     * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.assetmantle.schema.ids.base.OrderID.Builder getOrderIDBuilder() {
+    public com.assetmantle.modules.orders.key.Key.Builder getKeyBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return getOrderIDFieldBuilder().getBuilder();
+      return getKeyFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
+     * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.assetmantle.schema.ids.base.OrderIDOrBuilder getOrderIDOrBuilder() {
-      if (orderIDBuilder_ != null) {
-        return orderIDBuilder_.getMessageOrBuilder();
+    public com.assetmantle.modules.orders.key.KeyOrBuilder getKeyOrBuilder() {
+      if (keyBuilder_ != null) {
+        return keyBuilder_.getMessageOrBuilder();
       } else {
-        return orderID_ == null ?
-            com.assetmantle.schema.ids.base.OrderID.getDefaultInstance() : orderID_;
+        return key_ == null ?
+            com.assetmantle.modules.orders.key.Key.getDefaultInstance() : key_;
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
+     * <code>.assetmantle.modules.orders.key.Key key = 1 [json_name = "key"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.OrderID, com.assetmantle.schema.ids.base.OrderID.Builder, com.assetmantle.schema.ids.base.OrderIDOrBuilder> 
-        getOrderIDFieldBuilder() {
-      if (orderIDBuilder_ == null) {
-        orderIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.assetmantle.schema.ids.base.OrderID, com.assetmantle.schema.ids.base.OrderID.Builder, com.assetmantle.schema.ids.base.OrderIDOrBuilder>(
-                getOrderID(),
+        com.assetmantle.modules.orders.key.Key, com.assetmantle.modules.orders.key.Key.Builder, com.assetmantle.modules.orders.key.KeyOrBuilder> 
+        getKeyFieldBuilder() {
+      if (keyBuilder_ == null) {
+        keyBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.modules.orders.key.Key, com.assetmantle.modules.orders.key.Key.Builder, com.assetmantle.modules.orders.key.KeyOrBuilder>(
+                getKey(),
                 getParentForChildren(),
                 isClean());
-        orderID_ = null;
+        key_ = null;
       }
-      return orderIDBuilder_;
+      return keyBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

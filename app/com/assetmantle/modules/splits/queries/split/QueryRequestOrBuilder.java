@@ -8,17 +8,17 @@ public interface QueryRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
-   * @return Whether the splitID field is set.
+   * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
+   * @return Whether the key field is set.
    */
-  boolean hasSplitID();
+  boolean hasKey();
   /**
-   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
-   * @return The splitID.
+   * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
-  com.assetmantle.schema.ids.base.SplitID getSplitID();
+  com.assetmantle.modules.splits.key.Key getKey();
   /**
-   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
+   * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
    */
-  com.assetmantle.schema.ids.base.SplitIDOrBuilder getSplitIDOrBuilder();
+  com.assetmantle.modules.splits.key.KeyOrBuilder getKeyOrBuilder();
 }

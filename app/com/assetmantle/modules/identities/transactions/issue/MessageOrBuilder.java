@@ -35,89 +35,77 @@ public interface MessageOrBuilder extends
   com.assetmantle.schema.ids.base.IdentityIDOrBuilder getFromIDOrBuilder();
 
   /**
-   * <code>string to = 3 [json_name = "to"];</code>
-   * @return The to.
-   */
-  java.lang.String getTo();
-  /**
-   * <code>string to = 3 [json_name = "to"];</code>
-   * @return The bytes for to.
-   */
-  com.google.protobuf.ByteString
-      getToBytes();
-
-  /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
    * @return Whether the classificationID field is set.
    */
   boolean hasClassificationID();
   /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
    * @return The classificationID.
    */
   com.assetmantle.schema.ids.base.ClassificationID getClassificationID();
   /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
    */
   com.assetmantle.schema.ids.base.ClassificationIDOrBuilder getClassificationIDOrBuilder();
 
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
    * @return Whether the immutableMetaProperties field is set.
    */
   boolean hasImmutableMetaProperties();
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
    * @return The immutableMetaProperties.
    */
   com.assetmantle.schema.lists.base.PropertyList getImmutableMetaProperties();
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
    */
   com.assetmantle.schema.lists.base.PropertyListOrBuilder getImmutableMetaPropertiesOrBuilder();
 
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
    * @return Whether the immutableProperties field is set.
    */
   boolean hasImmutableProperties();
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
    * @return The immutableProperties.
    */
   com.assetmantle.schema.lists.base.PropertyList getImmutableProperties();
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
    */
   com.assetmantle.schema.lists.base.PropertyListOrBuilder getImmutablePropertiesOrBuilder();
 
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
    * @return Whether the mutableMetaProperties field is set.
    */
   boolean hasMutableMetaProperties();
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
    * @return The mutableMetaProperties.
    */
   com.assetmantle.schema.lists.base.PropertyList getMutableMetaProperties();
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
    */
   com.assetmantle.schema.lists.base.PropertyListOrBuilder getMutableMetaPropertiesOrBuilder();
 
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
    * @return Whether the mutableProperties field is set.
    */
   boolean hasMutableProperties();
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
    * @return The mutableProperties.
    */
   com.assetmantle.schema.lists.base.PropertyList getMutableProperties();
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
    */
   com.assetmantle.schema.lists.base.PropertyListOrBuilder getMutablePropertiesOrBuilder();
 }

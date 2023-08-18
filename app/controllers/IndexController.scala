@@ -22,6 +22,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 getBlockResults: GetBlockResults,
                                 getProposalDeposit: GetProposalDeposit,
                                 blockchainBlocks: blockchain.Blocks,
+                                blockchainProposals: blockchain.Proposals,
                                 cached: Cached,
                                 coordinatedShutdown: CoordinatedShutdown,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -40,7 +41,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   def search(query: String): EssentialAction = cached.apply(req => req.path + "/" + query, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-
         if (query == "") Future(Unauthorized(views.html.index(failures = Seq(constants.Response.EMPTY_QUERY))))
         else if (query.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)) Future(Redirect(routes.ComponentViewController.wallet(query)))
         else if (query.matches(constants.Blockchain.ValidatorPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex) || utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ComponentViewController.validator(query)))

@@ -30,10 +30,9 @@ public final class QueryRequestProto {
     java.lang.String[] descriptorData = {
       "\n&metas/queries/meta/query_request.proto" +
       "\022&assetmantle.modules.metas.queries.meta" +
-      "\032\026ids/base/data_id.proto\032\024gogoproto/gogo" +
-      ".proto\"S\n\014QueryRequest\022=\n\010data_i_d\030\001 \001(\013" +
-      "2#.assetmantle.schema.ids.base.DataIDR\006d" +
-      "ataID:\004\210\240\037\000B\262\002\n*com.assetmantle.modules." +
+      "\032\023metas/key/key.proto\"D\n\014QueryRequest\0224\n" +
+      "\003key\030\001 \001(\0132\".assetmantle.modules.metas.k" +
+      "ey.KeyR\003keyB\262\002\n*com.assetmantle.modules." +
       "metas.queries.metaB\021QueryRequestProtoP\001Z" +
       "3github.com/AssetMantle/modules/x/metas/" +
       "queries/meta\242\002\005AMMQM\252\002&Assetmantle.Modul" +
@@ -46,22 +45,15 @@ public final class QueryRequestProto {
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.assetmantle.schema.ids.base.DataIdProto.getDescriptor(),
-          com.gogoproto.GogoProto.getDescriptor(),
+          com.assetmantle.modules.metas.key.KeyProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_metas_queries_meta_QueryRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_metas_queries_meta_QueryRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_metas_queries_meta_QueryRequest_descriptor,
-        new java.lang.String[] { "DataID", });
-    com.google.protobuf.ExtensionRegistry registry =
-        com.google.protobuf.ExtensionRegistry.newInstance();
-    registry.add(com.gogoproto.GogoProto.goprotoGetters);
-    com.google.protobuf.Descriptors.FileDescriptor
-        .internalUpdateFileDescriptor(descriptor, registry);
-    com.assetmantle.schema.ids.base.DataIdProto.getDescriptor();
-    com.gogoproto.GogoProto.getDescriptor();
+        new java.lang.String[] { "Key", });
+    com.assetmantle.modules.metas.key.KeyProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -29,22 +29,22 @@ public final class ServiceProto {
       "otations.proto\032/identities/transactions/" +
       "provision/message.proto\032<identities/tran" +
       "sactions/provision/transaction_response." +
-      "proto2\306\001\n\007Service\022\272\001\n\006Handle\022>.assetmant" +
-      "le.modules.identities.transactions.provi" +
-      "sion.Message\032J.assetmantle.modules.ident" +
-      "ities.transactions.provision.Transaction" +
-      "Response\"$\202\323\344\223\002\036\"\034/mantle/identities/pro" +
-      "visionB\207\003\n9com.assetmantle.modules.ident" +
-      "ities.transactions.provisionB\014ServicePro" +
-      "toP\001ZBgithub.com/AssetMantle/modules/x/i" +
-      "dentities/transactions/provision\242\002\005AMITP" +
-      "\252\0025Assetmantle.Modules.Identities.Transa" +
-      "ctions.Provision\312\0025Assetmantle\\Modules\\I" +
-      "dentities\\Transactions\\Provision\342\002AAsset" +
-      "mantle\\Modules\\Identities\\Transactions\\P" +
-      "rovision\\GPBMetadata\352\0029Assetmantle::Modu" +
-      "les::Identities::Transactions::Provision" +
-      "b\006proto3"
+      "proto2\302\001\n\003Msg\022\272\001\n\006Handle\022>.assetmantle.m" +
+      "odules.identities.transactions.provision" +
+      ".Message\032J.assetmantle.modules.identitie" +
+      "s.transactions.provision.TransactionResp" +
+      "onse\"$\202\323\344\223\002\036\"\034/mantle/identities/provisi" +
+      "onB\207\003\n9com.assetmantle.modules.identitie" +
+      "s.transactions.provisionB\014ServiceProtoP\001" +
+      "ZBgithub.com/AssetMantle/modules/x/ident" +
+      "ities/transactions/provision\242\002\005AMITP\252\0025A" +
+      "ssetmantle.Modules.Identities.Transactio" +
+      "ns.Provision\312\0025Assetmantle\\Modules\\Ident" +
+      "ities\\Transactions\\Provision\342\002AAssetmant" +
+      "le\\Modules\\Identities\\Transactions\\Provi" +
+      "sion\\GPBMetadata\352\0029Assetmantle::Modules:" +
+      ":Identities::Transactions::Provisionb\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

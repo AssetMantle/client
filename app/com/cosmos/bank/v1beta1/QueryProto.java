@@ -185,12 +185,12 @@ public final class QueryProto {
       "os.bank.v1beta1.QueryDenomsMetadataReque" +
       "st\0320.cosmos.bank.v1beta1.QueryDenomsMeta" +
       "dataResponse\",\202\323\344\223\002&\022$/cosmos/bank/v1bet" +
-      "a1/denoms_metadataB\323\001\n\027com.cosmos.bank.v" +
-      "1beta1B\nQueryProtoP\001Z>github.com/AssetMa" +
-      "ntle/modules/cosmos/bank/v1beta1;bankv1b" +
-      "eta1\242\002\003CBX\252\002\023Cosmos.Bank.V1beta1\312\002\023Cosmo" +
-      "s\\Bank\\V1beta1\342\002\037Cosmos\\Bank\\V1beta1\\GPB" +
-      "Metadata\352\002\025Cosmos::Bank::V1beta1b\006proto3"
+      "a1/denoms_metadataB\276\001\n\027com.cosmos.bank.v" +
+      "1beta1B\nQueryProtoP\001Z)github.com/cosmos/" +
+      "cosmos-sdk/x/bank/types\242\002\003CBX\252\002\023Cosmos.B" +
+      "ank.V1beta1\312\002\023Cosmos\\Bank\\V1beta1\342\002\037Cosm" +
+      "os\\Bank\\V1beta1\\GPBMetadata\352\002\025Cosmos::Ba" +
+      "nk::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

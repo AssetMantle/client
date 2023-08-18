@@ -30,31 +30,31 @@ public final class QueryRequestProto {
     java.lang.String[] descriptorData = {
       "\n)orders/queries/orders/query_request.pr" +
       "oto\022)assetmantle.modules.orders.queries." +
-      "orders\032*cosmos/base/query/v1beta1/pagina" +
-      "tion.proto\"Y\n\014QueryRequest\022I\n\014page_reque" +
-      "st\030\001 \001(\0132&.cosmos.base.query.v1beta1.Pag" +
-      "eRequestR\013pageRequestB\304\002\n-com.assetmantl" +
-      "e.modules.orders.queries.ordersB\021QueryRe" +
-      "questProtoP\001Z6github.com/AssetMantle/mod" +
-      "ules/x/orders/queries/orders\242\002\005AMOQO\252\002)A" +
-      "ssetmantle.Modules.Orders.Queries.Orders" +
-      "\312\002)Assetmantle\\Modules\\Orders\\Queries\\Or" +
-      "ders\342\0025Assetmantle\\Modules\\Orders\\Querie" +
-      "s\\Orders\\GPBMetadata\352\002-Assetmantle::Modu" +
-      "les::Orders::Queries::Ordersb\006proto3"
+      "orders\032\024orders/key/key.proto\"[\n\014QueryReq" +
+      "uest\0225\n\003key\030\001 \001(\0132#.assetmantle.modules." +
+      "orders.key.KeyR\003key\022\024\n\005limit\030\002 \001(\005R\005limi" +
+      "tB\304\002\n-com.assetmantle.modules.orders.que" +
+      "ries.ordersB\021QueryRequestProtoP\001Z6github" +
+      ".com/AssetMantle/modules/x/orders/querie" +
+      "s/orders\242\002\005AMOQO\252\002)Assetmantle.Modules.O" +
+      "rders.Queries.Orders\312\002)Assetmantle\\Modul" +
+      "es\\Orders\\Queries\\Orders\342\0025Assetmantle\\M" +
+      "odules\\Orders\\Queries\\Orders\\GPBMetadata" +
+      "\352\002-Assetmantle::Modules::Orders::Queries" +
+      "::Ordersb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.cosmos.base.query.v1beta1.PaginationProto.getDescriptor(),
+          com.assetmantle.modules.orders.key.KeyProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_orders_queries_orders_QueryRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_orders_queries_orders_QueryRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_orders_queries_orders_QueryRequest_descriptor,
-        new java.lang.String[] { "PageRequest", });
-    com.cosmos.base.query.v1beta1.PaginationProto.getDescriptor();
+        new java.lang.String[] { "Key", "Limit", });
+    com.assetmantle.modules.orders.key.KeyProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

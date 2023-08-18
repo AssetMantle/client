@@ -48,13 +48,12 @@ public final class TxProto {
       "\n\024CreateVestingAccount\022/.cosmos.vesting." +
       "v1beta1.MsgCreateVestingAccount\0327.cosmos" +
       ".vesting.v1beta1.MsgCreateVestingAccount" +
-      "ResponseB\345\001\n\032com.cosmos.vesting.v1beta1B" +
-      "\007TxProtoP\001ZDgithub.com/AssetMantle/modul" +
-      "es/cosmos/vesting/v1beta1;vestingv1beta1" +
-      "\242\002\003CVX\252\002\026Cosmos.Vesting.V1beta1\312\002\026Cosmos" +
-      "\\Vesting\\V1beta1\342\002\"Cosmos\\Vesting\\V1beta" +
-      "1\\GPBMetadata\352\002\030Cosmos::Vesting::V1beta1" +
-      "b\006proto3"
+      "ResponseB\322\001\n\032com.cosmos.vesting.v1beta1B" +
+      "\007TxProtoP\001Z1github.com/cosmos/cosmos-sdk" +
+      "/x/auth/vesting/types\242\002\003CVX\252\002\026Cosmos.Ves" +
+      "ting.V1beta1\312\002\026Cosmos\\Vesting\\V1beta1\342\002\"" +
+      "Cosmos\\Vesting\\V1beta1\\GPBMetadata\352\002\030Cos" +
+      "mos::Vesting::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

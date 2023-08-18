@@ -8,14 +8,17 @@ public interface TransactionResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string identity_i_d = 1 [json_name = "identityID"];</code>
+   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
+   * @return Whether the identityID field is set.
+   */
+  boolean hasIdentityID();
+  /**
+   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
    * @return The identityID.
    */
-  java.lang.String getIdentityID();
+  com.assetmantle.schema.ids.base.IdentityID getIdentityID();
   /**
-   * <code>string identity_i_d = 1 [json_name = "identityID"];</code>
-   * @return The bytes for identityID.
+   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
    */
-  com.google.protobuf.ByteString
-      getIdentityIDBytes();
+  com.assetmantle.schema.ids.base.IdentityIDOrBuilder getIdentityIDOrBuilder();
 }

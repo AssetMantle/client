@@ -30,31 +30,31 @@ public final class QueryRequestProto {
     java.lang.String[] descriptorData = {
       "\n)splits/queries/splits/query_request.pr" +
       "oto\022)assetmantle.modules.splits.queries." +
-      "splits\032*cosmos/base/query/v1beta1/pagina" +
-      "tion.proto\"Y\n\014QueryRequest\022I\n\014page_reque" +
-      "st\030\001 \001(\0132&.cosmos.base.query.v1beta1.Pag" +
-      "eRequestR\013pageRequestB\304\002\n-com.assetmantl" +
-      "e.modules.splits.queries.splitsB\021QueryRe" +
-      "questProtoP\001Z6github.com/AssetMantle/mod" +
-      "ules/x/splits/queries/splits\242\002\005AMSQS\252\002)A" +
-      "ssetmantle.Modules.Splits.Queries.Splits" +
-      "\312\002)Assetmantle\\Modules\\Splits\\Queries\\Sp" +
-      "lits\342\0025Assetmantle\\Modules\\Splits\\Querie" +
-      "s\\Splits\\GPBMetadata\352\002-Assetmantle::Modu" +
-      "les::Splits::Queries::Splitsb\006proto3"
+      "splits\032\024splits/key/key.proto\"[\n\014QueryReq" +
+      "uest\0225\n\003key\030\001 \001(\0132#.assetmantle.modules." +
+      "splits.key.KeyR\003key\022\024\n\005limit\030\002 \001(\005R\005limi" +
+      "tB\304\002\n-com.assetmantle.modules.splits.que" +
+      "ries.splitsB\021QueryRequestProtoP\001Z6github" +
+      ".com/AssetMantle/modules/x/splits/querie" +
+      "s/splits\242\002\005AMSQS\252\002)Assetmantle.Modules.S" +
+      "plits.Queries.Splits\312\002)Assetmantle\\Modul" +
+      "es\\Splits\\Queries\\Splits\342\0025Assetmantle\\M" +
+      "odules\\Splits\\Queries\\Splits\\GPBMetadata" +
+      "\352\002-Assetmantle::Modules::Splits::Queries" +
+      "::Splitsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.cosmos.base.query.v1beta1.PaginationProto.getDescriptor(),
+          com.assetmantle.modules.splits.key.KeyProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_splits_queries_splits_QueryRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_splits_queries_splits_QueryRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_splits_queries_splits_QueryRequest_descriptor,
-        new java.lang.String[] { "PageRequest", });
-    com.cosmos.base.query.v1beta1.PaginationProto.getDescriptor();
+        new java.lang.String[] { "Key", "Limit", });
+    com.assetmantle.modules.splits.key.KeyProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

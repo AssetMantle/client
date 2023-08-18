@@ -28,20 +28,20 @@ public final class ServiceProto {
       "s.take\032\034google/api/annotations.proto\032&or" +
       "ders/transactions/take/message.proto\0323or" +
       "ders/transactions/take/transaction_respo" +
-      "nse.proto2\253\001\n\007Service\022\237\001\n\006Handle\0225.asset" +
-      "mantle.modules.orders.transactions.take." +
-      "Message\032A.assetmantle.modules.orders.tra" +
-      "nsactions.take.TransactionResponse\"\033\202\323\344\223" +
-      "\002\025\"\023/mantle/orders/takeB\321\002\n0com.assetman" +
-      "tle.modules.orders.transactions.takeB\014Se" +
-      "rviceProtoP\001Z9github.com/AssetMantle/mod" +
-      "ules/x/orders/transactions/take\242\002\005AMOTT\252" +
-      "\002,Assetmantle.Modules.Orders.Transaction" +
-      "s.Take\312\002,Assetmantle\\Modules\\Orders\\Tran" +
-      "sactions\\Take\342\0028Assetmantle\\Modules\\Orde" +
-      "rs\\Transactions\\Take\\GPBMetadata\352\0020Asset" +
-      "mantle::Modules::Orders::Transactions::T" +
-      "akeb\006proto3"
+      "nse.proto2\247\001\n\003Msg\022\237\001\n\006Handle\0225.assetmant" +
+      "le.modules.orders.transactions.take.Mess" +
+      "age\032A.assetmantle.modules.orders.transac" +
+      "tions.take.TransactionResponse\"\033\202\323\344\223\002\025\"\023" +
+      "/mantle/orders/takeB\321\002\n0com.assetmantle." +
+      "modules.orders.transactions.takeB\014Servic" +
+      "eProtoP\001Z9github.com/AssetMantle/modules" +
+      "/x/orders/transactions/take\242\002\005AMOTT\252\002,As" +
+      "setmantle.Modules.Orders.Transactions.Ta" +
+      "ke\312\002,Assetmantle\\Modules\\Orders\\Transact" +
+      "ions\\Take\342\0028Assetmantle\\Modules\\Orders\\T" +
+      "ransactions\\Take\\GPBMetadata\352\0020Assetmant" +
+      "le::Modules::Orders::Transactions::Takeb" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

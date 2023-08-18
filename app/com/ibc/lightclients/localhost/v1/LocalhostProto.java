@@ -34,14 +34,14 @@ public final class LocalhostProto {
       "/client.proto\"}\n\013ClientState\022.\n\010chain_id" +
       "\030\001 \001(\tB\023\362\336\037\017yaml:\"chain_id\"R\007chainId\0228\n\006" +
       "height\030\002 \001(\0132\032.ibc.core.client.v1.Height" +
-      "B\004\310\336\037\000R\006height:\004\210\240\037\000B\224\002\n!com.ibc.lightcl" +
-      "ients.localhost.v1B\016LocalhostProtoP\001ZHgi" +
-      "thub.com/AssetMantle/modules/ibc/lightcl" +
-      "ients/localhost/v1;localhostv1\242\002\003ILL\252\002\035I" +
-      "bc.Lightclients.Localhost.V1\312\002\035Ibc\\Light" +
-      "clients\\Localhost\\V1\342\002)Ibc\\Lightclients\\" +
-      "Localhost\\V1\\GPBMetadata\352\002 Ibc::Lightcli" +
-      "ents::Localhost::V1b\006proto3"
+      "B\004\310\336\037\000R\006height:\004\210\240\037\000B\220\002\n!com.ibc.lightcl" +
+      "ients.localhost.v1B\016LocalhostProtoP\001ZDgi" +
+      "thub.com/cosmos/ibc-go/v4/modules/light-" +
+      "clients/09-localhost/types\242\002\003ILL\252\002\035Ibc.L" +
+      "ightclients.Localhost.V1\312\002\035Ibc\\Lightclie" +
+      "nts\\Localhost\\V1\342\002)Ibc\\Lightclients\\Loca" +
+      "lhost\\V1\\GPBMetadata\352\002 Ibc::Lightclients" +
+      "::Localhost::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

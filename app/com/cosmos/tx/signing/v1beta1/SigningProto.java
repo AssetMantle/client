@@ -73,14 +73,13 @@ public final class SigningProto {
       "\001\n\010SignMode\022\031\n\025SIGN_MODE_UNSPECIFIED\020\000\022\024" +
       "\n\020SIGN_MODE_DIRECT\020\001\022\025\n\021SIGN_MODE_TEXTUA" +
       "L\020\002\022\037\n\033SIGN_MODE_LEGACY_AMINO_JSON\020\177\022\026\n\021" +
-      "SIGN_MODE_EIP_191\020\277\001B\375\001\n\035com.cosmos.tx.s" +
-      "igning.v1beta1B\014SigningProtoP\001ZGgithub.c" +
-      "om/AssetMantle/modules/cosmos/tx/signing" +
-      "/v1beta1;signingv1beta1\242\002\003CTS\252\002\031Cosmos.T" +
-      "x.Signing.V1beta1\312\002\031Cosmos\\Tx\\Signing\\V1" +
-      "beta1\342\002%Cosmos\\Tx\\Signing\\V1beta1\\GPBMet" +
-      "adata\352\002\034Cosmos::Tx::Signing::V1beta1b\006pr" +
-      "oto3"
+      "SIGN_MODE_EIP_191\020\277\001B\343\001\n\035com.cosmos.tx.s" +
+      "igning.v1beta1B\014SigningProtoP\001Z-github.c" +
+      "om/cosmos/cosmos-sdk/types/tx/signing\242\002\003" +
+      "CTS\252\002\031Cosmos.Tx.Signing.V1beta1\312\002\031Cosmos" +
+      "\\Tx\\Signing\\V1beta1\342\002%Cosmos\\Tx\\Signing\\" +
+      "V1beta1\\GPBMetadata\352\002\034Cosmos::Tx::Signin" +
+      "g::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

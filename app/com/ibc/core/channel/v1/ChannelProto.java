@@ -40,6 +40,11 @@ public final class ChannelProto {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ibc_core_channel_v1_PacketState_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ibc_core_channel_v1_PacketId_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_ibc_core_channel_v1_PacketId_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ibc_core_channel_v1_Acknowledgement_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -92,22 +97,26 @@ public final class ChannelProto {
       "\336\037\016yaml:\"port_id\"R\006portId\0224\n\nchannel_id\030" +
       "\002 \001(\tB\025\362\336\037\021yaml:\"channel_id\"R\tchannelId\022" +
       "\032\n\010sequence\030\003 \001(\004R\010sequence\022\022\n\004data\030\004 \001(" +
-      "\014R\004data:\004\210\240\037\000\"O\n\017Acknowledgement\022\030\n\006resu" +
-      "lt\030\025 \001(\014H\000R\006result\022\026\n\005error\030\026 \001(\tH\000R\005err" +
-      "orB\n\n\010response*\267\001\n\005State\0226\n\037STATE_UNINIT" +
-      "IALIZED_UNSPECIFIED\020\000\032\021\212\235 \rUNINITIALIZED" +
-      "\022\030\n\nSTATE_INIT\020\001\032\010\212\235 \004INIT\022\036\n\rSTATE_TRYO" +
-      "PEN\020\002\032\013\212\235 \007TRYOPEN\022\030\n\nSTATE_OPEN\020\003\032\010\212\235 \004" +
-      "OPEN\022\034\n\014STATE_CLOSED\020\004\032\n\212\235 \006CLOSED\032\004\210\243\036\000" +
-      "*w\n\005Order\022$\n\026ORDER_NONE_UNSPECIFIED\020\000\032\010\212" +
-      "\235 \004NONE\022\"\n\017ORDER_UNORDERED\020\001\032\r\212\235 \tUNORDE" +
-      "RED\022\036\n\rORDER_ORDERED\020\002\032\013\212\235 \007ORDERED\032\004\210\243\036" +
-      "\000B\324\001\n\027com.ibc.core.channel.v1B\014ChannelPr" +
-      "otoP\001Z<github.com/AssetMantle/modules/ib" +
-      "c/core/channel/v1;channelv1\242\002\003ICC\252\002\023Ibc." +
-      "Core.Channel.V1\312\002\023Ibc\\Core\\Channel\\V1\342\002\037" +
-      "Ibc\\Core\\Channel\\V1\\GPBMetadata\352\002\026Ibc::C" +
-      "ore::Channel::V1b\006proto3"
+      "\014R\004data:\004\210\240\037\000\"\217\001\n\010PacketId\022+\n\007port_id\030\001 " +
+      "\001(\tB\022\362\336\037\016yaml:\"port_id\"R\006portId\0224\n\nchann" +
+      "el_id\030\002 \001(\tB\025\362\336\037\021yaml:\"channel_id\"R\tchan" +
+      "nelId\022\032\n\010sequence\030\003 \001(\004R\010sequence:\004\210\240\037\000\"" +
+      "O\n\017Acknowledgement\022\030\n\006result\030\025 \001(\014H\000R\006re" +
+      "sult\022\026\n\005error\030\026 \001(\tH\000R\005errorB\n\n\010response" +
+      "*\267\001\n\005State\0226\n\037STATE_UNINITIALIZED_UNSPEC" +
+      "IFIED\020\000\032\021\212\235 \rUNINITIALIZED\022\030\n\nSTATE_INIT" +
+      "\020\001\032\010\212\235 \004INIT\022\036\n\rSTATE_TRYOPEN\020\002\032\013\212\235 \007TRY" +
+      "OPEN\022\030\n\nSTATE_OPEN\020\003\032\010\212\235 \004OPEN\022\034\n\014STATE_" +
+      "CLOSED\020\004\032\n\212\235 \006CLOSED\032\004\210\243\036\000*w\n\005Order\022$\n\026O" +
+      "RDER_NONE_UNSPECIFIED\020\000\032\010\212\235 \004NONE\022\"\n\017ORD" +
+      "ER_UNORDERED\020\001\032\r\212\235 \tUNORDERED\022\036\n\rORDER_O" +
+      "RDERED\020\002\032\013\212\235 \007ORDERED\032\004\210\243\036\000B\321\001\n\027com.ibc." +
+      "core.channel.v1B\014ChannelProtoP\001Z9github." +
+      "com/cosmos/ibc-go/v4/modules/core/04-cha" +
+      "nnel/types\242\002\003ICC\252\002\023Ibc.Core.Channel.V1\312\002" +
+      "\023Ibc\\Core\\Channel\\V1\342\002\037Ibc\\Core\\Channel\\" +
+      "V1\\GPBMetadata\352\002\026Ibc::Core::Channel::V1b" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -145,8 +154,14 @@ public final class ChannelProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ibc_core_channel_v1_PacketState_descriptor,
         new java.lang.String[] { "PortId", "ChannelId", "Sequence", "Data", });
-    internal_static_ibc_core_channel_v1_Acknowledgement_descriptor =
+    internal_static_ibc_core_channel_v1_PacketId_descriptor =
       getDescriptor().getMessageTypes().get(5);
+    internal_static_ibc_core_channel_v1_PacketId_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_ibc_core_channel_v1_PacketId_descriptor,
+        new java.lang.String[] { "PortId", "ChannelId", "Sequence", });
+    internal_static_ibc_core_channel_v1_Acknowledgement_descriptor =
+      getDescriptor().getMessageTypes().get(6);
     internal_static_ibc_core_channel_v1_Acknowledgement_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ibc_core_channel_v1_Acknowledgement_descriptor,

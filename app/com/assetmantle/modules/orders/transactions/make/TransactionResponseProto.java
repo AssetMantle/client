@@ -30,21 +30,24 @@ public final class TransactionResponseProto {
     java.lang.String[] descriptorData = {
       "\n3orders/transactions/make/transaction_r" +
       "esponse.proto\022,assetmantle.modules.order" +
-      "s.transactions.make\"1\n\023TransactionRespon" +
-      "se\022\032\n\torder_i_d\030\001 \001(\tR\007orderIDB\335\002\n0com.a" +
-      "ssetmantle.modules.orders.transactions.m" +
-      "akeB\030TransactionResponseProtoP\001Z9github." +
-      "com/AssetMantle/modules/x/orders/transac" +
-      "tions/make\242\002\005AMOTM\252\002,Assetmantle.Modules" +
-      ".Orders.Transactions.Make\312\002,Assetmantle\\" +
-      "Modules\\Orders\\Transactions\\Make\342\0028Asset" +
-      "mantle\\Modules\\Orders\\Transactions\\Make\\" +
-      "GPBMetadata\352\0020Assetmantle::Modules::Orde" +
-      "rs::Transactions::Makeb\006proto3"
+      "s.transactions.make\032\027ids/base/order_id.p" +
+      "roto\"W\n\023TransactionResponse\022@\n\torder_i_d" +
+      "\030\001 \001(\0132$.assetmantle.schema.ids.base.Ord" +
+      "erIDR\007orderIDB\335\002\n0com.assetmantle.module" +
+      "s.orders.transactions.makeB\030TransactionR" +
+      "esponseProtoP\001Z9github.com/AssetMantle/m" +
+      "odules/x/orders/transactions/make\242\002\005AMOT" +
+      "M\252\002,Assetmantle.Modules.Orders.Transacti" +
+      "ons.Make\312\002,Assetmantle\\Modules\\Orders\\Tr" +
+      "ansactions\\Make\342\0028Assetmantle\\Modules\\Or" +
+      "ders\\Transactions\\Make\\GPBMetadata\352\0020Ass" +
+      "etmantle::Modules::Orders::Transactions:" +
+      ":Makeb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.assetmantle.schema.ids.base.OrderIdProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_orders_transactions_make_TransactionResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -52,6 +55,7 @@ public final class TransactionResponseProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_orders_transactions_make_TransactionResponse_descriptor,
         new java.lang.String[] { "OrderID", });
+    com.assetmantle.schema.ids.base.OrderIdProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

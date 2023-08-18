@@ -27,20 +27,20 @@ public final class ServiceProto {
       "setmantle.modules.orders.queries.order\032\034" +
       "google/api/annotations.proto\032(orders/que" +
       "ries/order/query_request.proto\032)orders/q" +
-      "ueries/order/query_response.proto2\253\001\n\007Se" +
-      "rvice\022\237\001\n\006Handle\0226.assetmantle.modules.o" +
-      "rders.queries.order.QueryRequest\0327.asset" +
-      "mantle.modules.orders.queries.order.Quer" +
-      "yResponse\"$\202\323\344\223\002\036\022\034/mantle/orders/v1beta" +
-      "1/orderB\271\002\n,com.assetmantle.modules.orde" +
-      "rs.queries.orderB\014ServiceProtoP\001Z5github" +
-      ".com/AssetMantle/modules/x/orders/querie" +
-      "s/order\242\002\005AMOQO\252\002(Assetmantle.Modules.Or" +
-      "ders.Queries.Order\312\002(Assetmantle\\Modules" +
-      "\\Orders\\Queries\\Order\342\0024Assetmantle\\Modu" +
-      "les\\Orders\\Queries\\Order\\GPBMetadata\352\002,A" +
-      "ssetmantle::Modules::Orders::Queries::Or" +
-      "derb\006proto3"
+      "ueries/order/query_response.proto2\251\001\n\005Qu" +
+      "ery\022\237\001\n\006Handle\0226.assetmantle.modules.ord" +
+      "ers.queries.order.QueryRequest\0327.assetma" +
+      "ntle.modules.orders.queries.order.QueryR" +
+      "esponse\"$\202\323\344\223\002\036\022\034/mantle/orders/v1beta1/" +
+      "orderB\271\002\n,com.assetmantle.modules.orders" +
+      ".queries.orderB\014ServiceProtoP\001Z5github.c" +
+      "om/AssetMantle/modules/x/orders/queries/" +
+      "order\242\002\005AMOQO\252\002(Assetmantle.Modules.Orde" +
+      "rs.Queries.Order\312\002(Assetmantle\\Modules\\O" +
+      "rders\\Queries\\Order\342\0024Assetmantle\\Module" +
+      "s\\Orders\\Queries\\Order\\GPBMetadata\352\002,Ass" +
+      "etmantle::Modules::Orders::Queries::Orde" +
+      "rb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

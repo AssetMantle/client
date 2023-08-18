@@ -25,7 +25,7 @@ case class DataID(typeID: StringID, hashID: HashID) extends ID {
 
   def getHashID: HashID = this.hashID
 
-  def getHashIDString: String = utilities.Secrets.base64URLEncoder(hashID.getBytes)
+  def getHashIDString: String = schema.utilities.common.base64URLEncoder(hashID.getBytes)
 
   def getBytes: Array[Byte] = this.typeID.getBytes ++ this.hashID.getBytes
 
@@ -36,6 +36,8 @@ case class DataID(typeID: StringID, hashID: HashID) extends ID {
   def toAnyID: AnyID = AnyID.newBuilder().setDataID(this.asProtoDataID).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoDataID.toByteString.toByteArray
+
+  def compare(id: ID): Int = schema.utilities.common.byteArraysCompare(this.getBytes, id.asInstanceOf[DataID].getBytes)
 }
 
 object DataID {

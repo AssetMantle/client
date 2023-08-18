@@ -26,6 +26,7 @@ private static final long serialVersionUID = 0L;
     sourceChannel_ = "";
     sender_ = "";
     receiver_ = "";
+    memo_ = "";
   }
 
   @java.lang.Override
@@ -331,6 +332,53 @@ private static final long serialVersionUID = 0L;
     return timeoutTimestamp_;
   }
 
+  public static final int MEMO_FIELD_NUMBER = 8;
+  @SuppressWarnings("serial")
+  private volatile java.lang.Object memo_ = "";
+  /**
+   * <pre>
+   * optional memo
+   * </pre>
+   *
+   * <code>string memo = 8 [json_name = "memo"];</code>
+   * @return The memo.
+   */
+  @java.lang.Override
+  public java.lang.String getMemo() {
+    java.lang.Object ref = memo_;
+    if (ref instanceof java.lang.String) {
+      return (java.lang.String) ref;
+    } else {
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
+      java.lang.String s = bs.toStringUtf8();
+      memo_ = s;
+      return s;
+    }
+  }
+  /**
+   * <pre>
+   * optional memo
+   * </pre>
+   *
+   * <code>string memo = 8 [json_name = "memo"];</code>
+   * @return The bytes for memo.
+   */
+  @java.lang.Override
+  public com.google.protobuf.ByteString
+      getMemoBytes() {
+    java.lang.Object ref = memo_;
+    if (ref instanceof java.lang.String) {
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
+      memo_ = b;
+      return b;
+    } else {
+      return (com.google.protobuf.ByteString) ref;
+    }
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -366,6 +414,9 @@ private static final long serialVersionUID = 0L;
     if (timeoutTimestamp_ != 0L) {
       output.writeUInt64(7, timeoutTimestamp_);
     }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(memo_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 8, memo_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -398,6 +449,9 @@ private static final long serialVersionUID = 0L;
     if (timeoutTimestamp_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
         .computeUInt64Size(7, timeoutTimestamp_);
+    }
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(memo_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, memo_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -434,6 +488,8 @@ private static final long serialVersionUID = 0L;
     }
     if (getTimeoutTimestamp()
         != other.getTimeoutTimestamp()) return false;
+    if (!getMemo()
+        .equals(other.getMemo())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -464,6 +520,8 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + TIMEOUT_TIMESTAMP_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getTimeoutTimestamp());
+    hash = (37 * hash) + MEMO_FIELD_NUMBER;
+    hash = (53 * hash) + getMemo().hashCode();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -614,6 +672,7 @@ private static final long serialVersionUID = 0L;
         timeoutHeightBuilder_ = null;
       }
       timeoutTimestamp_ = 0L;
+      memo_ = "";
       return this;
     }
 
@@ -671,6 +730,9 @@ private static final long serialVersionUID = 0L;
       }
       if (((from_bitField0_ & 0x00000040) != 0)) {
         result.timeoutTimestamp_ = timeoutTimestamp_;
+      }
+      if (((from_bitField0_ & 0x00000080) != 0)) {
+        result.memo_ = memo_;
       }
     }
 
@@ -747,6 +809,11 @@ private static final long serialVersionUID = 0L;
       if (other.getTimeoutTimestamp() != 0L) {
         setTimeoutTimestamp(other.getTimeoutTimestamp());
       }
+      if (!other.getMemo().isEmpty()) {
+        memo_ = other.memo_;
+        bitField0_ |= 0x00000080;
+        onChanged();
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -812,6 +879,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000040;
               break;
             } // case 56
+            case 66: {
+              memo_ = input.readStringRequireUtf8();
+              bitField0_ |= 0x00000080;
+              break;
+            } // case 66
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1559,6 +1631,98 @@ private static final long serialVersionUID = 0L;
     public Builder clearTimeoutTimestamp() {
       bitField0_ = (bitField0_ & ~0x00000040);
       timeoutTimestamp_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private java.lang.Object memo_ = "";
+    /**
+     * <pre>
+     * optional memo
+     * </pre>
+     *
+     * <code>string memo = 8 [json_name = "memo"];</code>
+     * @return The memo.
+     */
+    public java.lang.String getMemo() {
+      java.lang.Object ref = memo_;
+      if (!(ref instanceof java.lang.String)) {
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        memo_ = s;
+        return s;
+      } else {
+        return (java.lang.String) ref;
+      }
+    }
+    /**
+     * <pre>
+     * optional memo
+     * </pre>
+     *
+     * <code>string memo = 8 [json_name = "memo"];</code>
+     * @return The bytes for memo.
+     */
+    public com.google.protobuf.ByteString
+        getMemoBytes() {
+      java.lang.Object ref = memo_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        memo_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    /**
+     * <pre>
+     * optional memo
+     * </pre>
+     *
+     * <code>string memo = 8 [json_name = "memo"];</code>
+     * @param value The memo to set.
+     * @return This builder for chaining.
+     */
+    public Builder setMemo(
+        java.lang.String value) {
+      if (value == null) { throw new NullPointerException(); }
+      memo_ = value;
+      bitField0_ |= 0x00000080;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * optional memo
+     * </pre>
+     *
+     * <code>string memo = 8 [json_name = "memo"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearMemo() {
+      memo_ = getDefaultInstance().getMemo();
+      bitField0_ = (bitField0_ & ~0x00000080);
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * optional memo
+     * </pre>
+     *
+     * <code>string memo = 8 [json_name = "memo"];</code>
+     * @param value The bytes for memo to set.
+     * @return This builder for chaining.
+     */
+    public Builder setMemoBytes(
+        com.google.protobuf.ByteString value) {
+      if (value == null) { throw new NullPointerException(); }
+      checkByteStringIsUtf8(value);
+      memo_ = value;
+      bitField0_ |= 0x00000080;
       onChanged();
       return this;
     }

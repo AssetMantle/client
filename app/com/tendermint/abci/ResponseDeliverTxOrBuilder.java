@@ -72,24 +72,44 @@ public interface ResponseDeliverTxOrBuilder extends
   long getGasUsed();
 
   /**
+   * <pre>
+   * nondeterministic
+   * </pre>
+   *
    * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
    */
   java.util.List<com.tendermint.abci.Event> 
       getEventsList();
   /**
+   * <pre>
+   * nondeterministic
+   * </pre>
+   *
    * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
    */
   com.tendermint.abci.Event getEvents(int index);
   /**
+   * <pre>
+   * nondeterministic
+   * </pre>
+   *
    * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
    */
   int getEventsCount();
   /**
+   * <pre>
+   * nondeterministic
+   * </pre>
+   *
    * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
    */
   java.util.List<? extends com.tendermint.abci.EventOrBuilder> 
       getEventsOrBuilderList();
   /**
+   * <pre>
+   * nondeterministic
+   * </pre>
+   *
    * <code>repeated .tendermint.abci.Event events = 7 [json_name = "events", (.gogoproto.nullable) = false, (.gogoproto.jsontag) = "events,omitempty"];</code>
    */
   com.tendermint.abci.EventOrBuilder getEventsOrBuilder(

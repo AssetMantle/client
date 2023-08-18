@@ -154,14 +154,13 @@ public final class DistributionProto {
       "\tB\024\362\336\037\020yaml:\"recipient\"R\trecipient\022)\n\006am" +
       "ount\030\004 \001(\tB\021\362\336\037\ryaml:\"amount\"R\006amount\022,\n" +
       "\007deposit\030\005 \001(\tB\022\362\336\037\016yaml:\"deposit\"R\007depo" +
-      "sit:\010\210\240\037\000\230\240\037\001B\226\002\n\037com.cosmos.distributio" +
-      "n.v1beta1B\021DistributionProtoP\001ZNgithub.c" +
-      "om/AssetMantle/modules/cosmos/distributi" +
-      "on/v1beta1;distributionv1beta1\242\002\003CDX\252\002\033C" +
-      "osmos.Distribution.V1beta1\312\002\033Cosmos\\Dist" +
-      "ribution\\V1beta1\342\002\'Cosmos\\Distribution\\V" +
-      "1beta1\\GPBMetadata\352\002\035Cosmos::Distributio" +
-      "n::V1beta1\250\342\036\001b\006proto3"
+      "sit:\010\210\240\037\000\230\240\037\001B\371\001\n\037com.cosmos.distributio" +
+      "n.v1beta1B\021DistributionProtoP\001Z1github.c" +
+      "om/cosmos/cosmos-sdk/x/distribution/type" +
+      "s\242\002\003CDX\252\002\033Cosmos.Distribution.V1beta1\312\002\033" +
+      "Cosmos\\Distribution\\V1beta1\342\002\'Cosmos\\Dis" +
+      "tribution\\V1beta1\\GPBMetadata\352\002\035Cosmos::" +
+      "Distribution::V1beta1\250\342\036\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

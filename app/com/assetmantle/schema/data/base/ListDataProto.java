@@ -30,16 +30,16 @@ public final class ListDataProto {
     java.lang.String[] descriptorData = {
       "\n\031data/base/list_data.proto\022\034assetmantle" +
       ".schema.data.base\032!data/base/any_listabl" +
-      "e_data.proto\032\024gogoproto/gogo.proto\"k\n\010Li" +
-      "stData\022Y\n\021any_listable_data\030\001 \003(\0132-.asse" +
-      "tmantle.schema.data.base.AnyListableData" +
-      "R\017anyListableData:\004\210\240\037\000B\361\001\n com.assetman" +
-      "tle.schema.data.baseB\rListDataProtoP\001Z*g" +
-      "ithub.com/AssetMantle/schema/go/data/bas" +
-      "e\242\002\004ASDB\252\002\034Assetmantle.Schema.Data.Base\312" +
-      "\002\034Assetmantle\\Schema\\Data\\Base\342\002(Assetma" +
-      "ntle\\Schema\\Data\\Base\\GPBMetadata\352\002\037Asse" +
-      "tmantle::Schema::Data::Baseb\006proto3"
+      "e_data.proto\032\024gogoproto/gogo.proto\"U\n\010Li" +
+      "stData\022C\n\005value\030\001 \003(\0132-.assetmantle.sche" +
+      "ma.data.base.AnyListableDataR\005value:\004\210\240\037" +
+      "\000B\361\001\n com.assetmantle.schema.data.baseB\r" +
+      "ListDataProtoP\001Z*github.com/AssetMantle/" +
+      "schema/go/data/base\242\002\004ASDB\252\002\034Assetmantle" +
+      ".Schema.Data.Base\312\002\034Assetmantle\\Schema\\D" +
+      "ata\\Base\342\002(Assetmantle\\Schema\\Data\\Base\\" +
+      "GPBMetadata\352\002\037Assetmantle::Schema::Data:" +
+      ":Baseb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -52,7 +52,7 @@ public final class ListDataProto {
     internal_static_assetmantle_schema_data_base_ListData_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_schema_data_base_ListData_descriptor,
-        new java.lang.String[] { "AnyListableData", });
+        new java.lang.String[] { "Value", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);

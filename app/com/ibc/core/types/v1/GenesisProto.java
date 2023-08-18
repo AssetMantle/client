@@ -41,12 +41,12 @@ public final class GenesisProto {
       "is\"R\021connectionGenesis\022j\n\017channel_genesi" +
       "s\030\003 \001(\0132!.ibc.core.channel.v1.GenesisSta" +
       "teB\036\310\336\037\000\362\336\037\026yaml:\"channel_genesis\"R\016chan" +
-      "nelGenesisB\306\001\n\025com.ibc.core.types.v1B\014Ge" +
-      "nesisProtoP\001Z8github.com/AssetMantle/mod" +
-      "ules/ibc/core/types/v1;typesv1\242\002\003ICT\252\002\021I" +
-      "bc.Core.Types.V1\312\002\021Ibc\\Core\\Types\\V1\342\002\035I" +
-      "bc\\Core\\Types\\V1\\GPBMetadata\352\002\024Ibc::Core" +
-      "::Types::V1b\006proto3"
+      "nelGenesisB\274\001\n\025com.ibc.core.types.v1B\014Ge" +
+      "nesisProtoP\001Z.github.com/cosmos/ibc-go/v" +
+      "4/modules/core/types\242\002\003ICT\252\002\021Ibc.Core.Ty" +
+      "pes.V1\312\002\021Ibc\\Core\\Types\\V1\342\002\035Ibc\\Core\\Ty" +
+      "pes\\V1\\GPBMetadata\352\002\024Ibc::Core::Types::V" +
+      "1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

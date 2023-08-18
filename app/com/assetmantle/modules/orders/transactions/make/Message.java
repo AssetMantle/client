@@ -17,8 +17,8 @@ private static final long serialVersionUID = 0L;
   }
   private Message() {
     from_ = "";
-    makerOwnableSplit_ = "";
-    takerOwnableSplit_ = "";
+    makerSplit_ = "";
+    takerSplit_ = "";
   }
 
   @java.lang.Override
@@ -158,56 +158,56 @@ private static final long serialVersionUID = 0L;
     return takerID_ == null ? com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance() : takerID_;
   }
 
-  public static final int MAKER_OWNABLE_I_D_FIELD_NUMBER = 5;
-  private com.assetmantle.schema.ids.base.AnyOwnableID makerOwnableID_;
+  public static final int MAKER_ASSET_I_D_FIELD_NUMBER = 5;
+  private com.assetmantle.schema.ids.base.AssetID makerAssetID_;
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
-   * @return Whether the makerOwnableID field is set.
+   * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
+   * @return Whether the makerAssetID field is set.
    */
   @java.lang.Override
-  public boolean hasMakerOwnableID() {
-    return makerOwnableID_ != null;
+  public boolean hasMakerAssetID() {
+    return makerAssetID_ != null;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
-   * @return The makerOwnableID.
+   * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
+   * @return The makerAssetID.
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.AnyOwnableID getMakerOwnableID() {
-    return makerOwnableID_ == null ? com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : makerOwnableID_;
+  public com.assetmantle.schema.ids.base.AssetID getMakerAssetID() {
+    return makerAssetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : makerAssetID_;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
+   * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder getMakerOwnableIDOrBuilder() {
-    return makerOwnableID_ == null ? com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : makerOwnableID_;
+  public com.assetmantle.schema.ids.base.AssetIDOrBuilder getMakerAssetIDOrBuilder() {
+    return makerAssetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : makerAssetID_;
   }
 
-  public static final int TAKER_OWNABLE_I_D_FIELD_NUMBER = 6;
-  private com.assetmantle.schema.ids.base.AnyOwnableID takerOwnableID_;
+  public static final int TAKER_ASSET_I_D_FIELD_NUMBER = 6;
+  private com.assetmantle.schema.ids.base.AssetID takerAssetID_;
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
-   * @return Whether the takerOwnableID field is set.
+   * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
+   * @return Whether the takerAssetID field is set.
    */
   @java.lang.Override
-  public boolean hasTakerOwnableID() {
-    return takerOwnableID_ != null;
+  public boolean hasTakerAssetID() {
+    return takerAssetID_ != null;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
-   * @return The takerOwnableID.
+   * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
+   * @return The takerAssetID.
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.AnyOwnableID getTakerOwnableID() {
-    return takerOwnableID_ == null ? com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : takerOwnableID_;
+  public com.assetmantle.schema.ids.base.AssetID getTakerAssetID() {
+    return takerAssetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : takerAssetID_;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
+   * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder getTakerOwnableIDOrBuilder() {
-    return takerOwnableID_ == null ? com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : takerOwnableID_;
+  public com.assetmantle.schema.ids.base.AssetIDOrBuilder getTakerAssetIDOrBuilder() {
+    return takerAssetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : takerAssetID_;
   }
 
   public static final int EXPIRES_IN_FIELD_NUMBER = 7;
@@ -236,78 +236,78 @@ private static final long serialVersionUID = 0L;
     return expiresIn_ == null ? com.assetmantle.schema.types.base.Height.getDefaultInstance() : expiresIn_;
   }
 
-  public static final int MAKER_OWNABLE_SPLIT_FIELD_NUMBER = 8;
+  public static final int MAKER_SPLIT_FIELD_NUMBER = 8;
   @SuppressWarnings("serial")
-  private volatile java.lang.Object makerOwnableSplit_ = "";
+  private volatile java.lang.Object makerSplit_ = "";
   /**
-   * <code>string maker_ownable_split = 8 [json_name = "makerOwnableSplit"];</code>
-   * @return The makerOwnableSplit.
+   * <code>string maker_split = 8 [json_name = "makerSplit"];</code>
+   * @return The makerSplit.
    */
   @java.lang.Override
-  public java.lang.String getMakerOwnableSplit() {
-    java.lang.Object ref = makerOwnableSplit_;
+  public java.lang.String getMakerSplit() {
+    java.lang.Object ref = makerSplit_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      makerOwnableSplit_ = s;
+      makerSplit_ = s;
       return s;
     }
   }
   /**
-   * <code>string maker_ownable_split = 8 [json_name = "makerOwnableSplit"];</code>
-   * @return The bytes for makerOwnableSplit.
+   * <code>string maker_split = 8 [json_name = "makerSplit"];</code>
+   * @return The bytes for makerSplit.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getMakerOwnableSplitBytes() {
-    java.lang.Object ref = makerOwnableSplit_;
+      getMakerSplitBytes() {
+    java.lang.Object ref = makerSplit_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      makerOwnableSplit_ = b;
+      makerSplit_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
     }
   }
 
-  public static final int TAKER_OWNABLE_SPLIT_FIELD_NUMBER = 9;
+  public static final int TAKER_SPLIT_FIELD_NUMBER = 9;
   @SuppressWarnings("serial")
-  private volatile java.lang.Object takerOwnableSplit_ = "";
+  private volatile java.lang.Object takerSplit_ = "";
   /**
-   * <code>string taker_ownable_split = 9 [json_name = "takerOwnableSplit"];</code>
-   * @return The takerOwnableSplit.
+   * <code>string taker_split = 9 [json_name = "takerSplit"];</code>
+   * @return The takerSplit.
    */
   @java.lang.Override
-  public java.lang.String getTakerOwnableSplit() {
-    java.lang.Object ref = takerOwnableSplit_;
+  public java.lang.String getTakerSplit() {
+    java.lang.Object ref = takerSplit_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      takerOwnableSplit_ = s;
+      takerSplit_ = s;
       return s;
     }
   }
   /**
-   * <code>string taker_ownable_split = 9 [json_name = "takerOwnableSplit"];</code>
-   * @return The bytes for takerOwnableSplit.
+   * <code>string taker_split = 9 [json_name = "takerSplit"];</code>
+   * @return The bytes for takerSplit.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getTakerOwnableSplitBytes() {
-    java.lang.Object ref = takerOwnableSplit_;
+      getTakerSplitBytes() {
+    java.lang.Object ref = takerSplit_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      takerOwnableSplit_ = b;
+      takerSplit_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
@@ -444,20 +444,20 @@ private static final long serialVersionUID = 0L;
     if (takerID_ != null) {
       output.writeMessage(4, getTakerID());
     }
-    if (makerOwnableID_ != null) {
-      output.writeMessage(5, getMakerOwnableID());
+    if (makerAssetID_ != null) {
+      output.writeMessage(5, getMakerAssetID());
     }
-    if (takerOwnableID_ != null) {
-      output.writeMessage(6, getTakerOwnableID());
+    if (takerAssetID_ != null) {
+      output.writeMessage(6, getTakerAssetID());
     }
     if (expiresIn_ != null) {
       output.writeMessage(7, getExpiresIn());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(makerOwnableSplit_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 8, makerOwnableSplit_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(makerSplit_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 8, makerSplit_);
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(takerOwnableSplit_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 9, takerOwnableSplit_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(takerSplit_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 9, takerSplit_);
     }
     if (immutableMetaProperties_ != null) {
       output.writeMessage(10, getImmutableMetaProperties());
@@ -495,23 +495,23 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(4, getTakerID());
     }
-    if (makerOwnableID_ != null) {
+    if (makerAssetID_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, getMakerOwnableID());
+        .computeMessageSize(5, getMakerAssetID());
     }
-    if (takerOwnableID_ != null) {
+    if (takerAssetID_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, getTakerOwnableID());
+        .computeMessageSize(6, getTakerAssetID());
     }
     if (expiresIn_ != null) {
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(7, getExpiresIn());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(makerOwnableSplit_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, makerOwnableSplit_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(makerSplit_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, makerSplit_);
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(takerOwnableSplit_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(9, takerOwnableSplit_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(takerSplit_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(9, takerSplit_);
     }
     if (immutableMetaProperties_ != null) {
       size += com.google.protobuf.CodedOutputStream
@@ -561,25 +561,25 @@ private static final long serialVersionUID = 0L;
       if (!getTakerID()
           .equals(other.getTakerID())) return false;
     }
-    if (hasMakerOwnableID() != other.hasMakerOwnableID()) return false;
-    if (hasMakerOwnableID()) {
-      if (!getMakerOwnableID()
-          .equals(other.getMakerOwnableID())) return false;
+    if (hasMakerAssetID() != other.hasMakerAssetID()) return false;
+    if (hasMakerAssetID()) {
+      if (!getMakerAssetID()
+          .equals(other.getMakerAssetID())) return false;
     }
-    if (hasTakerOwnableID() != other.hasTakerOwnableID()) return false;
-    if (hasTakerOwnableID()) {
-      if (!getTakerOwnableID()
-          .equals(other.getTakerOwnableID())) return false;
+    if (hasTakerAssetID() != other.hasTakerAssetID()) return false;
+    if (hasTakerAssetID()) {
+      if (!getTakerAssetID()
+          .equals(other.getTakerAssetID())) return false;
     }
     if (hasExpiresIn() != other.hasExpiresIn()) return false;
     if (hasExpiresIn()) {
       if (!getExpiresIn()
           .equals(other.getExpiresIn())) return false;
     }
-    if (!getMakerOwnableSplit()
-        .equals(other.getMakerOwnableSplit())) return false;
-    if (!getTakerOwnableSplit()
-        .equals(other.getTakerOwnableSplit())) return false;
+    if (!getMakerSplit()
+        .equals(other.getMakerSplit())) return false;
+    if (!getTakerSplit()
+        .equals(other.getTakerSplit())) return false;
     if (hasImmutableMetaProperties() != other.hasImmutableMetaProperties()) return false;
     if (hasImmutableMetaProperties()) {
       if (!getImmutableMetaProperties()
@@ -625,22 +625,22 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + TAKER_I_D_FIELD_NUMBER;
       hash = (53 * hash) + getTakerID().hashCode();
     }
-    if (hasMakerOwnableID()) {
-      hash = (37 * hash) + MAKER_OWNABLE_I_D_FIELD_NUMBER;
-      hash = (53 * hash) + getMakerOwnableID().hashCode();
+    if (hasMakerAssetID()) {
+      hash = (37 * hash) + MAKER_ASSET_I_D_FIELD_NUMBER;
+      hash = (53 * hash) + getMakerAssetID().hashCode();
     }
-    if (hasTakerOwnableID()) {
-      hash = (37 * hash) + TAKER_OWNABLE_I_D_FIELD_NUMBER;
-      hash = (53 * hash) + getTakerOwnableID().hashCode();
+    if (hasTakerAssetID()) {
+      hash = (37 * hash) + TAKER_ASSET_I_D_FIELD_NUMBER;
+      hash = (53 * hash) + getTakerAssetID().hashCode();
     }
     if (hasExpiresIn()) {
       hash = (37 * hash) + EXPIRES_IN_FIELD_NUMBER;
       hash = (53 * hash) + getExpiresIn().hashCode();
     }
-    hash = (37 * hash) + MAKER_OWNABLE_SPLIT_FIELD_NUMBER;
-    hash = (53 * hash) + getMakerOwnableSplit().hashCode();
-    hash = (37 * hash) + TAKER_OWNABLE_SPLIT_FIELD_NUMBER;
-    hash = (53 * hash) + getTakerOwnableSplit().hashCode();
+    hash = (37 * hash) + MAKER_SPLIT_FIELD_NUMBER;
+    hash = (53 * hash) + getMakerSplit().hashCode();
+    hash = (37 * hash) + TAKER_SPLIT_FIELD_NUMBER;
+    hash = (53 * hash) + getTakerSplit().hashCode();
     if (hasImmutableMetaProperties()) {
       hash = (37 * hash) + IMMUTABLE_META_PROPERTIES_FIELD_NUMBER;
       hash = (53 * hash) + getImmutableMetaProperties().hashCode();
@@ -802,23 +802,23 @@ private static final long serialVersionUID = 0L;
         takerIDBuilder_.dispose();
         takerIDBuilder_ = null;
       }
-      makerOwnableID_ = null;
-      if (makerOwnableIDBuilder_ != null) {
-        makerOwnableIDBuilder_.dispose();
-        makerOwnableIDBuilder_ = null;
+      makerAssetID_ = null;
+      if (makerAssetIDBuilder_ != null) {
+        makerAssetIDBuilder_.dispose();
+        makerAssetIDBuilder_ = null;
       }
-      takerOwnableID_ = null;
-      if (takerOwnableIDBuilder_ != null) {
-        takerOwnableIDBuilder_.dispose();
-        takerOwnableIDBuilder_ = null;
+      takerAssetID_ = null;
+      if (takerAssetIDBuilder_ != null) {
+        takerAssetIDBuilder_.dispose();
+        takerAssetIDBuilder_ = null;
       }
       expiresIn_ = null;
       if (expiresInBuilder_ != null) {
         expiresInBuilder_.dispose();
         expiresInBuilder_ = null;
       }
-      makerOwnableSplit_ = "";
-      takerOwnableSplit_ = "";
+      makerSplit_ = "";
+      takerSplit_ = "";
       immutableMetaProperties_ = null;
       if (immutableMetaPropertiesBuilder_ != null) {
         immutableMetaPropertiesBuilder_.dispose();
@@ -891,14 +891,14 @@ private static final long serialVersionUID = 0L;
             : takerIDBuilder_.build();
       }
       if (((from_bitField0_ & 0x00000010) != 0)) {
-        result.makerOwnableID_ = makerOwnableIDBuilder_ == null
-            ? makerOwnableID_
-            : makerOwnableIDBuilder_.build();
+        result.makerAssetID_ = makerAssetIDBuilder_ == null
+            ? makerAssetID_
+            : makerAssetIDBuilder_.build();
       }
       if (((from_bitField0_ & 0x00000020) != 0)) {
-        result.takerOwnableID_ = takerOwnableIDBuilder_ == null
-            ? takerOwnableID_
-            : takerOwnableIDBuilder_.build();
+        result.takerAssetID_ = takerAssetIDBuilder_ == null
+            ? takerAssetID_
+            : takerAssetIDBuilder_.build();
       }
       if (((from_bitField0_ & 0x00000040) != 0)) {
         result.expiresIn_ = expiresInBuilder_ == null
@@ -906,10 +906,10 @@ private static final long serialVersionUID = 0L;
             : expiresInBuilder_.build();
       }
       if (((from_bitField0_ & 0x00000080) != 0)) {
-        result.makerOwnableSplit_ = makerOwnableSplit_;
+        result.makerSplit_ = makerSplit_;
       }
       if (((from_bitField0_ & 0x00000100) != 0)) {
-        result.takerOwnableSplit_ = takerOwnableSplit_;
+        result.takerSplit_ = takerSplit_;
       }
       if (((from_bitField0_ & 0x00000200) != 0)) {
         result.immutableMetaProperties_ = immutableMetaPropertiesBuilder_ == null
@@ -991,22 +991,22 @@ private static final long serialVersionUID = 0L;
       if (other.hasTakerID()) {
         mergeTakerID(other.getTakerID());
       }
-      if (other.hasMakerOwnableID()) {
-        mergeMakerOwnableID(other.getMakerOwnableID());
+      if (other.hasMakerAssetID()) {
+        mergeMakerAssetID(other.getMakerAssetID());
       }
-      if (other.hasTakerOwnableID()) {
-        mergeTakerOwnableID(other.getTakerOwnableID());
+      if (other.hasTakerAssetID()) {
+        mergeTakerAssetID(other.getTakerAssetID());
       }
       if (other.hasExpiresIn()) {
         mergeExpiresIn(other.getExpiresIn());
       }
-      if (!other.getMakerOwnableSplit().isEmpty()) {
-        makerOwnableSplit_ = other.makerOwnableSplit_;
+      if (!other.getMakerSplit().isEmpty()) {
+        makerSplit_ = other.makerSplit_;
         bitField0_ |= 0x00000080;
         onChanged();
       }
-      if (!other.getTakerOwnableSplit().isEmpty()) {
-        takerOwnableSplit_ = other.takerOwnableSplit_;
+      if (!other.getTakerSplit().isEmpty()) {
+        takerSplit_ = other.takerSplit_;
         bitField0_ |= 0x00000100;
         onChanged();
       }
@@ -1076,14 +1076,14 @@ private static final long serialVersionUID = 0L;
             } // case 34
             case 42: {
               input.readMessage(
-                  getMakerOwnableIDFieldBuilder().getBuilder(),
+                  getMakerAssetIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000010;
               break;
             } // case 42
             case 50: {
               input.readMessage(
-                  getTakerOwnableIDFieldBuilder().getBuilder(),
+                  getTakerAssetIDFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000020;
               break;
@@ -1096,12 +1096,12 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 58
             case 66: {
-              makerOwnableSplit_ = input.readStringRequireUtf8();
+              makerSplit_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000080;
               break;
             } // case 66
             case 74: {
-              takerOwnableSplit_ = input.readStringRequireUtf8();
+              takerSplit_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000100;
               break;
             } // case 74
@@ -1579,242 +1579,242 @@ private static final long serialVersionUID = 0L;
       return takerIDBuilder_;
     }
 
-    private com.assetmantle.schema.ids.base.AnyOwnableID makerOwnableID_;
+    private com.assetmantle.schema.ids.base.AssetID makerAssetID_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder> makerOwnableIDBuilder_;
+        com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder> makerAssetIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
-     * @return Whether the makerOwnableID field is set.
+     * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
+     * @return Whether the makerAssetID field is set.
      */
-    public boolean hasMakerOwnableID() {
+    public boolean hasMakerAssetID() {
       return ((bitField0_ & 0x00000010) != 0);
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
-     * @return The makerOwnableID.
+     * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
+     * @return The makerAssetID.
      */
-    public com.assetmantle.schema.ids.base.AnyOwnableID getMakerOwnableID() {
-      if (makerOwnableIDBuilder_ == null) {
-        return makerOwnableID_ == null ? com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : makerOwnableID_;
+    public com.assetmantle.schema.ids.base.AssetID getMakerAssetID() {
+      if (makerAssetIDBuilder_ == null) {
+        return makerAssetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : makerAssetID_;
       } else {
-        return makerOwnableIDBuilder_.getMessage();
+        return makerAssetIDBuilder_.getMessage();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
      */
-    public Builder setMakerOwnableID(com.assetmantle.schema.ids.base.AnyOwnableID value) {
-      if (makerOwnableIDBuilder_ == null) {
+    public Builder setMakerAssetID(com.assetmantle.schema.ids.base.AssetID value) {
+      if (makerAssetIDBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        makerOwnableID_ = value;
+        makerAssetID_ = value;
       } else {
-        makerOwnableIDBuilder_.setMessage(value);
+        makerAssetIDBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
      */
-    public Builder setMakerOwnableID(
-        com.assetmantle.schema.ids.base.AnyOwnableID.Builder builderForValue) {
-      if (makerOwnableIDBuilder_ == null) {
-        makerOwnableID_ = builderForValue.build();
+    public Builder setMakerAssetID(
+        com.assetmantle.schema.ids.base.AssetID.Builder builderForValue) {
+      if (makerAssetIDBuilder_ == null) {
+        makerAssetID_ = builderForValue.build();
       } else {
-        makerOwnableIDBuilder_.setMessage(builderForValue.build());
+        makerAssetIDBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
      */
-    public Builder mergeMakerOwnableID(com.assetmantle.schema.ids.base.AnyOwnableID value) {
-      if (makerOwnableIDBuilder_ == null) {
+    public Builder mergeMakerAssetID(com.assetmantle.schema.ids.base.AssetID value) {
+      if (makerAssetIDBuilder_ == null) {
         if (((bitField0_ & 0x00000010) != 0) &&
-          makerOwnableID_ != null &&
-          makerOwnableID_ != com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance()) {
-          getMakerOwnableIDBuilder().mergeFrom(value);
+          makerAssetID_ != null &&
+          makerAssetID_ != com.assetmantle.schema.ids.base.AssetID.getDefaultInstance()) {
+          getMakerAssetIDBuilder().mergeFrom(value);
         } else {
-          makerOwnableID_ = value;
+          makerAssetID_ = value;
         }
       } else {
-        makerOwnableIDBuilder_.mergeFrom(value);
+        makerAssetIDBuilder_.mergeFrom(value);
       }
       bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
      */
-    public Builder clearMakerOwnableID() {
+    public Builder clearMakerAssetID() {
       bitField0_ = (bitField0_ & ~0x00000010);
-      makerOwnableID_ = null;
-      if (makerOwnableIDBuilder_ != null) {
-        makerOwnableIDBuilder_.dispose();
-        makerOwnableIDBuilder_ = null;
+      makerAssetID_ = null;
+      if (makerAssetIDBuilder_ != null) {
+        makerAssetIDBuilder_.dispose();
+        makerAssetIDBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
      */
-    public com.assetmantle.schema.ids.base.AnyOwnableID.Builder getMakerOwnableIDBuilder() {
+    public com.assetmantle.schema.ids.base.AssetID.Builder getMakerAssetIDBuilder() {
       bitField0_ |= 0x00000010;
       onChanged();
-      return getMakerOwnableIDFieldBuilder().getBuilder();
+      return getMakerAssetIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
      */
-    public com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder getMakerOwnableIDOrBuilder() {
-      if (makerOwnableIDBuilder_ != null) {
-        return makerOwnableIDBuilder_.getMessageOrBuilder();
+    public com.assetmantle.schema.ids.base.AssetIDOrBuilder getMakerAssetIDOrBuilder() {
+      if (makerAssetIDBuilder_ != null) {
+        return makerAssetIDBuilder_.getMessageOrBuilder();
       } else {
-        return makerOwnableID_ == null ?
-            com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : makerOwnableID_;
+        return makerAssetID_ == null ?
+            com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : makerAssetID_;
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder> 
-        getMakerOwnableIDFieldBuilder() {
-      if (makerOwnableIDBuilder_ == null) {
-        makerOwnableIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder>(
-                getMakerOwnableID(),
+        com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder> 
+        getMakerAssetIDFieldBuilder() {
+      if (makerAssetIDBuilder_ == null) {
+        makerAssetIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder>(
+                getMakerAssetID(),
                 getParentForChildren(),
                 isClean());
-        makerOwnableID_ = null;
+        makerAssetID_ = null;
       }
-      return makerOwnableIDBuilder_;
+      return makerAssetIDBuilder_;
     }
 
-    private com.assetmantle.schema.ids.base.AnyOwnableID takerOwnableID_;
+    private com.assetmantle.schema.ids.base.AssetID takerAssetID_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder> takerOwnableIDBuilder_;
+        com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder> takerAssetIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
-     * @return Whether the takerOwnableID field is set.
+     * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
+     * @return Whether the takerAssetID field is set.
      */
-    public boolean hasTakerOwnableID() {
+    public boolean hasTakerAssetID() {
       return ((bitField0_ & 0x00000020) != 0);
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
-     * @return The takerOwnableID.
+     * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
+     * @return The takerAssetID.
      */
-    public com.assetmantle.schema.ids.base.AnyOwnableID getTakerOwnableID() {
-      if (takerOwnableIDBuilder_ == null) {
-        return takerOwnableID_ == null ? com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : takerOwnableID_;
+    public com.assetmantle.schema.ids.base.AssetID getTakerAssetID() {
+      if (takerAssetIDBuilder_ == null) {
+        return takerAssetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : takerAssetID_;
       } else {
-        return takerOwnableIDBuilder_.getMessage();
+        return takerAssetIDBuilder_.getMessage();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
      */
-    public Builder setTakerOwnableID(com.assetmantle.schema.ids.base.AnyOwnableID value) {
-      if (takerOwnableIDBuilder_ == null) {
+    public Builder setTakerAssetID(com.assetmantle.schema.ids.base.AssetID value) {
+      if (takerAssetIDBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        takerOwnableID_ = value;
+        takerAssetID_ = value;
       } else {
-        takerOwnableIDBuilder_.setMessage(value);
+        takerAssetIDBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
      */
-    public Builder setTakerOwnableID(
-        com.assetmantle.schema.ids.base.AnyOwnableID.Builder builderForValue) {
-      if (takerOwnableIDBuilder_ == null) {
-        takerOwnableID_ = builderForValue.build();
+    public Builder setTakerAssetID(
+        com.assetmantle.schema.ids.base.AssetID.Builder builderForValue) {
+      if (takerAssetIDBuilder_ == null) {
+        takerAssetID_ = builderForValue.build();
       } else {
-        takerOwnableIDBuilder_.setMessage(builderForValue.build());
+        takerAssetIDBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
      */
-    public Builder mergeTakerOwnableID(com.assetmantle.schema.ids.base.AnyOwnableID value) {
-      if (takerOwnableIDBuilder_ == null) {
+    public Builder mergeTakerAssetID(com.assetmantle.schema.ids.base.AssetID value) {
+      if (takerAssetIDBuilder_ == null) {
         if (((bitField0_ & 0x00000020) != 0) &&
-          takerOwnableID_ != null &&
-          takerOwnableID_ != com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance()) {
-          getTakerOwnableIDBuilder().mergeFrom(value);
+          takerAssetID_ != null &&
+          takerAssetID_ != com.assetmantle.schema.ids.base.AssetID.getDefaultInstance()) {
+          getTakerAssetIDBuilder().mergeFrom(value);
         } else {
-          takerOwnableID_ = value;
+          takerAssetID_ = value;
         }
       } else {
-        takerOwnableIDBuilder_.mergeFrom(value);
+        takerAssetIDBuilder_.mergeFrom(value);
       }
       bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
      */
-    public Builder clearTakerOwnableID() {
+    public Builder clearTakerAssetID() {
       bitField0_ = (bitField0_ & ~0x00000020);
-      takerOwnableID_ = null;
-      if (takerOwnableIDBuilder_ != null) {
-        takerOwnableIDBuilder_.dispose();
-        takerOwnableIDBuilder_ = null;
+      takerAssetID_ = null;
+      if (takerAssetIDBuilder_ != null) {
+        takerAssetIDBuilder_.dispose();
+        takerAssetIDBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
      */
-    public com.assetmantle.schema.ids.base.AnyOwnableID.Builder getTakerOwnableIDBuilder() {
+    public com.assetmantle.schema.ids.base.AssetID.Builder getTakerAssetIDBuilder() {
       bitField0_ |= 0x00000020;
       onChanged();
-      return getTakerOwnableIDFieldBuilder().getBuilder();
+      return getTakerAssetIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
      */
-    public com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder getTakerOwnableIDOrBuilder() {
-      if (takerOwnableIDBuilder_ != null) {
-        return takerOwnableIDBuilder_.getMessageOrBuilder();
+    public com.assetmantle.schema.ids.base.AssetIDOrBuilder getTakerAssetIDOrBuilder() {
+      if (takerAssetIDBuilder_ != null) {
+        return takerAssetIDBuilder_.getMessageOrBuilder();
       } else {
-        return takerOwnableID_ == null ?
-            com.assetmantle.schema.ids.base.AnyOwnableID.getDefaultInstance() : takerOwnableID_;
+        return takerAssetID_ == null ?
+            com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : takerAssetID_;
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder> 
-        getTakerOwnableIDFieldBuilder() {
-      if (takerOwnableIDBuilder_ == null) {
-        takerOwnableIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.assetmantle.schema.ids.base.AnyOwnableID, com.assetmantle.schema.ids.base.AnyOwnableID.Builder, com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder>(
-                getTakerOwnableID(),
+        com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder> 
+        getTakerAssetIDFieldBuilder() {
+      if (takerAssetIDBuilder_ == null) {
+        takerAssetIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder>(
+                getTakerAssetID(),
                 getParentForChildren(),
                 isClean());
-        takerOwnableID_ = null;
+        takerAssetID_ = null;
       }
-      return takerOwnableIDBuilder_;
+      return takerAssetIDBuilder_;
     }
 
     private com.assetmantle.schema.types.base.Height expiresIn_;
@@ -1936,145 +1936,145 @@ private static final long serialVersionUID = 0L;
       return expiresInBuilder_;
     }
 
-    private java.lang.Object makerOwnableSplit_ = "";
+    private java.lang.Object makerSplit_ = "";
     /**
-     * <code>string maker_ownable_split = 8 [json_name = "makerOwnableSplit"];</code>
-     * @return The makerOwnableSplit.
+     * <code>string maker_split = 8 [json_name = "makerSplit"];</code>
+     * @return The makerSplit.
      */
-    public java.lang.String getMakerOwnableSplit() {
-      java.lang.Object ref = makerOwnableSplit_;
+    public java.lang.String getMakerSplit() {
+      java.lang.Object ref = makerSplit_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        makerOwnableSplit_ = s;
+        makerSplit_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>string maker_ownable_split = 8 [json_name = "makerOwnableSplit"];</code>
-     * @return The bytes for makerOwnableSplit.
+     * <code>string maker_split = 8 [json_name = "makerSplit"];</code>
+     * @return The bytes for makerSplit.
      */
     public com.google.protobuf.ByteString
-        getMakerOwnableSplitBytes() {
-      java.lang.Object ref = makerOwnableSplit_;
+        getMakerSplitBytes() {
+      java.lang.Object ref = makerSplit_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        makerOwnableSplit_ = b;
+        makerSplit_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>string maker_ownable_split = 8 [json_name = "makerOwnableSplit"];</code>
-     * @param value The makerOwnableSplit to set.
+     * <code>string maker_split = 8 [json_name = "makerSplit"];</code>
+     * @param value The makerSplit to set.
      * @return This builder for chaining.
      */
-    public Builder setMakerOwnableSplit(
+    public Builder setMakerSplit(
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
-      makerOwnableSplit_ = value;
+      makerSplit_ = value;
       bitField0_ |= 0x00000080;
       onChanged();
       return this;
     }
     /**
-     * <code>string maker_ownable_split = 8 [json_name = "makerOwnableSplit"];</code>
+     * <code>string maker_split = 8 [json_name = "makerSplit"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearMakerOwnableSplit() {
-      makerOwnableSplit_ = getDefaultInstance().getMakerOwnableSplit();
+    public Builder clearMakerSplit() {
+      makerSplit_ = getDefaultInstance().getMakerSplit();
       bitField0_ = (bitField0_ & ~0x00000080);
       onChanged();
       return this;
     }
     /**
-     * <code>string maker_ownable_split = 8 [json_name = "makerOwnableSplit"];</code>
-     * @param value The bytes for makerOwnableSplit to set.
+     * <code>string maker_split = 8 [json_name = "makerSplit"];</code>
+     * @param value The bytes for makerSplit to set.
      * @return This builder for chaining.
      */
-    public Builder setMakerOwnableSplitBytes(
+    public Builder setMakerSplitBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
-      makerOwnableSplit_ = value;
+      makerSplit_ = value;
       bitField0_ |= 0x00000080;
       onChanged();
       return this;
     }
 
-    private java.lang.Object takerOwnableSplit_ = "";
+    private java.lang.Object takerSplit_ = "";
     /**
-     * <code>string taker_ownable_split = 9 [json_name = "takerOwnableSplit"];</code>
-     * @return The takerOwnableSplit.
+     * <code>string taker_split = 9 [json_name = "takerSplit"];</code>
+     * @return The takerSplit.
      */
-    public java.lang.String getTakerOwnableSplit() {
-      java.lang.Object ref = takerOwnableSplit_;
+    public java.lang.String getTakerSplit() {
+      java.lang.Object ref = takerSplit_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        takerOwnableSplit_ = s;
+        takerSplit_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>string taker_ownable_split = 9 [json_name = "takerOwnableSplit"];</code>
-     * @return The bytes for takerOwnableSplit.
+     * <code>string taker_split = 9 [json_name = "takerSplit"];</code>
+     * @return The bytes for takerSplit.
      */
     public com.google.protobuf.ByteString
-        getTakerOwnableSplitBytes() {
-      java.lang.Object ref = takerOwnableSplit_;
+        getTakerSplitBytes() {
+      java.lang.Object ref = takerSplit_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        takerOwnableSplit_ = b;
+        takerSplit_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>string taker_ownable_split = 9 [json_name = "takerOwnableSplit"];</code>
-     * @param value The takerOwnableSplit to set.
+     * <code>string taker_split = 9 [json_name = "takerSplit"];</code>
+     * @param value The takerSplit to set.
      * @return This builder for chaining.
      */
-    public Builder setTakerOwnableSplit(
+    public Builder setTakerSplit(
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
-      takerOwnableSplit_ = value;
+      takerSplit_ = value;
       bitField0_ |= 0x00000100;
       onChanged();
       return this;
     }
     /**
-     * <code>string taker_ownable_split = 9 [json_name = "takerOwnableSplit"];</code>
+     * <code>string taker_split = 9 [json_name = "takerSplit"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearTakerOwnableSplit() {
-      takerOwnableSplit_ = getDefaultInstance().getTakerOwnableSplit();
+    public Builder clearTakerSplit() {
+      takerSplit_ = getDefaultInstance().getTakerSplit();
       bitField0_ = (bitField0_ & ~0x00000100);
       onChanged();
       return this;
     }
     /**
-     * <code>string taker_ownable_split = 9 [json_name = "takerOwnableSplit"];</code>
-     * @param value The bytes for takerOwnableSplit to set.
+     * <code>string taker_split = 9 [json_name = "takerSplit"];</code>
+     * @param value The bytes for takerSplit to set.
      * @return This builder for chaining.
      */
-    public Builder setTakerOwnableSplitBytes(
+    public Builder setTakerSplitBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
-      takerOwnableSplit_ = value;
+      takerSplit_ = value;
       bitField0_ |= 0x00000100;
       onChanged();
       return this;

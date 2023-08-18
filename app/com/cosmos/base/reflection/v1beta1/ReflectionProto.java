@@ -63,14 +63,14 @@ public final class ReflectionProto {
       "s.base.reflection.v1beta1.ListImplementa" +
       "tionsResponse\"S\202\323\344\223\002M\022K/cosmos/base/refl" +
       "ection/v1beta1/interfaces/{interface_nam" +
-      "e}/implementationsB\241\002\n\"com.cosmos.base.r" +
-      "eflection.v1beta1B\017ReflectionProtoP\001ZOgi" +
-      "thub.com/AssetMantle/modules/cosmos/base" +
-      "/reflection/v1beta1;reflectionv1beta1\242\002\003" +
-      "CBR\252\002\036Cosmos.Base.Reflection.V1beta1\312\002\036C" +
-      "osmos\\Base\\Reflection\\V1beta1\342\002*Cosmos\\B" +
-      "ase\\Reflection\\V1beta1\\GPBMetadata\352\002!Cos" +
-      "mos::Base::Reflection::V1beta1b\006proto3"
+      "e}/implementationsB\205\002\n\"com.cosmos.base.r" +
+      "eflection.v1beta1B\017ReflectionProtoP\001Z3gi" +
+      "thub.com/cosmos/cosmos-sdk/client/grpc/r" +
+      "eflection\242\002\003CBR\252\002\036Cosmos.Base.Reflection" +
+      ".V1beta1\312\002\036Cosmos\\Base\\Reflection\\V1beta" +
+      "1\342\002*Cosmos\\Base\\Reflection\\V1beta1\\GPBMe" +
+      "tadata\352\002!Cosmos::Base::Reflection::V1bet" +
+      "a1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

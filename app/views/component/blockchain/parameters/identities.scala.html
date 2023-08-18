@@ -1,5 +1,6 @@
 @import views.html.base.cards._
 @import models.common.Parameters.IdentityParameter
+@import views.html.base.commonIcon
 
 @(identityParameter: IdentityParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -10,8 +11,34 @@
         <tr>
             <td>
                 <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.ISSUE_ENABLED):</div>
+                    <div class="tableFieldValue">
+                    @if(identityParameter.issueEnabled) {
+                        <span class="statusCheck">@commonIcon("check")</span>
+                    } else {
+                        <span class="statusClose">@commonIcon("close")</span>
+                    }
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.QUASH_ENABLED):</div>
+                    <div class="tableFieldValue">
+                    @if(identityParameter.quashEnabled) {
+                        <span class="statusCheck">@commonIcon("check")</span>
+                    } else {
+                        <span class="statusClose">@commonIcon("close")</span>
+                    }
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
                     <div class="tableFieldTitle">@Messages(constants.View.MAX_PROVISIONED_ADDRESSES):</div>
-                    <div class="tableFieldValue">@identityParameter.maxProvisionAddressCount<div>
+                    <div class="tableFieldValue">
+                    @identityParameter.maxProvisionAddressCount
+                    </div>
                 </div>
             </td>
         </tr>

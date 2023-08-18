@@ -8,17 +8,23 @@ public interface QueryRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
-   * @return Whether the pageRequest field is set.
+   * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
+   * @return Whether the key field is set.
    */
-  boolean hasPageRequest();
+  boolean hasKey();
   /**
-   * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
-   * @return The pageRequest.
+   * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
-  com.cosmos.base.query.v1beta1.PageRequest getPageRequest();
+  com.assetmantle.modules.splits.key.Key getKey();
   /**
-   * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
+   * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
    */
-  com.cosmos.base.query.v1beta1.PageRequestOrBuilder getPageRequestOrBuilder();
+  com.assetmantle.modules.splits.key.KeyOrBuilder getKeyOrBuilder();
+
+  /**
+   * <code>int32 limit = 2 [json_name = "limit"];</code>
+   * @return The limit.
+   */
+  int getLimit();
 }

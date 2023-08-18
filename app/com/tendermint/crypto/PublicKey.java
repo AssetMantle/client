@@ -5,7 +5,7 @@ package com.tendermint.crypto;
 
 /**
  * <pre>
- * PublicKey defines the keys available for use with Tendermint Validators
+ * PublicKey defines the keys available for use with Validators
  * </pre>
  *
  * Protobuf type {@code tendermint.crypto.PublicKey}
@@ -315,7 +315,7 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * PublicKey defines the keys available for use with Tendermint Validators
+   * PublicKey defines the keys available for use with Validators
    * </pre>
    *
    * Protobuf type {@code tendermint.crypto.PublicKey}

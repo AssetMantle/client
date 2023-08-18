@@ -67,30 +67,32 @@ object Messages {
   val ASSET_MUTATE = "/assetmantle.modules.assets.transactions.mutate.Message"
   val ASSET_RENUMERATE = "/assetmantle.modules.assets.transactions.renumerate.Message"
   val ASSET_REVOKE = "/assetmantle.modules.assets.transactions.revoke.Message"
+  val ASSET_SEND = "/assetmantle.modules.assets.transactions.send.Message"
+  val ASSET_UNWRAP = "/assetmantle.modules.assets.transactions.unwrap.Message"
+  val ASSET_WRAP = "/assetmantle.modules.assets.transactions.wrap.Message"
   //identity
   val IDENTITY_DEFINE = "/assetmantle.modules.identities.transactions.define.Message"
   val IDENTITY_DEPUTIZE = "/assetmantle.modules.identities.transactions.deputize.Message"
   val IDENTITY_ISSUE = "/assetmantle.modules.identities.transactions.issue.Message"
   val IDENTITY_MUTATE = "/assetmantle.modules.identities.transactions.mutate.Message"
-  val IDENTITY_NUB = "/assetmantle.modules.identities.transactions.nub.Message"
+  val IDENTITY_NAME = "/assetmantle.modules.identities.transactions.name.Message"
   val IDENTITY_PROVISION = "/assetmantle.modules.identities.transactions.provision.Message"
   val IDENTITY_QUASH = "/assetmantle.modules.identities.transactions.quash.Message"
   val IDENTITY_REVOKE = "/assetmantle.modules.identities.transactions.revoke.Message"
   val IDENTITY_UNPROVISION = "/assetmantle.modules.identities.transactions.unprovision.Message"
-  //split
-  val SPLIT_SEND = "/assetmantle.modules.splits.transactions.send.Message"
-  val SPLIT_WRAP = "/assetmantle.modules.splits.transactions.wrap.Message"
-  val SPLIT_UNWRAP = "/assetmantle.modules.splits.transactions.unwrap.Message"
+  val IDENTITY_UPDATE = "/assetmantle.modules.identities.transactions.update.Message"
+  //meta
+  val META_REVEAL = "/assetmantle.modules.metas.transactions.reveal.Message"
   //order
   val ORDER_CANCEL = "/assetmantle.modules.orders.transactions.cancel.Message"
   val ORDER_DEFINE = "/assetmantle.modules.orders.transactions.define.Message"
   val ORDER_DEPUTIZE = "/assetmantle.modules.orders.transactions.deputize.Message"
+  val ORDER_GET = "/assetmantle.modules.orders.transactions.get.Message"
   val ORDER_IMMEDIATE = "/assetmantle.modules.orders.transactions.immediate.Message"
   val ORDER_MAKE = "/assetmantle.modules.orders.transactions.make.Message"
   val ORDER_MODIFY = "/assetmantle.modules.orders.transactions.modify.Message"
+  val ORDER_PUT = "/assetmantle.modules.orders.transactions.put.Message"
   val ORDER_REVOKE = "/assetmantle.modules.orders.transactions.revoke.Message"
   val ORDER_TAKE = "/assetmantle.modules.orders.transactions.take.Message"
-  //meta
-  val META_REVEAL = "/assetmantle.modules.metas.transactions.reveal.Message"
 
 }

@@ -56,13 +56,12 @@ public final class GenesisProto {
       "B\004\310\336\037\000R\rredelegations\022\032\n\010exported\030\010 \001(\010R" +
       "\010exported\"N\n\022LastValidatorPower\022\030\n\007addre" +
       "ss\030\001 \001(\tR\007address\022\024\n\005power\030\002 \001(\003R\005power:" +
-      "\010\210\240\037\000\350\240\037\000B\352\001\n\032com.cosmos.staking.v1beta1" +
-      "B\014GenesisProtoP\001ZDgithub.com/AssetMantle" +
-      "/modules/cosmos/staking/v1beta1;stakingv" +
-      "1beta1\242\002\003CSX\252\002\026Cosmos.Staking.V1beta1\312\002\026" +
-      "Cosmos\\Staking\\V1beta1\342\002\"Cosmos\\Staking\\" +
-      "V1beta1\\GPBMetadata\352\002\030Cosmos::Staking::V" +
-      "1beta1b\006proto3"
+      "\010\210\240\037\000\350\240\037\000B\322\001\n\032com.cosmos.staking.v1beta1" +
+      "B\014GenesisProtoP\001Z,github.com/cosmos/cosm" +
+      "os-sdk/x/staking/types\242\002\003CSX\252\002\026Cosmos.St" +
+      "aking.V1beta1\312\002\026Cosmos\\Staking\\V1beta1\342\002" +
+      "\"Cosmos\\Staking\\V1beta1\\GPBMetadata\352\002\030Co" +
+      "smos::Staking::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

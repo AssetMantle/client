@@ -21,24 +21,26 @@ public interface MsgConnectionOpenTryOrBuilder extends
 
   /**
    * <pre>
-   * in the case of crossing hello's, when both chains call OpenInit, we need
-   * the connection identifier of the previous connection in state INIT
+   * Deprecated: this field is unused. Crossing hellos are no longer supported in core IBC.
    * </pre>
    *
-   * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+   * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+   * @deprecated ibc.core.connection.v1.MsgConnectionOpenTry.previous_connection_id is deprecated.
+   *     See ibc/core/connection/v1/tx.proto;l=52
    * @return The previousConnectionId.
    */
-  java.lang.String getPreviousConnectionId();
+  @java.lang.Deprecated java.lang.String getPreviousConnectionId();
   /**
    * <pre>
-   * in the case of crossing hello's, when both chains call OpenInit, we need
-   * the connection identifier of the previous connection in state INIT
+   * Deprecated: this field is unused. Crossing hellos are no longer supported in core IBC.
    * </pre>
    *
-   * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+   * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+   * @deprecated ibc.core.connection.v1.MsgConnectionOpenTry.previous_connection_id is deprecated.
+   *     See ibc/core/connection/v1/tx.proto;l=52
    * @return The bytes for previousConnectionId.
    */
-  com.google.protobuf.ByteString
+  @java.lang.Deprecated com.google.protobuf.ByteString
       getPreviousConnectionIdBytes();
 
   /**

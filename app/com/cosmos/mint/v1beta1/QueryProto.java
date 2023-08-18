@@ -77,13 +77,12 @@ public final class QueryProto {
       "mos.mint.v1beta1.QueryAnnualProvisionsRe" +
       "quest\0322.cosmos.mint.v1beta1.QueryAnnualP" +
       "rovisionsResponse\".\202\323\344\223\002(\022&/cosmos/mint/" +
-      "v1beta1/annual_provisionsB\323\001\n\027com.cosmos" +
-      ".mint.v1beta1B\nQueryProtoP\001Z>github.com/" +
-      "AssetMantle/modules/cosmos/mint/v1beta1;" +
-      "mintv1beta1\242\002\003CMX\252\002\023Cosmos.Mint.V1beta1\312" +
-      "\002\023Cosmos\\Mint\\V1beta1\342\002\037Cosmos\\Mint\\V1be" +
-      "ta1\\GPBMetadata\352\002\025Cosmos::Mint::V1beta1b" +
-      "\006proto3"
+      "v1beta1/annual_provisionsB\276\001\n\027com.cosmos" +
+      ".mint.v1beta1B\nQueryProtoP\001Z)github.com/" +
+      "cosmos/cosmos-sdk/x/mint/types\242\002\003CMX\252\002\023C" +
+      "osmos.Mint.V1beta1\312\002\023Cosmos\\Mint\\V1beta1" +
+      "\342\002\037Cosmos\\Mint\\V1beta1\\GPBMetadata\352\002\025Cos" +
+      "mos::Mint::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

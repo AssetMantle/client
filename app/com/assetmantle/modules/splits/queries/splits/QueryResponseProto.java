@@ -30,25 +30,24 @@ public final class QueryResponseProto {
     java.lang.String[] descriptorData = {
       "\n*splits/queries/splits/query_response.p" +
       "roto\022)assetmantle.modules.splits.queries" +
-      ".splits\032\024gogoproto/gogo.proto\032\036splits/ma" +
-      "ppable/mappable.proto\"X\n\rQueryResponse\022A" +
-      "\n\004list\030\001 \003(\0132-.assetmantle.modules.split" +
-      "s.mappable.MappableR\004list:\004\210\240\037\000B\305\002\n-com." +
-      "assetmantle.modules.splits.queries.split" +
-      "sB\022QueryResponseProtoP\001Z6github.com/Asse" +
-      "tMantle/modules/x/splits/queries/splits\242" +
-      "\002\005AMSQS\252\002)Assetmantle.Modules.Splits.Que" +
-      "ries.Splits\312\002)Assetmantle\\Modules\\Splits" +
-      "\\Queries\\Splits\342\0025Assetmantle\\Modules\\Sp" +
-      "lits\\Queries\\Splits\\GPBMetadata\352\002-Assetm" +
-      "antle::Modules::Splits::Queries::Splitsb" +
-      "\006proto3"
+      ".splits\032\024gogoproto/gogo.proto\032\032splits/re" +
+      "cord/record.proto\"T\n\rQueryResponse\022=\n\004li" +
+      "st\030\001 \003(\0132).assetmantle.modules.splits.re" +
+      "cord.RecordR\004list:\004\210\240\037\000B\305\002\n-com.assetman" +
+      "tle.modules.splits.queries.splitsB\022Query" +
+      "ResponseProtoP\001Z6github.com/AssetMantle/" +
+      "modules/x/splits/queries/splits\242\002\005AMSQS\252" +
+      "\002)Assetmantle.Modules.Splits.Queries.Spl" +
+      "its\312\002)Assetmantle\\Modules\\Splits\\Queries" +
+      "\\Splits\342\0025Assetmantle\\Modules\\Splits\\Que" +
+      "ries\\Splits\\GPBMetadata\352\002-Assetmantle::M" +
+      "odules::Splits::Queries::Splitsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.gogoproto.GogoProto.getDescriptor(),
-          com.assetmantle.modules.splits.mappable.MappableProto.getDescriptor(),
+          com.assetmantle.modules.splits.record.RecordProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_splits_queries_splits_QueryResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -62,7 +61,7 @@ public final class QueryResponseProto {
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
-    com.assetmantle.modules.splits.mappable.MappableProto.getDescriptor();
+    com.assetmantle.modules.splits.record.RecordProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

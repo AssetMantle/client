@@ -38,30 +38,30 @@ private static final long serialVersionUID = 0L;
             com.assetmantle.modules.splits.queries.split.QueryRequest.class, com.assetmantle.modules.splits.queries.split.QueryRequest.Builder.class);
   }
 
-  public static final int SPLIT_I_D_FIELD_NUMBER = 1;
-  private com.assetmantle.schema.ids.base.SplitID splitID_;
+  public static final int KEY_FIELD_NUMBER = 1;
+  private com.assetmantle.modules.splits.key.Key key_;
   /**
-   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
-   * @return Whether the splitID field is set.
+   * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
+   * @return Whether the key field is set.
    */
   @java.lang.Override
-  public boolean hasSplitID() {
-    return splitID_ != null;
+  public boolean hasKey() {
+    return key_ != null;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
-   * @return The splitID.
+   * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.SplitID getSplitID() {
-    return splitID_ == null ? com.assetmantle.schema.ids.base.SplitID.getDefaultInstance() : splitID_;
+  public com.assetmantle.modules.splits.key.Key getKey() {
+    return key_ == null ? com.assetmantle.modules.splits.key.Key.getDefaultInstance() : key_;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
+   * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.SplitIDOrBuilder getSplitIDOrBuilder() {
-    return splitID_ == null ? com.assetmantle.schema.ids.base.SplitID.getDefaultInstance() : splitID_;
+  public com.assetmantle.modules.splits.key.KeyOrBuilder getKeyOrBuilder() {
+    return key_ == null ? com.assetmantle.modules.splits.key.Key.getDefaultInstance() : key_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -78,8 +78,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (splitID_ != null) {
-      output.writeMessage(1, getSplitID());
+    if (key_ != null) {
+      output.writeMessage(1, getKey());
     }
     getUnknownFields().writeTo(output);
   }
@@ -90,9 +90,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (splitID_ != null) {
+    if (key_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getSplitID());
+        .computeMessageSize(1, getKey());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -109,10 +109,10 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.modules.splits.queries.split.QueryRequest other = (com.assetmantle.modules.splits.queries.split.QueryRequest) obj;
 
-    if (hasSplitID() != other.hasSplitID()) return false;
-    if (hasSplitID()) {
-      if (!getSplitID()
-          .equals(other.getSplitID())) return false;
+    if (hasKey() != other.hasKey()) return false;
+    if (hasKey()) {
+      if (!getKey()
+          .equals(other.getKey())) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -125,9 +125,9 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasSplitID()) {
-      hash = (37 * hash) + SPLIT_I_D_FIELD_NUMBER;
-      hash = (53 * hash) + getSplitID().hashCode();
+    if (hasKey()) {
+      hash = (37 * hash) + KEY_FIELD_NUMBER;
+      hash = (53 * hash) + getKey().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -258,10 +258,10 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      splitID_ = null;
-      if (splitIDBuilder_ != null) {
-        splitIDBuilder_.dispose();
-        splitIDBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
       return this;
     }
@@ -297,9 +297,9 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(com.assetmantle.modules.splits.queries.split.QueryRequest result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.splitID_ = splitIDBuilder_ == null
-            ? splitID_
-            : splitIDBuilder_.build();
+        result.key_ = keyBuilder_ == null
+            ? key_
+            : keyBuilder_.build();
       }
     }
 
@@ -347,8 +347,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.modules.splits.queries.split.QueryRequest other) {
       if (other == com.assetmantle.modules.splits.queries.split.QueryRequest.getDefaultInstance()) return this;
-      if (other.hasSplitID()) {
-        mergeSplitID(other.getSplitID());
+      if (other.hasKey()) {
+        mergeKey(other.getKey());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -378,7 +378,7 @@ private static final long serialVersionUID = 0L;
               break;
             case 10: {
               input.readMessage(
-                  getSplitIDFieldBuilder().getBuilder(),
+                  getKeyFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
@@ -400,123 +400,123 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private com.assetmantle.schema.ids.base.SplitID splitID_;
+    private com.assetmantle.modules.splits.key.Key key_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.SplitID, com.assetmantle.schema.ids.base.SplitID.Builder, com.assetmantle.schema.ids.base.SplitIDOrBuilder> splitIDBuilder_;
+        com.assetmantle.modules.splits.key.Key, com.assetmantle.modules.splits.key.Key.Builder, com.assetmantle.modules.splits.key.KeyOrBuilder> keyBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
-     * @return Whether the splitID field is set.
+     * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
+     * @return Whether the key field is set.
      */
-    public boolean hasSplitID() {
+    public boolean hasKey() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
-     * @return The splitID.
+     * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
+     * @return The key.
      */
-    public com.assetmantle.schema.ids.base.SplitID getSplitID() {
-      if (splitIDBuilder_ == null) {
-        return splitID_ == null ? com.assetmantle.schema.ids.base.SplitID.getDefaultInstance() : splitID_;
+    public com.assetmantle.modules.splits.key.Key getKey() {
+      if (keyBuilder_ == null) {
+        return key_ == null ? com.assetmantle.modules.splits.key.Key.getDefaultInstance() : key_;
       } else {
-        return splitIDBuilder_.getMessage();
+        return keyBuilder_.getMessage();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
+     * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setSplitID(com.assetmantle.schema.ids.base.SplitID value) {
-      if (splitIDBuilder_ == null) {
+    public Builder setKey(com.assetmantle.modules.splits.key.Key value) {
+      if (keyBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        splitID_ = value;
+        key_ = value;
       } else {
-        splitIDBuilder_.setMessage(value);
+        keyBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
+     * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setSplitID(
-        com.assetmantle.schema.ids.base.SplitID.Builder builderForValue) {
-      if (splitIDBuilder_ == null) {
-        splitID_ = builderForValue.build();
+    public Builder setKey(
+        com.assetmantle.modules.splits.key.Key.Builder builderForValue) {
+      if (keyBuilder_ == null) {
+        key_ = builderForValue.build();
       } else {
-        splitIDBuilder_.setMessage(builderForValue.build());
+        keyBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
+     * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder mergeSplitID(com.assetmantle.schema.ids.base.SplitID value) {
-      if (splitIDBuilder_ == null) {
+    public Builder mergeKey(com.assetmantle.modules.splits.key.Key value) {
+      if (keyBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0) &&
-          splitID_ != null &&
-          splitID_ != com.assetmantle.schema.ids.base.SplitID.getDefaultInstance()) {
-          getSplitIDBuilder().mergeFrom(value);
+          key_ != null &&
+          key_ != com.assetmantle.modules.splits.key.Key.getDefaultInstance()) {
+          getKeyBuilder().mergeFrom(value);
         } else {
-          splitID_ = value;
+          key_ = value;
         }
       } else {
-        splitIDBuilder_.mergeFrom(value);
+        keyBuilder_.mergeFrom(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
+     * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder clearSplitID() {
+    public Builder clearKey() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      splitID_ = null;
-      if (splitIDBuilder_ != null) {
-        splitIDBuilder_.dispose();
-        splitIDBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
+     * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.assetmantle.schema.ids.base.SplitID.Builder getSplitIDBuilder() {
+    public com.assetmantle.modules.splits.key.Key.Builder getKeyBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return getSplitIDFieldBuilder().getBuilder();
+      return getKeyFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
+     * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.assetmantle.schema.ids.base.SplitIDOrBuilder getSplitIDOrBuilder() {
-      if (splitIDBuilder_ != null) {
-        return splitIDBuilder_.getMessageOrBuilder();
+    public com.assetmantle.modules.splits.key.KeyOrBuilder getKeyOrBuilder() {
+      if (keyBuilder_ != null) {
+        return keyBuilder_.getMessageOrBuilder();
       } else {
-        return splitID_ == null ?
-            com.assetmantle.schema.ids.base.SplitID.getDefaultInstance() : splitID_;
+        return key_ == null ?
+            com.assetmantle.modules.splits.key.Key.getDefaultInstance() : key_;
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.SplitID split_i_d = 1 [json_name = "splitID"];</code>
+     * <code>.assetmantle.modules.splits.key.Key key = 1 [json_name = "key"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.SplitID, com.assetmantle.schema.ids.base.SplitID.Builder, com.assetmantle.schema.ids.base.SplitIDOrBuilder> 
-        getSplitIDFieldBuilder() {
-      if (splitIDBuilder_ == null) {
-        splitIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.assetmantle.schema.ids.base.SplitID, com.assetmantle.schema.ids.base.SplitID.Builder, com.assetmantle.schema.ids.base.SplitIDOrBuilder>(
-                getSplitID(),
+        com.assetmantle.modules.splits.key.Key, com.assetmantle.modules.splits.key.Key.Builder, com.assetmantle.modules.splits.key.KeyOrBuilder> 
+        getKeyFieldBuilder() {
+      if (keyBuilder_ == null) {
+        keyBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.modules.splits.key.Key, com.assetmantle.modules.splits.key.Key.Builder, com.assetmantle.modules.splits.key.KeyOrBuilder>(
+                getKey(),
                 getParentForChildren(),
                 isClean());
-        splitID_ = null;
+        key_ = null;
       }
-      return splitIDBuilder_;
+      return keyBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

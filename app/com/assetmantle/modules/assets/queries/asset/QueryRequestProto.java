@@ -30,30 +30,30 @@ public final class QueryRequestProto {
     java.lang.String[] descriptorData = {
       "\n(assets/queries/asset/query_request.pro" +
       "to\022(assetmantle.modules.assets.queries.a" +
-      "sset\032\027ids/base/asset_id.proto\"P\n\014QueryRe" +
-      "quest\022@\n\tasset_i_d\030\001 \001(\0132$.assetmantle.s" +
-      "chema.ids.base.AssetIDR\007assetIDB\276\002\n,com." +
-      "assetmantle.modules.assets.queries.asset" +
-      "B\021QueryRequestProtoP\001Z5github.com/AssetM" +
-      "antle/modules/x/assets/queries/asset\242\002\005A" +
-      "MAQA\252\002(Assetmantle.Modules.Assets.Querie" +
-      "s.Asset\312\002(Assetmantle\\Modules\\Assets\\Que" +
-      "ries\\Asset\342\0024Assetmantle\\Modules\\Assets\\" +
-      "Queries\\Asset\\GPBMetadata\352\002,Assetmantle:" +
-      ":Modules::Assets::Queries::Assetb\006proto3"
+      "sset\032\024assets/key/key.proto\"E\n\014QueryReque" +
+      "st\0225\n\003key\030\001 \001(\0132#.assetmantle.modules.as" +
+      "sets.key.KeyR\003keyB\276\002\n,com.assetmantle.mo" +
+      "dules.assets.queries.assetB\021QueryRequest" +
+      "ProtoP\001Z5github.com/AssetMantle/modules/" +
+      "x/assets/queries/asset\242\002\005AMAQA\252\002(Assetma" +
+      "ntle.Modules.Assets.Queries.Asset\312\002(Asse" +
+      "tmantle\\Modules\\Assets\\Queries\\Asset\342\0024A" +
+      "ssetmantle\\Modules\\Assets\\Queries\\Asset\\" +
+      "GPBMetadata\352\002,Assetmantle::Modules::Asse" +
+      "ts::Queries::Assetb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.assetmantle.schema.ids.base.AssetIdProto.getDescriptor(),
+          com.assetmantle.modules.assets.key.KeyProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_assets_queries_asset_QueryRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_assets_queries_asset_QueryRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_assets_queries_asset_QueryRequest_descriptor,
-        new java.lang.String[] { "AssetID", });
-    com.assetmantle.schema.ids.base.AssetIdProto.getDescriptor();
+        new java.lang.String[] { "Key", });
+    com.assetmantle.modules.assets.key.KeyProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

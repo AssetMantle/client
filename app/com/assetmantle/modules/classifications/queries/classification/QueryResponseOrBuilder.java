@@ -8,26 +8,17 @@ public interface QueryResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>.assetmantle.modules.classifications.record.Record record = 1 [json_name = "record"];</code>
+   * @return Whether the record field is set.
    */
-  java.util.List<com.assetmantle.modules.classifications.mappable.Mappable> 
-      getListList();
+  boolean hasRecord();
   /**
-   * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>.assetmantle.modules.classifications.record.Record record = 1 [json_name = "record"];</code>
+   * @return The record.
    */
-  com.assetmantle.modules.classifications.mappable.Mappable getList(int index);
+  com.assetmantle.modules.classifications.record.Record getRecord();
   /**
-   * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>.assetmantle.modules.classifications.record.Record record = 1 [json_name = "record"];</code>
    */
-  int getListCount();
-  /**
-   * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
-   */
-  java.util.List<? extends com.assetmantle.modules.classifications.mappable.MappableOrBuilder> 
-      getListOrBuilderList();
-  /**
-   * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
-   */
-  com.assetmantle.modules.classifications.mappable.MappableOrBuilder getListOrBuilder(
-      int index);
+  com.assetmantle.modules.classifications.record.RecordOrBuilder getRecordOrBuilder();
 }

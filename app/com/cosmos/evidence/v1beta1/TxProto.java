@@ -43,14 +43,13 @@ public final class TxProto {
       "eResponse\022\022\n\004hash\030\004 \001(\014R\004hash2w\n\003Msg\022p\n\016" +
       "SubmitEvidence\022*.cosmos.evidence.v1beta1" +
       ".MsgSubmitEvidence\0322.cosmos.evidence.v1b" +
-      "eta1.MsgSubmitEvidenceResponseB\360\001\n\033com.c" +
-      "osmos.evidence.v1beta1B\007TxProtoP\001ZFgithu" +
-      "b.com/AssetMantle/modules/cosmos/evidenc" +
-      "e/v1beta1;evidencev1beta1\242\002\003CEX\252\002\027Cosmos" +
-      ".Evidence.V1beta1\312\002\027Cosmos\\Evidence\\V1be" +
-      "ta1\342\002#Cosmos\\Evidence\\V1beta1\\GPBMetadat" +
-      "a\352\002\031Cosmos::Evidence::V1beta1\250\342\036\001b\006proto" +
-      "3"
+      "eta1.MsgSubmitEvidenceResponseB\327\001\n\033com.c" +
+      "osmos.evidence.v1beta1B\007TxProtoP\001Z-githu" +
+      "b.com/cosmos/cosmos-sdk/x/evidence/types" +
+      "\242\002\003CEX\252\002\027Cosmos.Evidence.V1beta1\312\002\027Cosmo" +
+      "s\\Evidence\\V1beta1\342\002#Cosmos\\Evidence\\V1b" +
+      "eta1\\GPBMetadata\352\002\031Cosmos::Evidence::V1b" +
+      "eta1\250\342\036\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

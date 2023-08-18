@@ -39,14 +39,13 @@ public final class MultisigProto {
       "\036\n\nsignatures\030\001 \003(\014R\nsignatures:\004\320\241\037\001\"Y\n" +
       "\017CompactBitArray\022*\n\021extra_bits_stored\030\001 " +
       "\001(\rR\017extraBitsStored\022\024\n\005elems\030\002 \001(\014R\005ele" +
-      "ms:\004\230\240\037\000B\235\002\n\"com.cosmos.crypto.multisig." +
-      "v1beta1B\rMultisigProtoP\001ZMgithub.com/Ass" +
-      "etMantle/modules/cosmos/crypto/multisig/" +
-      "v1beta1;multisigv1beta1\242\002\003CCM\252\002\036Cosmos.C" +
-      "rypto.Multisig.V1beta1\312\002\036Cosmos\\Crypto\\M" +
-      "ultisig\\V1beta1\342\002*Cosmos\\Crypto\\Multisig" +
-      "\\V1beta1\\GPBMetadata\352\002!Cosmos::Crypto::M" +
-      "ultisig::V1beta1b\006proto3"
+      "ms:\004\230\240\037\000B\371\001\n\"com.cosmos.crypto.multisig." +
+      "v1beta1B\rMultisigProtoP\001Z)github.com/cos" +
+      "mos/cosmos-sdk/crypto/types\242\002\003CCM\252\002\036Cosm" +
+      "os.Crypto.Multisig.V1beta1\312\002\036Cosmos\\Cryp" +
+      "to\\Multisig\\V1beta1\342\002*Cosmos\\Crypto\\Mult" +
+      "isig\\V1beta1\\GPBMetadata\352\002!Cosmos::Crypt" +
+      "o::Multisig::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -12,9 +12,8 @@
 @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonJavascriptLink(ClassificationID(msg.getClassificationID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${ClassificationID(msg.getClassificationID).asString}'))")))
 @Messages(constants.View.MAINTAINED_PROPERTIES):
 @mesaProperties(msg.getMaintainedProperties)
-@commonBooleanInfo(constants.View.MINT, Option(msg.getCanMintAsset))
-@commonBooleanInfo(constants.View.BURN, Option(msg.getCanBurnAsset))
+@commonBooleanInfo(constants.View.CAN_ISSUE, Option(msg.getCanIssueIdentity))
+@commonBooleanInfo(constants.View.CAN_QUASH, Option(msg.getCanQuashIdentity))
 @commonBooleanInfo(constants.View.ADD_MAINTAINER, Option(msg.getCanAddMaintainer))
 @commonBooleanInfo(constants.View.MUTATE_MAINTAINER, Option(msg.getCanMutateMaintainer))
 @commonBooleanInfo(constants.View.REMOVE_MAINTAINER, Option(msg.getCanRemoveMaintainer))
-@commonBooleanInfo(constants.View.RENUMERATE, Option(msg.getCanRenumerateAsset))

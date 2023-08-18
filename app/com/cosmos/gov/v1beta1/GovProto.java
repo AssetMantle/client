@@ -156,12 +156,12 @@ public final class GovProto {
       "\003\032\020\212\235 \014StatusPassed\0220\n\030PROPOSAL_STATUS_R" +
       "EJECTED\020\004\032\022\212\235 \016StatusRejected\022,\n\026PROPOSA" +
       "L_STATUS_FAILED\020\005\032\020\212\235 \014StatusFailed\032\004\210\243\036" +
-      "\000B\326\001\n\026com.cosmos.gov.v1beta1B\010GovProtoP\001" +
-      "Z<github.com/AssetMantle/modules/cosmos/" +
-      "gov/v1beta1;govv1beta1\242\002\003CGX\252\002\022Cosmos.Go" +
-      "v.V1beta1\312\002\022Cosmos\\Gov\\V1beta1\342\002\036Cosmos\\" +
-      "Gov\\V1beta1\\GPBMetadata\352\002\024Cosmos::Gov::V" +
-      "1beta1\310\341\036\000\330\341\036\000\200\342\036\000b\006proto3"
+      "\000B\302\001\n\026com.cosmos.gov.v1beta1B\010GovProtoP\001" +
+      "Z(github.com/cosmos/cosmos-sdk/x/gov/typ" +
+      "es\242\002\003CGX\252\002\022Cosmos.Gov.V1beta1\312\002\022Cosmos\\G" +
+      "ov\\V1beta1\342\002\036Cosmos\\Gov\\V1beta1\\GPBMetad" +
+      "ata\352\002\024Cosmos::Gov::V1beta1\310\341\036\000\330\341\036\000\200\342\036\000b\006" +
+      "proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

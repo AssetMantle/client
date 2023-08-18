@@ -29,21 +29,21 @@ public final class ServiceProto {
       "ations.proto\032.identities/transactions/de" +
       "putize/message.proto\032;identities/transac" +
       "tions/deputize/transaction_response.prot" +
-      "o2\303\001\n\007Service\022\267\001\n\006Handle\022=.assetmantle.m" +
-      "odules.identities.transactions.deputize." +
-      "Message\032I.assetmantle.modules.identities" +
-      ".transactions.deputize.TransactionRespon" +
-      "se\"#\202\323\344\223\002\035\"\033/mantle/identities/deputizeB" +
-      "\201\003\n8com.assetmantle.modules.identities.t" +
-      "ransactions.deputizeB\014ServiceProtoP\001ZAgi" +
-      "thub.com/AssetMantle/modules/x/identitie" +
-      "s/transactions/deputize\242\002\005AMITD\252\0024Assetm" +
-      "antle.Modules.Identities.Transactions.De" +
-      "putize\312\0024Assetmantle\\Modules\\Identities\\" +
-      "Transactions\\Deputize\342\002@Assetmantle\\Modu" +
-      "les\\Identities\\Transactions\\Deputize\\GPB" +
-      "Metadata\352\0028Assetmantle::Modules::Identit" +
-      "ies::Transactions::Deputizeb\006proto3"
+      "o2\277\001\n\003Msg\022\267\001\n\006Handle\022=.assetmantle.modul" +
+      "es.identities.transactions.deputize.Mess" +
+      "age\032I.assetmantle.modules.identities.tra" +
+      "nsactions.deputize.TransactionResponse\"#" +
+      "\202\323\344\223\002\035\"\033/mantle/identities/deputizeB\201\003\n8" +
+      "com.assetmantle.modules.identities.trans" +
+      "actions.deputizeB\014ServiceProtoP\001ZAgithub" +
+      ".com/AssetMantle/modules/x/identities/tr" +
+      "ansactions/deputize\242\002\005AMITD\252\0024Assetmantl" +
+      "e.Modules.Identities.Transactions.Deputi" +
+      "ze\312\0024Assetmantle\\Modules\\Identities\\Tran" +
+      "sactions\\Deputize\342\002@Assetmantle\\Modules\\" +
+      "Identities\\Transactions\\Deputize\\GPBMeta" +
+      "data\352\0028Assetmantle::Modules::Identities:" +
+      ":Transactions::Deputizeb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

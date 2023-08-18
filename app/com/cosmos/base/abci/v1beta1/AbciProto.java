@@ -117,13 +117,13 @@ public final class AbciProto {
       "al\030\004 \001(\004B#\352\336\037\npage_total\362\336\037\021yaml:\"page_t" +
       "otal\"R\tpageTotal\022\024\n\005limit\030\005 \001(\004R\005limit\0226" +
       "\n\003txs\030\006 \003(\0132$.cosmos.base.abci.v1beta1.T" +
-      "xResponseR\003txs:\004\200\334 \001B\365\001\n\034com.cosmos.base" +
-      ".abci.v1beta1B\tAbciProtoP\001ZCgithub.com/A" +
-      "ssetMantle/modules/cosmos/base/abci/v1be" +
-      "ta1;abciv1beta1\242\002\003CBA\252\002\030Cosmos.Base.Abci" +
-      ".V1beta1\312\002\030Cosmos\\Base\\Abci\\V1beta1\342\002$Co" +
-      "smos\\Base\\Abci\\V1beta1\\GPBMetadata\352\002\033Cos" +
-      "mos::Base::Abci::V1beta1\330\341\036\000b\006proto3"
+      "xResponseR\003txs:\004\200\334 \001B\324\001\n\034com.cosmos.base" +
+      ".abci.v1beta1B\tAbciProtoP\001Z\"github.com/c" +
+      "osmos/cosmos-sdk/types\242\002\003CBA\252\002\030Cosmos.Ba" +
+      "se.Abci.V1beta1\312\002\030Cosmos\\Base\\Abci\\V1bet" +
+      "a1\342\002$Cosmos\\Base\\Abci\\V1beta1\\GPBMetadat" +
+      "a\352\002\033Cosmos::Base::Abci::V1beta1\330\341\036\000b\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

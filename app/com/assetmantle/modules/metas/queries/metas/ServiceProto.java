@@ -27,19 +27,19 @@ public final class ServiceProto {
       "etmantle.modules.metas.queries.metas\032\034go" +
       "ogle/api/annotations.proto\032\'metas/querie" +
       "s/metas/query_request.proto\032(metas/queri" +
-      "es/metas/query_response.proto2\250\001\n\007Servic" +
-      "e\022\234\001\n\006Handle\0225.assetmantle.modules.metas" +
-      ".queries.metas.QueryRequest\0326.assetmantl" +
-      "e.modules.metas.queries.metas.QueryRespo" +
-      "nse\"#\202\323\344\223\002\035\022\033/mantle/metas/v1beta1/metas" +
-      "B\263\002\n+com.assetmantle.modules.metas.queri" +
-      "es.metasB\014ServiceProtoP\001Z4github.com/Ass" +
-      "etMantle/modules/x/metas/queries/metas\242\002" +
-      "\005AMMQM\252\002\'Assetmantle.Modules.Metas.Queri" +
-      "es.Metas\312\002\'Assetmantle\\Modules\\Metas\\Que" +
-      "ries\\Metas\342\0023Assetmantle\\Modules\\Metas\\Q" +
-      "ueries\\Metas\\GPBMetadata\352\002+Assetmantle::" +
-      "Modules::Metas::Queries::Metasb\006proto3"
+      "es/metas/query_response.proto2\246\001\n\005Query\022" +
+      "\234\001\n\006Handle\0225.assetmantle.modules.metas.q" +
+      "ueries.metas.QueryRequest\0326.assetmantle." +
+      "modules.metas.queries.metas.QueryRespons" +
+      "e\"#\202\323\344\223\002\035\022\033/mantle/metas/v1beta1/metasB\263" +
+      "\002\n+com.assetmantle.modules.metas.queries" +
+      ".metasB\014ServiceProtoP\001Z4github.com/Asset" +
+      "Mantle/modules/x/metas/queries/metas\242\002\005A" +
+      "MMQM\252\002\'Assetmantle.Modules.Metas.Queries" +
+      ".Metas\312\002\'Assetmantle\\Modules\\Metas\\Queri" +
+      "es\\Metas\342\0023Assetmantle\\Modules\\Metas\\Que" +
+      "ries\\Metas\\GPBMetadata\352\002+Assetmantle::Mo" +
+      "dules::Metas::Queries::Metasb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

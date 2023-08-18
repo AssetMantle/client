@@ -46,14 +46,13 @@ public final class CapabilityProto {
       "odule\022#\n\004name\030\002 \001(\tB\017\362\336\037\013yaml:\"name\"R\004na" +
       "me:\010\210\240\037\000\230\240\037\000\"R\n\020CapabilityOwners\022>\n\006owne" +
       "rs\030\001 \003(\0132 .cosmos.capability.v1beta1.Own" +
-      "erB\004\310\336\037\000R\006ownersB\202\002\n\035com.cosmos.capabili" +
-      "ty.v1beta1B\017CapabilityProtoP\001ZJgithub.co" +
-      "m/AssetMantle/modules/cosmos/capability/" +
-      "v1beta1;capabilityv1beta1\242\002\003CCX\252\002\031Cosmos" +
-      ".Capability.V1beta1\312\002\031Cosmos\\Capability\\" +
-      "V1beta1\342\002%Cosmos\\Capability\\V1beta1\\GPBM" +
-      "etadata\352\002\033Cosmos::Capability::V1beta1b\006p" +
-      "roto3"
+      "erB\004\310\336\037\000R\006ownersB\347\001\n\035com.cosmos.capabili" +
+      "ty.v1beta1B\017CapabilityProtoP\001Z/github.co" +
+      "m/cosmos/cosmos-sdk/x/capability/types\242\002" +
+      "\003CCX\252\002\031Cosmos.Capability.V1beta1\312\002\031Cosmo" +
+      "s\\Capability\\V1beta1\342\002%Cosmos\\Capability" +
+      "\\V1beta1\\GPBMetadata\352\002\033Cosmos::Capabilit" +
+      "y::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

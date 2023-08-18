@@ -38,16 +38,15 @@ public final class MetadataProto {
       "\tB\035\362\336\037\031yaml:\"host_connection_id\"R\020hostCo" +
       "nnectionId\022\030\n\007address\030\004 \001(\tR\007address\022\032\n\010" +
       "encoding\030\005 \001(\tR\010encoding\022\027\n\007tx_type\030\006 \001(" +
-      "\tR\006txTypeB\325\002\n+com.ibc.applications.inter" +
-      "chain_accounts.v1B\rMetadataProtoP\001Z\\gith" +
-      "ub.com/AssetMantle/modules/ibc/applicati" +
-      "ons/interchain_accounts/v1;interchain_ac" +
-      "countsv1\242\002\003IAI\252\002&Ibc.Applications.Interc" +
-      "hainAccounts.V1\312\002&Ibc\\Applications\\Inter" +
-      "chainAccounts\\V1\342\0022Ibc\\Applications\\Inte" +
-      "rchainAccounts\\V1\\GPBMetadata\352\002)Ibc::App" +
-      "lications::InterchainAccounts::V1b\006proto" +
-      "3"
+      "\tR\006txTypeB\276\002\n+com.ibc.applications.inter" +
+      "chain_accounts.v1B\rMetadataProtoP\001ZEgith" +
+      "ub.com/cosmos/ibc-go/v4/modules/apps/27-" +
+      "interchain-accounts/types\242\002\003IAI\252\002&Ibc.Ap" +
+      "plications.InterchainAccounts.V1\312\002&Ibc\\A" +
+      "pplications\\InterchainAccounts\\V1\342\0022Ibc\\" +
+      "Applications\\InterchainAccounts\\V1\\GPBMe" +
+      "tadata\352\002)Ibc::Applications::InterchainAc" +
+      "counts::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

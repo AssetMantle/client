@@ -53,13 +53,12 @@ public final class AuthzProto {
       "\001(\0132\024.google.protobuf.AnyB\021\312\264-\rAuthoriza" +
       "tionR\rauthorization\022D\n\nexpiration\030\004 \001(\0132" +
       "\032.google.protobuf.TimestampB\010\310\336\037\000\220\337\037\001R\ne" +
-      "xpirationB\336\001\n\030com.cosmos.authz.v1beta1B\n" +
-      "AuthzProtoP\001Z@github.com/AssetMantle/mod" +
-      "ules/cosmos/authz/v1beta1;authzv1beta1\242\002" +
-      "\003CAX\252\002\024Cosmos.Authz.V1beta1\312\002\024Cosmos\\Aut" +
-      "hz\\V1beta1\342\002 Cosmos\\Authz\\V1beta1\\GPBMet" +
-      "adata\352\002\026Cosmos::Authz::V1beta1\310\341\036\000b\006prot" +
-      "o3"
+      "xpirationB\302\001\n\030com.cosmos.authz.v1beta1B\n" +
+      "AuthzProtoP\001Z$github.com/cosmos/cosmos-s" +
+      "dk/x/authz\242\002\003CAX\252\002\024Cosmos.Authz.V1beta1\312" +
+      "\002\024Cosmos\\Authz\\V1beta1\342\002 Cosmos\\Authz\\V1" +
+      "beta1\\GPBMetadata\352\002\026Cosmos::Authz::V1bet" +
+      "a1\310\341\036\000b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

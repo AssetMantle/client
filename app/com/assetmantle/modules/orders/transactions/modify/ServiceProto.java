@@ -28,20 +28,20 @@ public final class ServiceProto {
       "ons.modify\032\034google/api/annotations.proto" +
       "\032(orders/transactions/modify/message.pro" +
       "to\0325orders/transactions/modify/transacti" +
-      "on_response.proto2\261\001\n\007Service\022\245\001\n\006Handle" +
-      "\0227.assetmantle.modules.orders.transactio" +
-      "ns.modify.Message\032C.assetmantle.modules." +
-      "orders.transactions.modify.TransactionRe" +
-      "sponse\"\035\202\323\344\223\002\027\"\025/mantle/orders/modifyB\335\002" +
-      "\n2com.assetmantle.modules.orders.transac" +
-      "tions.modifyB\014ServiceProtoP\001Z;github.com" +
-      "/AssetMantle/modules/x/orders/transactio" +
-      "ns/modify\242\002\005AMOTM\252\002.Assetmantle.Modules." +
-      "Orders.Transactions.Modify\312\002.Assetmantle" +
-      "\\Modules\\Orders\\Transactions\\Modify\342\002:As" +
-      "setmantle\\Modules\\Orders\\Transactions\\Mo" +
-      "dify\\GPBMetadata\352\0022Assetmantle::Modules:" +
-      ":Orders::Transactions::Modifyb\006proto3"
+      "on_response.proto2\255\001\n\003Msg\022\245\001\n\006Handle\0227.a" +
+      "ssetmantle.modules.orders.transactions.m" +
+      "odify.Message\032C.assetmantle.modules.orde" +
+      "rs.transactions.modify.TransactionRespon" +
+      "se\"\035\202\323\344\223\002\027\"\025/mantle/orders/modifyB\335\002\n2co" +
+      "m.assetmantle.modules.orders.transaction" +
+      "s.modifyB\014ServiceProtoP\001Z;github.com/Ass" +
+      "etMantle/modules/x/orders/transactions/m" +
+      "odify\242\002\005AMOTM\252\002.Assetmantle.Modules.Orde" +
+      "rs.Transactions.Modify\312\002.Assetmantle\\Mod" +
+      "ules\\Orders\\Transactions\\Modify\342\002:Assetm" +
+      "antle\\Modules\\Orders\\Transactions\\Modify" +
+      "\\GPBMetadata\352\0022Assetmantle::Modules::Ord" +
+      "ers::Transactions::Modifyb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

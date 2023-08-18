@@ -25,38 +25,38 @@ public final class ServiceProto {
     java.lang.String[] descriptorData = {
       "\n#assets/queries/assets/service.proto\022)a" +
       "ssetmantle.modules.assets.queries.assets" +
-      "\032\034google/api/annotations.proto\032)assets/q" +
-      "ueries/assets/query_request.proto\032*asset" +
-      "s/queries/assets/query_response.proto2\256\001" +
-      "\n\007Service\022\242\001\n\006Handle\0227.assetmantle.modul" +
-      "es.assets.queries.assets.QueryRequest\0328." +
-      "assetmantle.modules.assets.queries.asset" +
-      "s.QueryResponse\"%\202\323\344\223\002\037\022\035/mantle/assets/" +
-      "v1beta1/assetsB\277\002\n-com.assetmantle.modul" +
-      "es.assets.queries.assetsB\014ServiceProtoP\001" +
-      "Z6github.com/AssetMantle/modules/x/asset" +
-      "s/queries/assets\242\002\005AMAQA\252\002)Assetmantle.M" +
-      "odules.Assets.Queries.Assets\312\002)Assetmant" +
-      "le\\Modules\\Assets\\Queries\\Assets\342\0025Asset" +
-      "mantle\\Modules\\Assets\\Queries\\Assets\\GPB" +
-      "Metadata\352\002-Assetmantle::Modules::Assets:" +
-      ":Queries::Assetsb\006proto3"
+      "\032)assets/queries/assets/query_request.pr" +
+      "oto\032*assets/queries/assets/query_respons" +
+      "e.proto\032\034google/api/annotations.proto2\254\001" +
+      "\n\005Query\022\242\001\n\006Handle\0227.assetmantle.modules" +
+      ".assets.queries.assets.QueryRequest\0328.as" +
+      "setmantle.modules.assets.queries.assets." +
+      "QueryResponse\"%\202\323\344\223\002\037\022\035/mantle/assets/v1" +
+      "beta1/assetsB\277\002\n-com.assetmantle.modules" +
+      ".assets.queries.assetsB\014ServiceProtoP\001Z6" +
+      "github.com/AssetMantle/modules/x/assets/" +
+      "queries/assets\242\002\005AMAQA\252\002)Assetmantle.Mod" +
+      "ules.Assets.Queries.Assets\312\002)Assetmantle" +
+      "\\Modules\\Assets\\Queries\\Assets\342\0025Assetma" +
+      "ntle\\Modules\\Assets\\Queries\\Assets\\GPBMe" +
+      "tadata\352\002-Assetmantle::Modules::Assets::Q" +
+      "ueries::Assetsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.google.api.AnnotationsProto.getDescriptor(),
           com.assetmantle.modules.assets.queries.assets.QueryRequestProto.getDescriptor(),
           com.assetmantle.modules.assets.queries.assets.QueryResponseProto.getDescriptor(),
+          com.google.api.AnnotationsProto.getDescriptor(),
         });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.api.AnnotationsProto.http);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
-    com.google.api.AnnotationsProto.getDescriptor();
     com.assetmantle.modules.assets.queries.assets.QueryRequestProto.getDescriptor();
     com.assetmantle.modules.assets.queries.assets.QueryResponseProto.getDescriptor();
+    com.google.api.AnnotationsProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

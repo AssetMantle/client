@@ -31,14 +31,13 @@ public final class GenesisProto {
       "\n%cosmos/evidence/v1beta1/genesis.proto\022" +
       "\027cosmos.evidence.v1beta1\032\031google/protobu" +
       "f/any.proto\"@\n\014GenesisState\0220\n\010evidence\030" +
-      "\001 \003(\0132\024.google.protobuf.AnyR\010evidenceB\361\001" +
+      "\001 \003(\0132\024.google.protobuf.AnyR\010evidenceB\330\001" +
       "\n\033com.cosmos.evidence.v1beta1B\014GenesisPr" +
-      "otoP\001ZFgithub.com/AssetMantle/modules/co" +
-      "smos/evidence/v1beta1;evidencev1beta1\242\002\003" +
-      "CEX\252\002\027Cosmos.Evidence.V1beta1\312\002\027Cosmos\\E" +
-      "vidence\\V1beta1\342\002#Cosmos\\Evidence\\V1beta" +
-      "1\\GPBMetadata\352\002\031Cosmos::Evidence::V1beta" +
-      "1b\006proto3"
+      "otoP\001Z-github.com/cosmos/cosmos-sdk/x/ev" +
+      "idence/types\242\002\003CEX\252\002\027Cosmos.Evidence.V1b" +
+      "eta1\312\002\027Cosmos\\Evidence\\V1beta1\342\002#Cosmos\\" +
+      "Evidence\\V1beta1\\GPBMetadata\352\002\031Cosmos::E" +
+      "vidence::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

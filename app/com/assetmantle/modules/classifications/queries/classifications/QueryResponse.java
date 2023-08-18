@@ -41,41 +41,41 @@ private static final long serialVersionUID = 0L;
 
   public static final int LIST_FIELD_NUMBER = 1;
   @SuppressWarnings("serial")
-  private java.util.List<com.assetmantle.modules.classifications.mappable.Mappable> list_;
+  private java.util.List<com.assetmantle.modules.classifications.record.Record> list_;
   /**
-   * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
    */
   @java.lang.Override
-  public java.util.List<com.assetmantle.modules.classifications.mappable.Mappable> getListList() {
+  public java.util.List<com.assetmantle.modules.classifications.record.Record> getListList() {
     return list_;
   }
   /**
-   * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
    */
   @java.lang.Override
-  public java.util.List<? extends com.assetmantle.modules.classifications.mappable.MappableOrBuilder> 
+  public java.util.List<? extends com.assetmantle.modules.classifications.record.RecordOrBuilder> 
       getListOrBuilderList() {
     return list_;
   }
   /**
-   * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
    */
   @java.lang.Override
   public int getListCount() {
     return list_.size();
   }
   /**
-   * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.modules.classifications.mappable.Mappable getList(int index) {
+  public com.assetmantle.modules.classifications.record.Record getList(int index) {
     return list_.get(index);
   }
   /**
-   * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.modules.classifications.mappable.MappableOrBuilder getListOrBuilder(
+  public com.assetmantle.modules.classifications.record.RecordOrBuilder getListOrBuilder(
       int index) {
     return list_.get(index);
   }
@@ -423,9 +423,9 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 10: {
-              com.assetmantle.modules.classifications.mappable.Mappable m =
+              com.assetmantle.modules.classifications.record.Record m =
                   input.readMessage(
-                      com.assetmantle.modules.classifications.mappable.Mappable.parser(),
+                      com.assetmantle.modules.classifications.record.Record.parser(),
                       extensionRegistry);
               if (listBuilder_ == null) {
                 ensureListIsMutable();
@@ -452,22 +452,22 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.util.List<com.assetmantle.modules.classifications.mappable.Mappable> list_ =
+    private java.util.List<com.assetmantle.modules.classifications.record.Record> list_ =
       java.util.Collections.emptyList();
     private void ensureListIsMutable() {
       if (!((bitField0_ & 0x00000001) != 0)) {
-        list_ = new java.util.ArrayList<com.assetmantle.modules.classifications.mappable.Mappable>(list_);
+        list_ = new java.util.ArrayList<com.assetmantle.modules.classifications.record.Record>(list_);
         bitField0_ |= 0x00000001;
        }
     }
 
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.assetmantle.modules.classifications.mappable.Mappable, com.assetmantle.modules.classifications.mappable.Mappable.Builder, com.assetmantle.modules.classifications.mappable.MappableOrBuilder> listBuilder_;
+        com.assetmantle.modules.classifications.record.Record, com.assetmantle.modules.classifications.record.Record.Builder, com.assetmantle.modules.classifications.record.RecordOrBuilder> listBuilder_;
 
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
-    public java.util.List<com.assetmantle.modules.classifications.mappable.Mappable> getListList() {
+    public java.util.List<com.assetmantle.modules.classifications.record.Record> getListList() {
       if (listBuilder_ == null) {
         return java.util.Collections.unmodifiableList(list_);
       } else {
@@ -475,7 +475,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
     public int getListCount() {
       if (listBuilder_ == null) {
@@ -485,9 +485,9 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
-    public com.assetmantle.modules.classifications.mappable.Mappable getList(int index) {
+    public com.assetmantle.modules.classifications.record.Record getList(int index) {
       if (listBuilder_ == null) {
         return list_.get(index);
       } else {
@@ -495,10 +495,10 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
     public Builder setList(
-        int index, com.assetmantle.modules.classifications.mappable.Mappable value) {
+        int index, com.assetmantle.modules.classifications.record.Record value) {
       if (listBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -512,10 +512,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
     public Builder setList(
-        int index, com.assetmantle.modules.classifications.mappable.Mappable.Builder builderForValue) {
+        int index, com.assetmantle.modules.classifications.record.Record.Builder builderForValue) {
       if (listBuilder_ == null) {
         ensureListIsMutable();
         list_.set(index, builderForValue.build());
@@ -526,9 +526,9 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
-    public Builder addList(com.assetmantle.modules.classifications.mappable.Mappable value) {
+    public Builder addList(com.assetmantle.modules.classifications.record.Record value) {
       if (listBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -542,10 +542,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
     public Builder addList(
-        int index, com.assetmantle.modules.classifications.mappable.Mappable value) {
+        int index, com.assetmantle.modules.classifications.record.Record value) {
       if (listBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -559,10 +559,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
     public Builder addList(
-        com.assetmantle.modules.classifications.mappable.Mappable.Builder builderForValue) {
+        com.assetmantle.modules.classifications.record.Record.Builder builderForValue) {
       if (listBuilder_ == null) {
         ensureListIsMutable();
         list_.add(builderForValue.build());
@@ -573,10 +573,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
     public Builder addList(
-        int index, com.assetmantle.modules.classifications.mappable.Mappable.Builder builderForValue) {
+        int index, com.assetmantle.modules.classifications.record.Record.Builder builderForValue) {
       if (listBuilder_ == null) {
         ensureListIsMutable();
         list_.add(index, builderForValue.build());
@@ -587,10 +587,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
     public Builder addAllList(
-        java.lang.Iterable<? extends com.assetmantle.modules.classifications.mappable.Mappable> values) {
+        java.lang.Iterable<? extends com.assetmantle.modules.classifications.record.Record> values) {
       if (listBuilder_ == null) {
         ensureListIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
@@ -602,7 +602,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
     public Builder clearList() {
       if (listBuilder_ == null) {
@@ -615,7 +615,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
     public Builder removeList(int index) {
       if (listBuilder_ == null) {
@@ -628,16 +628,16 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
-    public com.assetmantle.modules.classifications.mappable.Mappable.Builder getListBuilder(
+    public com.assetmantle.modules.classifications.record.Record.Builder getListBuilder(
         int index) {
       return getListFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
-    public com.assetmantle.modules.classifications.mappable.MappableOrBuilder getListOrBuilder(
+    public com.assetmantle.modules.classifications.record.RecordOrBuilder getListOrBuilder(
         int index) {
       if (listBuilder_ == null) {
         return list_.get(index);  } else {
@@ -645,9 +645,9 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
-    public java.util.List<? extends com.assetmantle.modules.classifications.mappable.MappableOrBuilder> 
+    public java.util.List<? extends com.assetmantle.modules.classifications.record.RecordOrBuilder> 
          getListOrBuilderList() {
       if (listBuilder_ != null) {
         return listBuilder_.getMessageOrBuilderList();
@@ -656,33 +656,33 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
-    public com.assetmantle.modules.classifications.mappable.Mappable.Builder addListBuilder() {
+    public com.assetmantle.modules.classifications.record.Record.Builder addListBuilder() {
       return getListFieldBuilder().addBuilder(
-          com.assetmantle.modules.classifications.mappable.Mappable.getDefaultInstance());
+          com.assetmantle.modules.classifications.record.Record.getDefaultInstance());
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
-    public com.assetmantle.modules.classifications.mappable.Mappable.Builder addListBuilder(
+    public com.assetmantle.modules.classifications.record.Record.Builder addListBuilder(
         int index) {
       return getListFieldBuilder().addBuilder(
-          index, com.assetmantle.modules.classifications.mappable.Mappable.getDefaultInstance());
+          index, com.assetmantle.modules.classifications.record.Record.getDefaultInstance());
     }
     /**
-     * <code>repeated .assetmantle.modules.classifications.mappable.Mappable list = 1 [json_name = "list"];</code>
+     * <code>repeated .assetmantle.modules.classifications.record.Record list = 1 [json_name = "list"];</code>
      */
-    public java.util.List<com.assetmantle.modules.classifications.mappable.Mappable.Builder> 
+    public java.util.List<com.assetmantle.modules.classifications.record.Record.Builder> 
          getListBuilderList() {
       return getListFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.assetmantle.modules.classifications.mappable.Mappable, com.assetmantle.modules.classifications.mappable.Mappable.Builder, com.assetmantle.modules.classifications.mappable.MappableOrBuilder> 
+        com.assetmantle.modules.classifications.record.Record, com.assetmantle.modules.classifications.record.Record.Builder, com.assetmantle.modules.classifications.record.RecordOrBuilder> 
         getListFieldBuilder() {
       if (listBuilder_ == null) {
         listBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-            com.assetmantle.modules.classifications.mappable.Mappable, com.assetmantle.modules.classifications.mappable.Mappable.Builder, com.assetmantle.modules.classifications.mappable.MappableOrBuilder>(
+            com.assetmantle.modules.classifications.record.Record, com.assetmantle.modules.classifications.record.Record.Builder, com.assetmantle.modules.classifications.record.RecordOrBuilder>(
                 list_,
                 ((bitField0_ & 0x00000001) != 0),
                 getParentForChildren(),

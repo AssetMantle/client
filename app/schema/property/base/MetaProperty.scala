@@ -24,6 +24,8 @@ case class MetaProperty(id: PropertyID, data: Data) extends Property {
 
   def isMeta: Boolean = true
 
+  def isMesa: Boolean = false
+
   def asProtoMetaProperty: protoMetaProperty = protoMetaProperty.newBuilder().setID(this.id.asProtoPropertyID).setData(this.data.toAnyData).build()
 
   def toAnyProperty: AnyProperty = AnyProperty.newBuilder().setMetaProperty(this.asProtoMetaProperty).build()
@@ -31,6 +33,8 @@ case class MetaProperty(id: PropertyID, data: Data) extends Property {
   def scrub(): MesaProperty = MesaProperty(id = this.id, dataID = this.getDataID)
 
   def getProtoBytes: Array[Byte] = this.asProtoMetaProperty.toByteString.toByteArray
+
+  def mutate(data: Data): Property = MetaProperty(id = this.id, data = data)
 }
 
 object MetaProperty {

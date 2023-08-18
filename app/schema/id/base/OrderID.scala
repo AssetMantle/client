@@ -9,13 +9,15 @@ case class OrderID(hashID: HashID) extends ID {
 
   def getType: StringID = constants.OrderIDType
 
-  def asString: String = utilities.Secrets.base64URLEncoder(this.getBytes)
+  def asString: String = schema.utilities.common.base64URLEncoder(this.getBytes)
 
   def asProtoOrderID: protoOrderID = protoOrderID.newBuilder().setHashID(this.hashID.asProtoHashID).build()
 
   def toAnyID: AnyID = AnyID.newBuilder().setOrderID(this.asProtoOrderID).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoOrderID.toByteString.toByteArray
+
+  def compare(id: ID): Int = schema.utilities.common.byteArraysCompare(this.getBytes, id.asInstanceOf[OrderID].getBytes)
 
 }
 

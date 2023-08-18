@@ -1,17 +1,13 @@
 package models.blockchain
 
-import com.assetmantle.modules.splits.{transactions => splitsTransactions}
-import models.common.Serializable.Coin
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import schema.id.OwnableID
-import schema.id.base.{CoinID, IdentityID, StringID}
+import schema.id.base.{AssetID, IdentityID}
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 case class Split(ownerID: Array[Byte], ownableID: Array[Byte], protoOwnableID: Array[Byte], ownerIDString: String, ownableIDString: String, value: BigInt, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
@@ -83,7 +79,6 @@ private[blockchain] object Splits {
 
 @Singleton
 class Splits @Inject()(
-                        blockchainBalances: Balances,
                         utilitiesOperations: utilities.Operations,
                         protected val dbConfigProvider: DatabaseConfigProvider,
                       )(implicit val executionContext: ExecutionContext)
@@ -102,56 +97,29 @@ class Splits @Inject()(
 
     def getByOwnerID(ownerId: IdentityID): Future[Seq[Split]] = filter(_.ownerID === ownerId.getBytes).map(_.map(_.deserialize))
 
-    def getByOwnableID(ownableID: OwnableID): Future[Seq[Split]] = filter(_.ownableID === ownableID.getBytes).map(_.map(_.deserialize))
+    def getByOwnableID(ownableID: AssetID): Future[Seq[Split]] = filter(_.ownableID === ownableID.getBytes).map(_.map(_.deserialize))
 
-    def getTotalSupply(ownableID: OwnableID): Future[BigInt] = filter(_.ownableID === ownableID.getBytes).map(_.map(_.deserialize.value).sum)
+    def getTotalSupply(ownableID: AssetID): Future[BigInt] = filter(_.ownableID === ownableID.getBytes).map(_.map(_.deserialize.value).sum)
 
-    def getByOwnerIDAndOwnableID(ownerId: IdentityID, ownableID: OwnableID): Future[Option[Split]] = filter(x => x.ownerID === ownerId.getBytes && x.ownableID === ownableID.getBytes).map(_.headOption.map(_.deserialize))
+    def getByOwnerIDAndOwnableID(ownerId: IdentityID, ownableID: AssetID): Future[Option[Split]] = filter(x => x.ownerID === ownerId.getBytes && x.ownableID === ownableID.getBytes).map(_.headOption.map(_.deserialize))
 
-    def tryGetByOwnerIDAndOwnableID(ownerId: IdentityID, ownableID: OwnableID): Future[Split] = tryGetById1AndId2(id1 = ownerId.getBytes, id2 = ownableID.getBytes).map(_.deserialize)
+    def tryGetByOwnerIDAndOwnableID(ownerId: IdentityID, ownableID: AssetID): Future[Split] = tryGetById1AndId2(id1 = ownerId.getBytes, id2 = ownableID.getBytes).map(_.deserialize)
 
-    def deleteByOwnerIDAndOwnableID(ownerId: IdentityID, ownableID: OwnableID): Future[Int] = deleteById1AndId2(id1 = ownerId.getBytes, id2 = ownableID.getBytes)
+    def deleteByOwnerIDAndOwnableID(ownerId: IdentityID, ownableID: AssetID): Future[Int] = deleteById1AndId2(id1 = ownerId.getBytes, id2 = ownableID.getBytes)
 
   }
 
   object Utility {
 
-    def onSend(msg: splitsTransactions.send.Message): Future[String] = {
-      val add = addSplit(ownerId = IdentityID(msg.getToID), ownableID = OwnableID(msg.getOwnableID), value = BigInt(msg.getValue))
-      val subtract = subtractSplit(ownerId = IdentityID(msg.getFromID), ownableID = OwnableID(msg.getOwnableID), value = BigInt(msg.getValue))
-      for {
-        _ <- add
-        _ <- subtract
-      } yield msg.getFrom
-    }
+    def mint(ownerID: IdentityID, assetID: AssetID, value: BigInt): Future[Unit] = addSplit(ownerId = ownerID, assetID = assetID, value = value)
 
-    def onWrap(msg: splitsTransactions.wrap.Message): Future[String] = {
-      val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(msg.getFrom)
-      val add = utilitiesOperations.traverse(msg.getCoinsList.asScala.toSeq.map(x => Coin(x))) { coin => addSplit(ownerId = IdentityID(msg.getFromID), ownableID = CoinID(StringID(coin.denom)), value = coin.amount.value) }
-      for {
-        _ <- updateBalance
-        _ <- add
-      } yield msg.getFrom
-    }
+    def burn(ownerID: IdentityID, assetID: AssetID, value: BigInt): Future[Unit] = subtractSplit(ownerId = ownerID, assetID = assetID, value = value)
 
-    def onUnwrap(msg: splitsTransactions.unwrap.Message): Future[String] = {
-      val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(msg.getFrom)
-      val subtract = subtractSplit(ownerId = IdentityID(msg.getFromID), ownableID = OwnableID(msg.getOwnableID), value = BigInt(msg.getValue))
-      for {
-        _ <- updateBalance
-        _ <- subtract
-      } yield msg.getFrom
-    }
+    def renumerate(ownerID: IdentityID, assetID: AssetID, value: BigInt): Future[Unit] = {
+      val totalSupply = Service.getTotalSupply(assetID)
 
-    def mint(ownerID: IdentityID, ownableID: OwnableID, value: BigInt): Future[Unit] = addSplit(ownerId = ownerID, ownableID = ownableID, value = value)
-
-    def burn(ownerID: IdentityID, ownableID: OwnableID, value: BigInt): Future[Unit] = subtractSplit(ownerId = ownerID, ownableID = ownableID, value = value)
-
-    def renumerate(ownerID: IdentityID, ownableID: OwnableID, value: BigInt): Future[Unit] = {
-      val totalSupply = Service.getTotalSupply(ownableID)
-
-      def update(totalSupply: BigInt) = if (totalSupply < value) addSplit(ownerId = ownerID, ownableID = ownableID, value = value - totalSupply)
-      else if (totalSupply > value) subtractSplit(ownerId = ownerID, ownableID = ownableID, value = totalSupply - value)
+      def update(totalSupply: BigInt) = if (totalSupply < value) addSplit(ownerId = ownerID, assetID = assetID, value = value - totalSupply)
+      else if (totalSupply > value) subtractSplit(ownerId = ownerID, assetID = assetID, value = totalSupply - value)
       else Future()
 
       for {
@@ -160,10 +128,10 @@ class Splits @Inject()(
       } yield ()
     }
 
-    def transfer(fromID: IdentityID, toID: IdentityID, ownableID: OwnableID, value: BigInt): Future[Unit] = {
-      val add = addSplit(ownerId = toID, ownableID = ownableID, value = value)
+    def transfer(fromID: IdentityID, toID: IdentityID, assetID: AssetID, value: BigInt): Future[Unit] = {
+      val add = addSplit(ownerId = toID, assetID = assetID, value = value)
 
-      def subtract = subtractSplit(ownerId = fromID, ownableID = ownableID, value = value)
+      def subtract = subtractSplit(ownerId = fromID, assetID = assetID, value = value)
 
       for {
         _ <- add
@@ -171,12 +139,12 @@ class Splits @Inject()(
       } yield ()
     }
 
-    private def addSplit(ownerId: IdentityID, ownableID: OwnableID, value: BigInt) = {
-      val ownedSplit = Service.getByOwnerIDAndOwnableID(ownerId = ownerId, ownableID = ownableID)
+    def addSplit(ownerId: IdentityID, assetID: AssetID, value: BigInt): Future[Unit] = {
+      val ownedSplit = Service.getByOwnerIDAndOwnableID(ownerId = ownerId, ownableID = assetID)
 
       def addOrUpdate(ownedSplit: Option[Split]) = {
         val split = if (ownedSplit.isDefined) ownedSplit.get.copy(value = ownedSplit.get.value + value)
-        else Split(ownerID = ownerId.getBytes, ownableID = ownableID.getBytes, protoOwnableID = ownableID.toAnyOwnableID.toByteArray, ownerIDString = ownerId.asString, ownableIDString = ownableID.asString, value = value)
+        else Split(ownerID = ownerId.getBytes, ownableID = assetID.getBytes, protoOwnableID = assetID.getProtoBytes, ownerIDString = ownerId.asString, ownableIDString = assetID.asString, value = value)
         Service.insertOrUpdate(split)
       }
 
@@ -186,12 +154,12 @@ class Splits @Inject()(
       } yield ()
     }
 
-    private def subtractSplit(ownerId: IdentityID, ownableID: OwnableID, value: BigInt) = {
-      val ownedSplit = Service.tryGetByOwnerIDAndOwnableID(ownerId = ownerId, ownableID = ownableID)
+    def subtractSplit(ownerId: IdentityID, assetID: AssetID, value: BigInt): Future[Unit] = {
+      val ownedSplit = Service.tryGetByOwnerIDAndOwnableID(ownerId = ownerId, ownableID = assetID)
 
       def deleteOrUpdate(ownedSplit: Split) = {
         val split = ownedSplit.copy(value = ownedSplit.value - value)
-        if (split.value == 0) Service.deleteByOwnerIDAndOwnableID(ownerId = ownerId, ownableID = ownableID)
+        if (split.value == 0) Service.deleteByOwnerIDAndOwnableID(ownerId = ownerId, ownableID = assetID)
         else Service.insertOrUpdate(split)
       }
 

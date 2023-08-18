@@ -30,23 +30,26 @@ public final class TransactionResponseProto {
     java.lang.String[] descriptorData = {
       "\n9identities/transactions/define/transac" +
       "tion_response.proto\0222assetmantle.modules" +
-      ".identities.transactions.define\"C\n\023Trans" +
-      "actionResponse\022,\n\022classification_i_d\030\001 \001" +
-      "(\tR\020classificationIDB\201\003\n6com.assetmantle" +
-      ".modules.identities.transactions.defineB" +
-      "\030TransactionResponseProtoP\001Z?github.com/" +
-      "AssetMantle/modules/x/identities/transac" +
-      "tions/define\242\002\005AMITD\252\0022Assetmantle.Modul" +
-      "es.Identities.Transactions.Define\312\0022Asse" +
-      "tmantle\\Modules\\Identities\\Transactions\\" +
-      "Define\342\002>Assetmantle\\Modules\\Identities\\" +
-      "Transactions\\Define\\GPBMetadata\352\0026Assetm" +
-      "antle::Modules::Identities::Transactions" +
-      "::Defineb\006proto3"
+      ".identities.transactions.define\032 ids/bas" +
+      "e/classification_id.proto\"r\n\023Transaction" +
+      "Response\022[\n\022classification_i_d\030\001 \001(\0132-.a" +
+      "ssetmantle.schema.ids.base.Classificatio" +
+      "nIDR\020classificationIDB\201\003\n6com.assetmantl" +
+      "e.modules.identities.transactions.define" +
+      "B\030TransactionResponseProtoP\001Z?github.com" +
+      "/AssetMantle/modules/x/identities/transa" +
+      "ctions/define\242\002\005AMITD\252\0022Assetmantle.Modu" +
+      "les.Identities.Transactions.Define\312\0022Ass" +
+      "etmantle\\Modules\\Identities\\Transactions" +
+      "\\Define\342\002>Assetmantle\\Modules\\Identities" +
+      "\\Transactions\\Define\\GPBMetadata\352\0026Asset" +
+      "mantle::Modules::Identities::Transaction" +
+      "s::Defineb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.assetmantle.schema.ids.base.ClassificationIdProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_identities_transactions_define_TransactionResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -54,6 +57,7 @@ public final class TransactionResponseProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_identities_transactions_define_TransactionResponse_descriptor,
         new java.lang.String[] { "ClassificationID", });
+    com.assetmantle.schema.ids.base.ClassificationIdProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

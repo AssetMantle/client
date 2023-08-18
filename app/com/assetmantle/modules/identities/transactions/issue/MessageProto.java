@@ -32,32 +32,31 @@ public final class MessageProto {
       "proto\0221assetmantle.modules.identities.tr" +
       "ansactions.issue\032 ids/base/classificatio" +
       "n_id.proto\032\032ids/base/identity_id.proto\032\036" +
-      "lists/base/property_list.proto\"\327\004\n\007Messa" +
+      "lists/base/property_list.proto\"\307\004\n\007Messa" +
       "ge\022\022\n\004from\030\001 \001(\tR\004from\022A\n\010from_i_d\030\002 \001(\013" +
       "2\'.assetmantle.schema.ids.base.IdentityI" +
-      "DR\006fromID\022\016\n\002to\030\003 \001(\tR\002to\022[\n\022classificat" +
-      "ion_i_d\030\004 \001(\0132-.assetmantle.schema.ids.b" +
-      "ase.ClassificationIDR\020classificationID\022g" +
-      "\n\031immutable_meta_properties\030\005 \001(\0132+.asse" +
-      "tmantle.schema.lists.base.PropertyListR\027" +
-      "immutableMetaProperties\022^\n\024immutable_pro" +
-      "perties\030\006 \001(\0132+.assetmantle.schema.lists" +
-      ".base.PropertyListR\023immutableProperties\022" +
-      "c\n\027mutable_meta_properties\030\007 \001(\0132+.asset" +
-      "mantle.schema.lists.base.PropertyListR\025m" +
-      "utableMetaProperties\022Z\n\022mutable_properti" +
-      "es\030\010 \001(\0132+.assetmantle.schema.lists.base" +
-      ".PropertyListR\021mutablePropertiesB\357\002\n5com" +
-      ".assetmantle.modules.identities.transact" +
-      "ions.issueB\014MessageProtoP\001Z>github.com/A" +
-      "ssetMantle/modules/x/identities/transact" +
-      "ions/issue\242\002\005AMITI\252\0021Assetmantle.Modules" +
-      ".Identities.Transactions.Issue\312\0021Assetma" +
-      "ntle\\Modules\\Identities\\Transactions\\Iss" +
-      "ue\342\002=Assetmantle\\Modules\\Identities\\Tran" +
-      "sactions\\Issue\\GPBMetadata\352\0025Assetmantle" +
-      "::Modules::Identities::Transactions::Iss" +
-      "ueb\006proto3"
+      "DR\006fromID\022[\n\022classification_i_d\030\003 \001(\0132-." +
+      "assetmantle.schema.ids.base.Classificati" +
+      "onIDR\020classificationID\022g\n\031immutable_meta" +
+      "_properties\030\004 \001(\0132+.assetmantle.schema.l" +
+      "ists.base.PropertyListR\027immutableMetaPro" +
+      "perties\022^\n\024immutable_properties\030\005 \001(\0132+." +
+      "assetmantle.schema.lists.base.PropertyLi" +
+      "stR\023immutableProperties\022c\n\027mutable_meta_" +
+      "properties\030\006 \001(\0132+.assetmantle.schema.li" +
+      "sts.base.PropertyListR\025mutableMetaProper" +
+      "ties\022Z\n\022mutable_properties\030\007 \001(\0132+.asset" +
+      "mantle.schema.lists.base.PropertyListR\021m" +
+      "utablePropertiesB\357\002\n5com.assetmantle.mod" +
+      "ules.identities.transactions.issueB\014Mess" +
+      "ageProtoP\001Z>github.com/AssetMantle/modul" +
+      "es/x/identities/transactions/issue\242\002\005AMI" +
+      "TI\252\0021Assetmantle.Modules.Identities.Tran" +
+      "sactions.Issue\312\0021Assetmantle\\Modules\\Ide" +
+      "ntities\\Transactions\\Issue\342\002=Assetmantle" +
+      "\\Modules\\Identities\\Transactions\\Issue\\G" +
+      "PBMetadata\352\0025Assetmantle::Modules::Ident" +
+      "ities::Transactions::Issueb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -71,7 +70,7 @@ public final class MessageProto {
     internal_static_assetmantle_modules_identities_transactions_issue_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_identities_transactions_issue_Message_descriptor,
-        new java.lang.String[] { "From", "FromID", "To", "ClassificationID", "ImmutableMetaProperties", "ImmutableProperties", "MutableMetaProperties", "MutableProperties", });
+        new java.lang.String[] { "From", "FromID", "ClassificationID", "ImmutableMetaProperties", "ImmutableProperties", "MutableMetaProperties", "MutableProperties", });
     com.assetmantle.schema.ids.base.ClassificationIdProto.getDescriptor();
     com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor();
     com.assetmantle.schema.lists.base.PropertyListProto.getDescriptor();

@@ -31,40 +31,40 @@ public final class QueryResponseProto {
       "\n3maintainers/queries/maintainer/query_r" +
       "esponse.proto\0222assetmantle.modules.maint" +
       "ainers.queries.maintainer\032\024gogoproto/gog" +
-      "o.proto\032#maintainers/mappable/mappable.p" +
-      "roto\"]\n\rQueryResponse\022F\n\004list\030\001 \003(\01322.as" +
-      "setmantle.modules.maintainers.mappable.M" +
-      "appableR\004list:\004\210\240\037\000B\373\002\n6com.assetmantle." +
-      "modules.maintainers.queries.maintainerB\022" +
-      "QueryResponseProtoP\001Z?github.com/AssetMa" +
-      "ntle/modules/x/maintainers/queries/maint" +
-      "ainer\242\002\005AMMQM\252\0022Assetmantle.Modules.Main" +
-      "tainers.Queries.Maintainer\312\0022Assetmantle" +
-      "\\Modules\\Maintainers\\Queries\\Maintainer\342" +
-      "\002>Assetmantle\\Modules\\Maintainers\\Querie" +
-      "s\\Maintainer\\GPBMetadata\352\0026Assetmantle::" +
-      "Modules::Maintainers::Queries::Maintaine" +
-      "rb\006proto3"
+      "o.proto\032\037maintainers/record/record.proto" +
+      "\"]\n\rQueryResponse\022F\n\006record\030\001 \001(\0132..asse" +
+      "tmantle.modules.maintainers.record.Recor" +
+      "dR\006record:\004\210\240\037\000B\373\002\n6com.assetmantle.modu" +
+      "les.maintainers.queries.maintainerB\022Quer" +
+      "yResponseProtoP\001Z?github.com/AssetMantle" +
+      "/modules/x/maintainers/queries/maintaine" +
+      "r\242\002\005AMMQM\252\0022Assetmantle.Modules.Maintain" +
+      "ers.Queries.Maintainer\312\0022Assetmantle\\Mod" +
+      "ules\\Maintainers\\Queries\\Maintainer\342\002>As" +
+      "setmantle\\Modules\\Maintainers\\Queries\\Ma" +
+      "intainer\\GPBMetadata\352\0026Assetmantle::Modu" +
+      "les::Maintainers::Queries::Maintainerb\006p" +
+      "roto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.gogoproto.GogoProto.getDescriptor(),
-          com.assetmantle.modules.maintainers.mappable.MappableProto.getDescriptor(),
+          com.assetmantle.modules.maintainers.record.RecordProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_maintainers_queries_maintainer_QueryResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_maintainers_queries_maintainer_QueryResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_maintainers_queries_maintainer_QueryResponse_descriptor,
-        new java.lang.String[] { "List", });
+        new java.lang.String[] { "Record", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
-    com.assetmantle.modules.maintainers.mappable.MappableProto.getDescriptor();
+    com.assetmantle.modules.maintainers.record.RecordProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

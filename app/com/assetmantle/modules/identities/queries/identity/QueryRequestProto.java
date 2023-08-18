@@ -30,32 +30,32 @@ public final class QueryRequestProto {
     java.lang.String[] descriptorData = {
       "\n/identities/queries/identity/query_requ" +
       "est.proto\022/assetmantle.modules.identitie" +
-      "s.queries.identity\032\032ids/base/identity_id" +
-      ".proto\"Y\n\014QueryRequest\022I\n\014identity_i_d\030\001" +
-      " \001(\0132\'.assetmantle.schema.ids.base.Ident" +
-      "ityIDR\nidentityIDB\350\002\n3com.assetmantle.mo" +
-      "dules.identities.queries.identityB\021Query" +
-      "RequestProtoP\001Z<github.com/AssetMantle/m" +
-      "odules/x/identities/queries/identity\242\002\005A" +
-      "MIQI\252\002/Assetmantle.Modules.Identities.Qu" +
-      "eries.Identity\312\002/Assetmantle\\Modules\\Ide" +
-      "ntities\\Queries\\Identity\342\002;Assetmantle\\M" +
-      "odules\\Identities\\Queries\\Identity\\GPBMe" +
-      "tadata\352\0023Assetmantle::Modules::Identitie" +
-      "s::Queries::Identityb\006proto3"
+      "s.queries.identity\032\030identities/key/key.p" +
+      "roto\"I\n\014QueryRequest\0229\n\003key\030\001 \001(\0132\'.asse" +
+      "tmantle.modules.identities.key.KeyR\003keyB" +
+      "\350\002\n3com.assetmantle.modules.identities.q" +
+      "ueries.identityB\021QueryRequestProtoP\001Z<gi" +
+      "thub.com/AssetMantle/modules/x/identitie" +
+      "s/queries/identity\242\002\005AMIQI\252\002/Assetmantle" +
+      ".Modules.Identities.Queries.Identity\312\002/A" +
+      "ssetmantle\\Modules\\Identities\\Queries\\Id" +
+      "entity\342\002;Assetmantle\\Modules\\Identities\\" +
+      "Queries\\Identity\\GPBMetadata\352\0023Assetmant" +
+      "le::Modules::Identities::Queries::Identi" +
+      "tyb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor(),
+          com.assetmantle.modules.identities.key.KeyProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_identities_queries_identity_QueryRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_identities_queries_identity_QueryRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_identities_queries_identity_QueryRequest_descriptor,
-        new java.lang.String[] { "IdentityID", });
-    com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor();
+        new java.lang.String[] { "Key", });
+    com.assetmantle.modules.identities.key.KeyProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

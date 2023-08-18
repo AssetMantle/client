@@ -4,7 +4,6 @@ import com.assetmantle.modules.assets.{transactions => assetsTransactions}
 import com.assetmantle.modules.identities.{transactions => identitiesTransactions}
 import com.assetmantle.modules.metas.{transactions => metasTransactions}
 import com.assetmantle.modules.orders.{transactions => ordersTransactions}
-import com.assetmantle.modules.splits.{transactions => splitsTransactions}
 import com.cosmos.authz.{v1beta1 => authzTx}
 import com.cosmos.bank.{v1beta1 => bankTx}
 import com.cosmos.crisis.{v1beta1 => crisisTx}
@@ -201,19 +200,21 @@ class WalletTransactions @Inject()(
             case schema.constants.Messages.ASSET_MUTATE => Seq(assetsTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
             case schema.constants.Messages.ASSET_RENUMERATE => Seq(assetsTransactions.renumerate.Message.parseFrom(stdMsg.getValue).getFrom)
             case schema.constants.Messages.ASSET_REVOKE => Seq(assetsTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
+            case schema.constants.Messages.ASSET_SEND => Seq(assetsTransactions.send.Message.parseFrom(stdMsg.getValue).getFrom)
+            case schema.constants.Messages.ASSET_WRAP => Seq(assetsTransactions.wrap.Message.parseFrom(stdMsg.getValue).getFrom)
+            case schema.constants.Messages.ASSET_UNWRAP => Seq(assetsTransactions.unwrap.Message.parseFrom(stdMsg.getValue).getFrom)
             //identities
             case schema.constants.Messages.IDENTITY_DEFINE => Seq(identitiesTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
             case schema.constants.Messages.IDENTITY_DEPUTIZE => Seq(identitiesTransactions.deputize.Message.parseFrom(stdMsg.getValue).getFrom)
-            case schema.constants.Messages.IDENTITY_ISSUE => val msg = identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue)
-              Seq(msg.getFrom, msg.getTo).distinct
-            case schema.constants.Messages.IDENTITY_MUTATE => Seq(identitiesTransactions.mutate.Message.parseFrom(stdMsg.getValue).getFrom)
-            case schema.constants.Messages.IDENTITY_NUB => Seq(identitiesTransactions.nub.Message.parseFrom(stdMsg.getValue).getFrom)
+            case schema.constants.Messages.IDENTITY_ISSUE => Seq(identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue).getFrom)
+            case schema.constants.Messages.IDENTITY_NAME => Seq(identitiesTransactions.name.Message.parseFrom(stdMsg.getValue).getFrom)
             case schema.constants.Messages.IDENTITY_PROVISION => val msg = identitiesTransactions.provision.Message.parseFrom(stdMsg.getValue)
               Seq(msg.getFrom, msg.getTo).distinct
             case schema.constants.Messages.IDENTITY_QUASH => Seq(identitiesTransactions.quash.Message.parseFrom(stdMsg.getValue).getFrom)
             case schema.constants.Messages.IDENTITY_REVOKE => Seq(identitiesTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
             case schema.constants.Messages.IDENTITY_UNPROVISION => val msg = identitiesTransactions.unprovision.Message.parseFrom(stdMsg.getValue)
               Seq(msg.getFrom, msg.getTo).distinct
+            case schema.constants.Messages.IDENTITY_UPDATE => Seq(identitiesTransactions.update.Message.parseFrom(stdMsg.getValue).getFrom)
             //orders
             case schema.constants.Messages.ORDER_CANCEL => Seq(ordersTransactions.cancel.Message.parseFrom(stdMsg.getValue).getFrom)
             case schema.constants.Messages.ORDER_DEFINE => Seq(ordersTransactions.define.Message.parseFrom(stdMsg.getValue).getFrom)
@@ -223,12 +224,10 @@ class WalletTransactions @Inject()(
             case schema.constants.Messages.ORDER_MODIFY => Seq(ordersTransactions.modify.Message.parseFrom(stdMsg.getValue).getFrom)
             case schema.constants.Messages.ORDER_REVOKE => Seq(ordersTransactions.revoke.Message.parseFrom(stdMsg.getValue).getFrom)
             case schema.constants.Messages.ORDER_TAKE => Seq(ordersTransactions.take.Message.parseFrom(stdMsg.getValue).getFrom)
+            case schema.constants.Messages.ORDER_PUT => Seq(ordersTransactions.put.Message.parseFrom(stdMsg.getValue).getFrom)
+            case schema.constants.Messages.ORDER_GET => Seq(ordersTransactions.get.Message.parseFrom(stdMsg.getValue).getFrom)
             //metas
             case schema.constants.Messages.META_REVEAL => Seq(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue).getFrom)
-            // splits
-            case schema.constants.Messages.SPLIT_SEND => Seq(splitsTransactions.send.Message.parseFrom(stdMsg.getValue).getFrom)
-            case schema.constants.Messages.SPLIT_WRAP => Seq(splitsTransactions.wrap.Message.parseFrom(stdMsg.getValue).getFrom)
-            case schema.constants.Messages.SPLIT_UNWRAP => Seq(splitsTransactions.unwrap.Message.parseFrom(stdMsg.getValue).getFrom)
             case _ => Seq()
           }
         }

@@ -4,21 +4,23 @@ package schema.id.base
 import com.assetmantle.schema.ids.base.{AnyID, SplitID => protoSplitID}
 import schema.id._
 
-case class SplitID(ownerID: IdentityID, ownableID: OwnableID) extends ID {
+case class SplitID(assetID: AssetID, ownerID: IdentityID) extends ID {
 
-  def getBytes: Array[Byte] = this.ownerID.getBytes ++ this.ownableID.getBytes
+  def getBytes: Array[Byte] = this.assetID.getBytes ++ this.ownerID.getBytes
 
   def getType: StringID = constants.SplitIDType
 
-  def asString: String = this.ownerID.asString + constants.Separator + this.ownableID.asString
+  def asString: String = this.assetID.asString + constants.Separator + this.ownerID.asString
 
-  def asProtoSplitID: protoSplitID = protoSplitID.newBuilder().setOwnerID(this.ownerID.asProtoIdentityID).setOwnableID(this.ownableID.toAnyOwnableID).build()
+  def asProtoSplitID: protoSplitID = protoSplitID.newBuilder().setAssetID(this.assetID.asProtoAssetID).setOwnerID(this.ownerID.asProtoIdentityID).build()
 
   def toAnyID: AnyID = AnyID.newBuilder().setSplitID(this.asProtoSplitID).build()
 
   def getProtoBytes: Array[Byte] = this.asProtoSplitID.toByteString.toByteArray
+
+  def compare(id: ID): Int = schema.utilities.common.byteArraysCompare(this.getBytes, id.asInstanceOf[SplitID].getBytes)
 }
 
 object SplitID {
-  def apply(anyID: protoSplitID): SplitID = SplitID(ownerID = IdentityID(anyID.getOwnerID), ownableID = OwnableID(anyID.getOwnableID))
+  def apply(splitID: protoSplitID): SplitID = SplitID(assetID = AssetID(splitID.getAssetID),ownerID = IdentityID(splitID.getOwnerID))
 }

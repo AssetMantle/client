@@ -17,7 +17,6 @@ private static final long serialVersionUID = 0L;
   }
   private Message() {
     from_ = "";
-    to_ = "";
   }
 
   @java.lang.Override
@@ -105,49 +104,10 @@ private static final long serialVersionUID = 0L;
     return fromID_ == null ? com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance() : fromID_;
   }
 
-  public static final int TO_FIELD_NUMBER = 3;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object to_ = "";
-  /**
-   * <code>string to = 3 [json_name = "to"];</code>
-   * @return The to.
-   */
-  @java.lang.Override
-  public java.lang.String getTo() {
-    java.lang.Object ref = to_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      to_ = s;
-      return s;
-    }
-  }
-  /**
-   * <code>string to = 3 [json_name = "to"];</code>
-   * @return The bytes for to.
-   */
-  @java.lang.Override
-  public com.google.protobuf.ByteString
-      getToBytes() {
-    java.lang.Object ref = to_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      to_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
-  }
-
-  public static final int CLASSIFICATION_I_D_FIELD_NUMBER = 4;
+  public static final int CLASSIFICATION_I_D_FIELD_NUMBER = 3;
   private com.assetmantle.schema.ids.base.ClassificationID classificationID_;
   /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
    * @return Whether the classificationID field is set.
    */
   @java.lang.Override
@@ -155,7 +115,7 @@ private static final long serialVersionUID = 0L;
     return classificationID_ != null;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
    * @return The classificationID.
    */
   @java.lang.Override
@@ -163,17 +123,17 @@ private static final long serialVersionUID = 0L;
     return classificationID_ == null ? com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance() : classificationID_;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.ids.base.ClassificationIDOrBuilder getClassificationIDOrBuilder() {
     return classificationID_ == null ? com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance() : classificationID_;
   }
 
-  public static final int IMMUTABLE_META_PROPERTIES_FIELD_NUMBER = 5;
+  public static final int IMMUTABLE_META_PROPERTIES_FIELD_NUMBER = 4;
   private com.assetmantle.schema.lists.base.PropertyList immutableMetaProperties_;
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
    * @return Whether the immutableMetaProperties field is set.
    */
   @java.lang.Override
@@ -181,7 +141,7 @@ private static final long serialVersionUID = 0L;
     return immutableMetaProperties_ != null;
   }
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
    * @return The immutableMetaProperties.
    */
   @java.lang.Override
@@ -189,17 +149,17 @@ private static final long serialVersionUID = 0L;
     return immutableMetaProperties_ == null ? com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance() : immutableMetaProperties_;
   }
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.lists.base.PropertyListOrBuilder getImmutableMetaPropertiesOrBuilder() {
     return immutableMetaProperties_ == null ? com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance() : immutableMetaProperties_;
   }
 
-  public static final int IMMUTABLE_PROPERTIES_FIELD_NUMBER = 6;
+  public static final int IMMUTABLE_PROPERTIES_FIELD_NUMBER = 5;
   private com.assetmantle.schema.lists.base.PropertyList immutableProperties_;
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
    * @return Whether the immutableProperties field is set.
    */
   @java.lang.Override
@@ -207,7 +167,7 @@ private static final long serialVersionUID = 0L;
     return immutableProperties_ != null;
   }
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
    * @return The immutableProperties.
    */
   @java.lang.Override
@@ -215,17 +175,17 @@ private static final long serialVersionUID = 0L;
     return immutableProperties_ == null ? com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance() : immutableProperties_;
   }
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.lists.base.PropertyListOrBuilder getImmutablePropertiesOrBuilder() {
     return immutableProperties_ == null ? com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance() : immutableProperties_;
   }
 
-  public static final int MUTABLE_META_PROPERTIES_FIELD_NUMBER = 7;
+  public static final int MUTABLE_META_PROPERTIES_FIELD_NUMBER = 6;
   private com.assetmantle.schema.lists.base.PropertyList mutableMetaProperties_;
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
    * @return Whether the mutableMetaProperties field is set.
    */
   @java.lang.Override
@@ -233,7 +193,7 @@ private static final long serialVersionUID = 0L;
     return mutableMetaProperties_ != null;
   }
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
    * @return The mutableMetaProperties.
    */
   @java.lang.Override
@@ -241,17 +201,17 @@ private static final long serialVersionUID = 0L;
     return mutableMetaProperties_ == null ? com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance() : mutableMetaProperties_;
   }
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.lists.base.PropertyListOrBuilder getMutableMetaPropertiesOrBuilder() {
     return mutableMetaProperties_ == null ? com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance() : mutableMetaProperties_;
   }
 
-  public static final int MUTABLE_PROPERTIES_FIELD_NUMBER = 8;
+  public static final int MUTABLE_PROPERTIES_FIELD_NUMBER = 7;
   private com.assetmantle.schema.lists.base.PropertyList mutableProperties_;
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
    * @return Whether the mutableProperties field is set.
    */
   @java.lang.Override
@@ -259,7 +219,7 @@ private static final long serialVersionUID = 0L;
     return mutableProperties_ != null;
   }
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
    * @return The mutableProperties.
    */
   @java.lang.Override
@@ -267,7 +227,7 @@ private static final long serialVersionUID = 0L;
     return mutableProperties_ == null ? com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance() : mutableProperties_;
   }
   /**
-   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+   * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.lists.base.PropertyListOrBuilder getMutablePropertiesOrBuilder() {
@@ -294,23 +254,20 @@ private static final long serialVersionUID = 0L;
     if (fromID_ != null) {
       output.writeMessage(2, getFromID());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(to_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 3, to_);
-    }
     if (classificationID_ != null) {
-      output.writeMessage(4, getClassificationID());
+      output.writeMessage(3, getClassificationID());
     }
     if (immutableMetaProperties_ != null) {
-      output.writeMessage(5, getImmutableMetaProperties());
+      output.writeMessage(4, getImmutableMetaProperties());
     }
     if (immutableProperties_ != null) {
-      output.writeMessage(6, getImmutableProperties());
+      output.writeMessage(5, getImmutableProperties());
     }
     if (mutableMetaProperties_ != null) {
-      output.writeMessage(7, getMutableMetaProperties());
+      output.writeMessage(6, getMutableMetaProperties());
     }
     if (mutableProperties_ != null) {
-      output.writeMessage(8, getMutableProperties());
+      output.writeMessage(7, getMutableProperties());
     }
     getUnknownFields().writeTo(output);
   }
@@ -328,28 +285,25 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(2, getFromID());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(to_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, to_);
-    }
     if (classificationID_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(4, getClassificationID());
+        .computeMessageSize(3, getClassificationID());
     }
     if (immutableMetaProperties_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(5, getImmutableMetaProperties());
+        .computeMessageSize(4, getImmutableMetaProperties());
     }
     if (immutableProperties_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(6, getImmutableProperties());
+        .computeMessageSize(5, getImmutableProperties());
     }
     if (mutableMetaProperties_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, getMutableMetaProperties());
+        .computeMessageSize(6, getMutableMetaProperties());
     }
     if (mutableProperties_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(8, getMutableProperties());
+        .computeMessageSize(7, getMutableProperties());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -373,8 +327,6 @@ private static final long serialVersionUID = 0L;
       if (!getFromID()
           .equals(other.getFromID())) return false;
     }
-    if (!getTo()
-        .equals(other.getTo())) return false;
     if (hasClassificationID() != other.hasClassificationID()) return false;
     if (hasClassificationID()) {
       if (!getClassificationID()
@@ -417,8 +369,6 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + FROM_I_D_FIELD_NUMBER;
       hash = (53 * hash) + getFromID().hashCode();
     }
-    hash = (37 * hash) + TO_FIELD_NUMBER;
-    hash = (53 * hash) + getTo().hashCode();
     if (hasClassificationID()) {
       hash = (37 * hash) + CLASSIFICATION_I_D_FIELD_NUMBER;
       hash = (53 * hash) + getClassificationID().hashCode();
@@ -574,7 +524,6 @@ private static final long serialVersionUID = 0L;
         fromIDBuilder_.dispose();
         fromIDBuilder_ = null;
       }
-      to_ = "";
       classificationID_ = null;
       if (classificationIDBuilder_ != null) {
         classificationIDBuilder_.dispose();
@@ -642,29 +591,26 @@ private static final long serialVersionUID = 0L;
             : fromIDBuilder_.build();
       }
       if (((from_bitField0_ & 0x00000004) != 0)) {
-        result.to_ = to_;
-      }
-      if (((from_bitField0_ & 0x00000008) != 0)) {
         result.classificationID_ = classificationIDBuilder_ == null
             ? classificationID_
             : classificationIDBuilder_.build();
       }
-      if (((from_bitField0_ & 0x00000010) != 0)) {
+      if (((from_bitField0_ & 0x00000008) != 0)) {
         result.immutableMetaProperties_ = immutableMetaPropertiesBuilder_ == null
             ? immutableMetaProperties_
             : immutableMetaPropertiesBuilder_.build();
       }
-      if (((from_bitField0_ & 0x00000020) != 0)) {
+      if (((from_bitField0_ & 0x00000010) != 0)) {
         result.immutableProperties_ = immutablePropertiesBuilder_ == null
             ? immutableProperties_
             : immutablePropertiesBuilder_.build();
       }
-      if (((from_bitField0_ & 0x00000040) != 0)) {
+      if (((from_bitField0_ & 0x00000020) != 0)) {
         result.mutableMetaProperties_ = mutableMetaPropertiesBuilder_ == null
             ? mutableMetaProperties_
             : mutableMetaPropertiesBuilder_.build();
       }
-      if (((from_bitField0_ & 0x00000080) != 0)) {
+      if (((from_bitField0_ & 0x00000040) != 0)) {
         result.mutableProperties_ = mutablePropertiesBuilder_ == null
             ? mutableProperties_
             : mutablePropertiesBuilder_.build();
@@ -723,11 +669,6 @@ private static final long serialVersionUID = 0L;
       if (other.hasFromID()) {
         mergeFromID(other.getFromID());
       }
-      if (!other.getTo().isEmpty()) {
-        to_ = other.to_;
-        bitField0_ |= 0x00000004;
-        onChanged();
-      }
       if (other.hasClassificationID()) {
         mergeClassificationID(other.getClassificationID());
       }
@@ -782,45 +723,40 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 18
             case 26: {
-              to_ = input.readStringRequireUtf8();
+              input.readMessage(
+                  getClassificationIDFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000004;
               break;
             } // case 26
             case 34: {
               input.readMessage(
-                  getClassificationIDFieldBuilder().getBuilder(),
+                  getImmutableMetaPropertiesFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000008;
               break;
             } // case 34
             case 42: {
               input.readMessage(
-                  getImmutableMetaPropertiesFieldBuilder().getBuilder(),
+                  getImmutablePropertiesFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000010;
               break;
             } // case 42
             case 50: {
               input.readMessage(
-                  getImmutablePropertiesFieldBuilder().getBuilder(),
+                  getMutableMetaPropertiesFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000020;
               break;
             } // case 50
             case 58: {
               input.readMessage(
-                  getMutableMetaPropertiesFieldBuilder().getBuilder(),
+                  getMutablePropertiesFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000040;
               break;
             } // case 58
-            case 66: {
-              input.readMessage(
-                  getMutablePropertiesFieldBuilder().getBuilder(),
-                  extensionRegistry);
-              bitField0_ |= 0x00000080;
-              break;
-            } // case 66
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1029,90 +965,18 @@ private static final long serialVersionUID = 0L;
       return fromIDBuilder_;
     }
 
-    private java.lang.Object to_ = "";
-    /**
-     * <code>string to = 3 [json_name = "to"];</code>
-     * @return The to.
-     */
-    public java.lang.String getTo() {
-      java.lang.Object ref = to_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        to_ = s;
-        return s;
-      } else {
-        return (java.lang.String) ref;
-      }
-    }
-    /**
-     * <code>string to = 3 [json_name = "to"];</code>
-     * @return The bytes for to.
-     */
-    public com.google.protobuf.ByteString
-        getToBytes() {
-      java.lang.Object ref = to_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        to_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    /**
-     * <code>string to = 3 [json_name = "to"];</code>
-     * @param value The to to set.
-     * @return This builder for chaining.
-     */
-    public Builder setTo(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      to_ = value;
-      bitField0_ |= 0x00000004;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string to = 3 [json_name = "to"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearTo() {
-      to_ = getDefaultInstance().getTo();
-      bitField0_ = (bitField0_ & ~0x00000004);
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>string to = 3 [json_name = "to"];</code>
-     * @param value The bytes for to to set.
-     * @return This builder for chaining.
-     */
-    public Builder setToBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      to_ = value;
-      bitField0_ |= 0x00000004;
-      onChanged();
-      return this;
-    }
-
     private com.assetmantle.schema.ids.base.ClassificationID classificationID_;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.ClassificationID, com.assetmantle.schema.ids.base.ClassificationID.Builder, com.assetmantle.schema.ids.base.ClassificationIDOrBuilder> classificationIDBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
      * @return Whether the classificationID field is set.
      */
     public boolean hasClassificationID() {
-      return ((bitField0_ & 0x00000008) != 0);
+      return ((bitField0_ & 0x00000004) != 0);
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
      * @return The classificationID.
      */
     public com.assetmantle.schema.ids.base.ClassificationID getClassificationID() {
@@ -1123,7 +987,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
      */
     public Builder setClassificationID(com.assetmantle.schema.ids.base.ClassificationID value) {
       if (classificationIDBuilder_ == null) {
@@ -1134,12 +998,12 @@ private static final long serialVersionUID = 0L;
       } else {
         classificationIDBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
      */
     public Builder setClassificationID(
         com.assetmantle.schema.ids.base.ClassificationID.Builder builderForValue) {
@@ -1148,16 +1012,16 @@ private static final long serialVersionUID = 0L;
       } else {
         classificationIDBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
      */
     public Builder mergeClassificationID(com.assetmantle.schema.ids.base.ClassificationID value) {
       if (classificationIDBuilder_ == null) {
-        if (((bitField0_ & 0x00000008) != 0) &&
+        if (((bitField0_ & 0x00000004) != 0) &&
           classificationID_ != null &&
           classificationID_ != com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance()) {
           getClassificationIDBuilder().mergeFrom(value);
@@ -1167,15 +1031,15 @@ private static final long serialVersionUID = 0L;
       } else {
         classificationIDBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000004;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
      */
     public Builder clearClassificationID() {
-      bitField0_ = (bitField0_ & ~0x00000008);
+      bitField0_ = (bitField0_ & ~0x00000004);
       classificationID_ = null;
       if (classificationIDBuilder_ != null) {
         classificationIDBuilder_.dispose();
@@ -1185,15 +1049,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
      */
     public com.assetmantle.schema.ids.base.ClassificationID.Builder getClassificationIDBuilder() {
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000004;
       onChanged();
       return getClassificationIDFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
      */
     public com.assetmantle.schema.ids.base.ClassificationIDOrBuilder getClassificationIDOrBuilder() {
       if (classificationIDBuilder_ != null) {
@@ -1204,7 +1068,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 4 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 3 [json_name = "classificationID"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.ids.base.ClassificationID, com.assetmantle.schema.ids.base.ClassificationID.Builder, com.assetmantle.schema.ids.base.ClassificationIDOrBuilder> 
@@ -1224,14 +1088,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.lists.base.PropertyList, com.assetmantle.schema.lists.base.PropertyList.Builder, com.assetmantle.schema.lists.base.PropertyListOrBuilder> immutableMetaPropertiesBuilder_;
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
      * @return Whether the immutableMetaProperties field is set.
      */
     public boolean hasImmutableMetaProperties() {
-      return ((bitField0_ & 0x00000010) != 0);
+      return ((bitField0_ & 0x00000008) != 0);
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
      * @return The immutableMetaProperties.
      */
     public com.assetmantle.schema.lists.base.PropertyList getImmutableMetaProperties() {
@@ -1242,7 +1106,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
      */
     public Builder setImmutableMetaProperties(com.assetmantle.schema.lists.base.PropertyList value) {
       if (immutableMetaPropertiesBuilder_ == null) {
@@ -1253,12 +1117,12 @@ private static final long serialVersionUID = 0L;
       } else {
         immutableMetaPropertiesBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
      */
     public Builder setImmutableMetaProperties(
         com.assetmantle.schema.lists.base.PropertyList.Builder builderForValue) {
@@ -1267,16 +1131,16 @@ private static final long serialVersionUID = 0L;
       } else {
         immutableMetaPropertiesBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
      */
     public Builder mergeImmutableMetaProperties(com.assetmantle.schema.lists.base.PropertyList value) {
       if (immutableMetaPropertiesBuilder_ == null) {
-        if (((bitField0_ & 0x00000010) != 0) &&
+        if (((bitField0_ & 0x00000008) != 0) &&
           immutableMetaProperties_ != null &&
           immutableMetaProperties_ != com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance()) {
           getImmutableMetaPropertiesBuilder().mergeFrom(value);
@@ -1286,15 +1150,15 @@ private static final long serialVersionUID = 0L;
       } else {
         immutableMetaPropertiesBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
      */
     public Builder clearImmutableMetaProperties() {
-      bitField0_ = (bitField0_ & ~0x00000010);
+      bitField0_ = (bitField0_ & ~0x00000008);
       immutableMetaProperties_ = null;
       if (immutableMetaPropertiesBuilder_ != null) {
         immutableMetaPropertiesBuilder_.dispose();
@@ -1304,15 +1168,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
      */
     public com.assetmantle.schema.lists.base.PropertyList.Builder getImmutableMetaPropertiesBuilder() {
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000008;
       onChanged();
       return getImmutableMetaPropertiesFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
      */
     public com.assetmantle.schema.lists.base.PropertyListOrBuilder getImmutableMetaPropertiesOrBuilder() {
       if (immutableMetaPropertiesBuilder_ != null) {
@@ -1323,7 +1187,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 5 [json_name = "immutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 4 [json_name = "immutableMetaProperties"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.lists.base.PropertyList, com.assetmantle.schema.lists.base.PropertyList.Builder, com.assetmantle.schema.lists.base.PropertyListOrBuilder> 
@@ -1343,14 +1207,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.lists.base.PropertyList, com.assetmantle.schema.lists.base.PropertyList.Builder, com.assetmantle.schema.lists.base.PropertyListOrBuilder> immutablePropertiesBuilder_;
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
      * @return Whether the immutableProperties field is set.
      */
     public boolean hasImmutableProperties() {
-      return ((bitField0_ & 0x00000020) != 0);
+      return ((bitField0_ & 0x00000010) != 0);
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
      * @return The immutableProperties.
      */
     public com.assetmantle.schema.lists.base.PropertyList getImmutableProperties() {
@@ -1361,7 +1225,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
      */
     public Builder setImmutableProperties(com.assetmantle.schema.lists.base.PropertyList value) {
       if (immutablePropertiesBuilder_ == null) {
@@ -1372,12 +1236,12 @@ private static final long serialVersionUID = 0L;
       } else {
         immutablePropertiesBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
      */
     public Builder setImmutableProperties(
         com.assetmantle.schema.lists.base.PropertyList.Builder builderForValue) {
@@ -1386,16 +1250,16 @@ private static final long serialVersionUID = 0L;
       } else {
         immutablePropertiesBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
      */
     public Builder mergeImmutableProperties(com.assetmantle.schema.lists.base.PropertyList value) {
       if (immutablePropertiesBuilder_ == null) {
-        if (((bitField0_ & 0x00000020) != 0) &&
+        if (((bitField0_ & 0x00000010) != 0) &&
           immutableProperties_ != null &&
           immutableProperties_ != com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance()) {
           getImmutablePropertiesBuilder().mergeFrom(value);
@@ -1405,15 +1269,15 @@ private static final long serialVersionUID = 0L;
       } else {
         immutablePropertiesBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
      */
     public Builder clearImmutableProperties() {
-      bitField0_ = (bitField0_ & ~0x00000020);
+      bitField0_ = (bitField0_ & ~0x00000010);
       immutableProperties_ = null;
       if (immutablePropertiesBuilder_ != null) {
         immutablePropertiesBuilder_.dispose();
@@ -1423,15 +1287,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
      */
     public com.assetmantle.schema.lists.base.PropertyList.Builder getImmutablePropertiesBuilder() {
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000010;
       onChanged();
       return getImmutablePropertiesFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
      */
     public com.assetmantle.schema.lists.base.PropertyListOrBuilder getImmutablePropertiesOrBuilder() {
       if (immutablePropertiesBuilder_ != null) {
@@ -1442,7 +1306,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 6 [json_name = "immutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList immutable_properties = 5 [json_name = "immutableProperties"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.lists.base.PropertyList, com.assetmantle.schema.lists.base.PropertyList.Builder, com.assetmantle.schema.lists.base.PropertyListOrBuilder> 
@@ -1462,14 +1326,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.lists.base.PropertyList, com.assetmantle.schema.lists.base.PropertyList.Builder, com.assetmantle.schema.lists.base.PropertyListOrBuilder> mutableMetaPropertiesBuilder_;
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
      * @return Whether the mutableMetaProperties field is set.
      */
     public boolean hasMutableMetaProperties() {
-      return ((bitField0_ & 0x00000040) != 0);
+      return ((bitField0_ & 0x00000020) != 0);
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
      * @return The mutableMetaProperties.
      */
     public com.assetmantle.schema.lists.base.PropertyList getMutableMetaProperties() {
@@ -1480,7 +1344,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
      */
     public Builder setMutableMetaProperties(com.assetmantle.schema.lists.base.PropertyList value) {
       if (mutableMetaPropertiesBuilder_ == null) {
@@ -1491,12 +1355,12 @@ private static final long serialVersionUID = 0L;
       } else {
         mutableMetaPropertiesBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
      */
     public Builder setMutableMetaProperties(
         com.assetmantle.schema.lists.base.PropertyList.Builder builderForValue) {
@@ -1505,16 +1369,16 @@ private static final long serialVersionUID = 0L;
       } else {
         mutableMetaPropertiesBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
      */
     public Builder mergeMutableMetaProperties(com.assetmantle.schema.lists.base.PropertyList value) {
       if (mutableMetaPropertiesBuilder_ == null) {
-        if (((bitField0_ & 0x00000040) != 0) &&
+        if (((bitField0_ & 0x00000020) != 0) &&
           mutableMetaProperties_ != null &&
           mutableMetaProperties_ != com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance()) {
           getMutableMetaPropertiesBuilder().mergeFrom(value);
@@ -1524,15 +1388,15 @@ private static final long serialVersionUID = 0L;
       } else {
         mutableMetaPropertiesBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
      */
     public Builder clearMutableMetaProperties() {
-      bitField0_ = (bitField0_ & ~0x00000040);
+      bitField0_ = (bitField0_ & ~0x00000020);
       mutableMetaProperties_ = null;
       if (mutableMetaPropertiesBuilder_ != null) {
         mutableMetaPropertiesBuilder_.dispose();
@@ -1542,15 +1406,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
      */
     public com.assetmantle.schema.lists.base.PropertyList.Builder getMutableMetaPropertiesBuilder() {
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000020;
       onChanged();
       return getMutableMetaPropertiesFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
      */
     public com.assetmantle.schema.lists.base.PropertyListOrBuilder getMutableMetaPropertiesOrBuilder() {
       if (mutableMetaPropertiesBuilder_ != null) {
@@ -1561,7 +1425,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 7 [json_name = "mutableMetaProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_meta_properties = 6 [json_name = "mutableMetaProperties"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.lists.base.PropertyList, com.assetmantle.schema.lists.base.PropertyList.Builder, com.assetmantle.schema.lists.base.PropertyListOrBuilder> 
@@ -1581,14 +1445,14 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.lists.base.PropertyList, com.assetmantle.schema.lists.base.PropertyList.Builder, com.assetmantle.schema.lists.base.PropertyListOrBuilder> mutablePropertiesBuilder_;
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
      * @return Whether the mutableProperties field is set.
      */
     public boolean hasMutableProperties() {
-      return ((bitField0_ & 0x00000080) != 0);
+      return ((bitField0_ & 0x00000040) != 0);
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
      * @return The mutableProperties.
      */
     public com.assetmantle.schema.lists.base.PropertyList getMutableProperties() {
@@ -1599,7 +1463,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
      */
     public Builder setMutableProperties(com.assetmantle.schema.lists.base.PropertyList value) {
       if (mutablePropertiesBuilder_ == null) {
@@ -1610,12 +1474,12 @@ private static final long serialVersionUID = 0L;
       } else {
         mutablePropertiesBuilder_.setMessage(value);
       }
-      bitField0_ |= 0x00000080;
+      bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
      */
     public Builder setMutableProperties(
         com.assetmantle.schema.lists.base.PropertyList.Builder builderForValue) {
@@ -1624,16 +1488,16 @@ private static final long serialVersionUID = 0L;
       } else {
         mutablePropertiesBuilder_.setMessage(builderForValue.build());
       }
-      bitField0_ |= 0x00000080;
+      bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
      */
     public Builder mergeMutableProperties(com.assetmantle.schema.lists.base.PropertyList value) {
       if (mutablePropertiesBuilder_ == null) {
-        if (((bitField0_ & 0x00000080) != 0) &&
+        if (((bitField0_ & 0x00000040) != 0) &&
           mutableProperties_ != null &&
           mutableProperties_ != com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance()) {
           getMutablePropertiesBuilder().mergeFrom(value);
@@ -1643,15 +1507,15 @@ private static final long serialVersionUID = 0L;
       } else {
         mutablePropertiesBuilder_.mergeFrom(value);
       }
-      bitField0_ |= 0x00000080;
+      bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
      */
     public Builder clearMutableProperties() {
-      bitField0_ = (bitField0_ & ~0x00000080);
+      bitField0_ = (bitField0_ & ~0x00000040);
       mutableProperties_ = null;
       if (mutablePropertiesBuilder_ != null) {
         mutablePropertiesBuilder_.dispose();
@@ -1661,15 +1525,15 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
      */
     public com.assetmantle.schema.lists.base.PropertyList.Builder getMutablePropertiesBuilder() {
-      bitField0_ |= 0x00000080;
+      bitField0_ |= 0x00000040;
       onChanged();
       return getMutablePropertiesFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
      */
     public com.assetmantle.schema.lists.base.PropertyListOrBuilder getMutablePropertiesOrBuilder() {
       if (mutablePropertiesBuilder_ != null) {
@@ -1680,7 +1544,7 @@ private static final long serialVersionUID = 0L;
       }
     }
     /**
-     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 8 [json_name = "mutableProperties"];</code>
+     * <code>.assetmantle.schema.lists.base.PropertyList mutable_properties = 7 [json_name = "mutableProperties"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.lists.base.PropertyList, com.assetmantle.schema.lists.base.PropertyList.Builder, com.assetmantle.schema.lists.base.PropertyListOrBuilder> 

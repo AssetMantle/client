@@ -59,12 +59,12 @@ public final class ProofProto {
       "\tR\006output\"C\n\007ProofOp\022\022\n\004type\030\001 \001(\tR\004type" +
       "\022\020\n\003key\030\002 \001(\014R\003key\022\022\n\004data\030\003 \001(\014R\004data\">" +
       "\n\010ProofOps\0222\n\003ops\030\001 \003(\0132\032.tendermint.cry" +
-      "pto.ProofOpB\004\310\336\037\000R\003opsB\272\001\n\025com.tendermin" +
-      "t.cryptoB\nProofProtoP\001Z0github.com/Asset" +
-      "Mantle/modules/tendermint/crypto\242\002\003TCX\252\002" +
-      "\021Tendermint.Crypto\312\002\021Tendermint\\Crypto\342\002" +
-      "\035Tendermint\\Crypto\\GPBMetadata\352\002\022Tenderm" +
-      "int::Cryptob\006proto3"
+      "pto.ProofOpB\004\310\336\037\000R\003opsB\302\001\n\025com.tendermin" +
+      "t.cryptoB\nProofProtoP\001Z8github.com/tende" +
+      "rmint/tendermint/proto/tendermint/crypto" +
+      "\242\002\003TCX\252\002\021Tendermint.Crypto\312\002\021Tendermint\\" +
+      "Crypto\342\002\035Tendermint\\Crypto\\GPBMetadata\352\002" +
+      "\022Tendermint::Cryptob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

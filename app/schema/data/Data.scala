@@ -8,7 +8,7 @@ abstract class Data {
 
   def getType: StringID
 
-  def getDataID: DataID
+  def getDataID: DataID = DataID(typeID = this.getType, hashID = this.generateHashID)
 
   def zeroValue: Data
 
@@ -36,8 +36,9 @@ object Data {
     case 4 => HeightData(anyData.getHeightData)
     case 5 => IDData(anyData.getIDData)
     case 6 => ListData(anyData.getListData)
-    case 7 => NumberData(anyData.getNumberData)
-    case 8 => StringData(anyData.getStringData)
+    case 7 => LinkedData(anyData.getLinkedData)
+    case 8 => NumberData(anyData.getNumberData)
+    case 9 => StringData(anyData.getStringData)
     case _ => throw new IllegalArgumentException("INVALID_DATA_IMPL_CASE_NUMBER: " + anyData.getImplCase.getNumber.toString)
   }
 

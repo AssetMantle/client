@@ -38,30 +38,30 @@ private static final long serialVersionUID = 0L;
             com.assetmantle.modules.maintainers.queries.maintainer.QueryRequest.class, com.assetmantle.modules.maintainers.queries.maintainer.QueryRequest.Builder.class);
   }
 
-  public static final int MAINTAINER_I_D_FIELD_NUMBER = 1;
-  private com.assetmantle.schema.ids.base.MaintainerID maintainerID_;
+  public static final int KEY_FIELD_NUMBER = 1;
+  private com.assetmantle.modules.maintainers.key.Key key_;
   /**
-   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
-   * @return Whether the maintainerID field is set.
+   * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
+   * @return Whether the key field is set.
    */
   @java.lang.Override
-  public boolean hasMaintainerID() {
-    return maintainerID_ != null;
+  public boolean hasKey() {
+    return key_ != null;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
-   * @return The maintainerID.
+   * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.MaintainerID getMaintainerID() {
-    return maintainerID_ == null ? com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance() : maintainerID_;
+  public com.assetmantle.modules.maintainers.key.Key getKey() {
+    return key_ == null ? com.assetmantle.modules.maintainers.key.Key.getDefaultInstance() : key_;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
+   * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.MaintainerIDOrBuilder getMaintainerIDOrBuilder() {
-    return maintainerID_ == null ? com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance() : maintainerID_;
+  public com.assetmantle.modules.maintainers.key.KeyOrBuilder getKeyOrBuilder() {
+    return key_ == null ? com.assetmantle.modules.maintainers.key.Key.getDefaultInstance() : key_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -78,8 +78,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (maintainerID_ != null) {
-      output.writeMessage(1, getMaintainerID());
+    if (key_ != null) {
+      output.writeMessage(1, getKey());
     }
     getUnknownFields().writeTo(output);
   }
@@ -90,9 +90,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (maintainerID_ != null) {
+    if (key_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getMaintainerID());
+        .computeMessageSize(1, getKey());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -109,10 +109,10 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.modules.maintainers.queries.maintainer.QueryRequest other = (com.assetmantle.modules.maintainers.queries.maintainer.QueryRequest) obj;
 
-    if (hasMaintainerID() != other.hasMaintainerID()) return false;
-    if (hasMaintainerID()) {
-      if (!getMaintainerID()
-          .equals(other.getMaintainerID())) return false;
+    if (hasKey() != other.hasKey()) return false;
+    if (hasKey()) {
+      if (!getKey()
+          .equals(other.getKey())) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -125,9 +125,9 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasMaintainerID()) {
-      hash = (37 * hash) + MAINTAINER_I_D_FIELD_NUMBER;
-      hash = (53 * hash) + getMaintainerID().hashCode();
+    if (hasKey()) {
+      hash = (37 * hash) + KEY_FIELD_NUMBER;
+      hash = (53 * hash) + getKey().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -258,10 +258,10 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      maintainerID_ = null;
-      if (maintainerIDBuilder_ != null) {
-        maintainerIDBuilder_.dispose();
-        maintainerIDBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
       return this;
     }
@@ -297,9 +297,9 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(com.assetmantle.modules.maintainers.queries.maintainer.QueryRequest result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.maintainerID_ = maintainerIDBuilder_ == null
-            ? maintainerID_
-            : maintainerIDBuilder_.build();
+        result.key_ = keyBuilder_ == null
+            ? key_
+            : keyBuilder_.build();
       }
     }
 
@@ -347,8 +347,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.modules.maintainers.queries.maintainer.QueryRequest other) {
       if (other == com.assetmantle.modules.maintainers.queries.maintainer.QueryRequest.getDefaultInstance()) return this;
-      if (other.hasMaintainerID()) {
-        mergeMaintainerID(other.getMaintainerID());
+      if (other.hasKey()) {
+        mergeKey(other.getKey());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -378,7 +378,7 @@ private static final long serialVersionUID = 0L;
               break;
             case 10: {
               input.readMessage(
-                  getMaintainerIDFieldBuilder().getBuilder(),
+                  getKeyFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
@@ -400,123 +400,123 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private com.assetmantle.schema.ids.base.MaintainerID maintainerID_;
+    private com.assetmantle.modules.maintainers.key.Key key_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.MaintainerID, com.assetmantle.schema.ids.base.MaintainerID.Builder, com.assetmantle.schema.ids.base.MaintainerIDOrBuilder> maintainerIDBuilder_;
+        com.assetmantle.modules.maintainers.key.Key, com.assetmantle.modules.maintainers.key.Key.Builder, com.assetmantle.modules.maintainers.key.KeyOrBuilder> keyBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
-     * @return Whether the maintainerID field is set.
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
+     * @return Whether the key field is set.
      */
-    public boolean hasMaintainerID() {
+    public boolean hasKey() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
-     * @return The maintainerID.
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
+     * @return The key.
      */
-    public com.assetmantle.schema.ids.base.MaintainerID getMaintainerID() {
-      if (maintainerIDBuilder_ == null) {
-        return maintainerID_ == null ? com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance() : maintainerID_;
+    public com.assetmantle.modules.maintainers.key.Key getKey() {
+      if (keyBuilder_ == null) {
+        return key_ == null ? com.assetmantle.modules.maintainers.key.Key.getDefaultInstance() : key_;
       } else {
-        return maintainerIDBuilder_.getMessage();
+        return keyBuilder_.getMessage();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setMaintainerID(com.assetmantle.schema.ids.base.MaintainerID value) {
-      if (maintainerIDBuilder_ == null) {
+    public Builder setKey(com.assetmantle.modules.maintainers.key.Key value) {
+      if (keyBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        maintainerID_ = value;
+        key_ = value;
       } else {
-        maintainerIDBuilder_.setMessage(value);
+        keyBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setMaintainerID(
-        com.assetmantle.schema.ids.base.MaintainerID.Builder builderForValue) {
-      if (maintainerIDBuilder_ == null) {
-        maintainerID_ = builderForValue.build();
+    public Builder setKey(
+        com.assetmantle.modules.maintainers.key.Key.Builder builderForValue) {
+      if (keyBuilder_ == null) {
+        key_ = builderForValue.build();
       } else {
-        maintainerIDBuilder_.setMessage(builderForValue.build());
+        keyBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder mergeMaintainerID(com.assetmantle.schema.ids.base.MaintainerID value) {
-      if (maintainerIDBuilder_ == null) {
+    public Builder mergeKey(com.assetmantle.modules.maintainers.key.Key value) {
+      if (keyBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0) &&
-          maintainerID_ != null &&
-          maintainerID_ != com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance()) {
-          getMaintainerIDBuilder().mergeFrom(value);
+          key_ != null &&
+          key_ != com.assetmantle.modules.maintainers.key.Key.getDefaultInstance()) {
+          getKeyBuilder().mergeFrom(value);
         } else {
-          maintainerID_ = value;
+          key_ = value;
         }
       } else {
-        maintainerIDBuilder_.mergeFrom(value);
+        keyBuilder_.mergeFrom(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder clearMaintainerID() {
+    public Builder clearKey() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      maintainerID_ = null;
-      if (maintainerIDBuilder_ != null) {
-        maintainerIDBuilder_.dispose();
-        maintainerIDBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.assetmantle.schema.ids.base.MaintainerID.Builder getMaintainerIDBuilder() {
+    public com.assetmantle.modules.maintainers.key.Key.Builder getKeyBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return getMaintainerIDFieldBuilder().getBuilder();
+      return getKeyFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.assetmantle.schema.ids.base.MaintainerIDOrBuilder getMaintainerIDOrBuilder() {
-      if (maintainerIDBuilder_ != null) {
-        return maintainerIDBuilder_.getMessageOrBuilder();
+    public com.assetmantle.modules.maintainers.key.KeyOrBuilder getKeyOrBuilder() {
+      if (keyBuilder_ != null) {
+        return keyBuilder_.getMessageOrBuilder();
       } else {
-        return maintainerID_ == null ?
-            com.assetmantle.schema.ids.base.MaintainerID.getDefaultInstance() : maintainerID_;
+        return key_ == null ?
+            com.assetmantle.modules.maintainers.key.Key.getDefaultInstance() : key_;
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.MaintainerID, com.assetmantle.schema.ids.base.MaintainerID.Builder, com.assetmantle.schema.ids.base.MaintainerIDOrBuilder> 
-        getMaintainerIDFieldBuilder() {
-      if (maintainerIDBuilder_ == null) {
-        maintainerIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.assetmantle.schema.ids.base.MaintainerID, com.assetmantle.schema.ids.base.MaintainerID.Builder, com.assetmantle.schema.ids.base.MaintainerIDOrBuilder>(
-                getMaintainerID(),
+        com.assetmantle.modules.maintainers.key.Key, com.assetmantle.modules.maintainers.key.Key.Builder, com.assetmantle.modules.maintainers.key.KeyOrBuilder> 
+        getKeyFieldBuilder() {
+      if (keyBuilder_ == null) {
+        keyBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.modules.maintainers.key.Key, com.assetmantle.modules.maintainers.key.Key.Builder, com.assetmantle.modules.maintainers.key.KeyOrBuilder>(
+                getKey(),
                 getParentForChildren(),
                 isClean());
-        maintainerID_ = null;
+        key_ = null;
       }
-      return maintainerIDBuilder_;
+      return keyBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

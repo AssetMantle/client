@@ -52,13 +52,12 @@ public final class AuthzProto {
       "ION_TYPE_UNSPECIFIED\020\000\022\037\n\033AUTHORIZATION_" +
       "TYPE_DELEGATE\020\001\022!\n\035AUTHORIZATION_TYPE_UN" +
       "DELEGATE\020\002\022!\n\035AUTHORIZATION_TYPE_REDELEG" +
-      "ATE\020\003B\350\001\n\032com.cosmos.staking.v1beta1B\nAu" +
-      "thzProtoP\001ZDgithub.com/AssetMantle/modul" +
-      "es/cosmos/staking/v1beta1;stakingv1beta1" +
-      "\242\002\003CSX\252\002\026Cosmos.Staking.V1beta1\312\002\026Cosmos" +
-      "\\Staking\\V1beta1\342\002\"Cosmos\\Staking\\V1beta" +
-      "1\\GPBMetadata\352\002\030Cosmos::Staking::V1beta1" +
-      "b\006proto3"
+      "ATE\020\003B\320\001\n\032com.cosmos.staking.v1beta1B\nAu" +
+      "thzProtoP\001Z,github.com/cosmos/cosmos-sdk" +
+      "/x/staking/types\242\002\003CSX\252\002\026Cosmos.Staking." +
+      "V1beta1\312\002\026Cosmos\\Staking\\V1beta1\342\002\"Cosmo" +
+      "s\\Staking\\V1beta1\\GPBMetadata\352\002\030Cosmos::" +
+      "Staking::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

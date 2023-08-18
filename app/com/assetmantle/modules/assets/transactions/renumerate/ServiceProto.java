@@ -28,22 +28,22 @@ public final class ServiceProto {
       "actions.renumerate\032\034google/api/annotatio" +
       "ns.proto\032,assets/transactions/renumerate" +
       "/message.proto\0329assets/transactions/renu" +
-      "merate/transaction_response.proto2\275\001\n\007Se" +
-      "rvice\022\261\001\n\006Handle\022;.assetmantle.modules.a" +
-      "ssets.transactions.renumerate.Message\032G." +
-      "assetmantle.modules.assets.transactions." +
-      "renumerate.TransactionResponse\"!\202\323\344\223\002\033\"\031" +
-      "/mantle/assets/renumerateB\365\002\n6com.assetm" +
-      "antle.modules.assets.transactions.renume" +
-      "rateB\014ServiceProtoP\001Z?github.com/AssetMa" +
-      "ntle/modules/x/assets/transactions/renum" +
-      "erate\242\002\005AMATR\252\0022Assetmantle.Modules.Asse" +
-      "ts.Transactions.Renumerate\312\0022Assetmantle" +
-      "\\Modules\\Assets\\Transactions\\Renumerate\342" +
-      "\002>Assetmantle\\Modules\\Assets\\Transaction" +
-      "s\\Renumerate\\GPBMetadata\352\0026Assetmantle::" +
-      "Modules::Assets::Transactions::Renumerat" +
-      "eb\006proto3"
+      "merate/transaction_response.proto2\271\001\n\003Ms" +
+      "g\022\261\001\n\006Handle\022;.assetmantle.modules.asset" +
+      "s.transactions.renumerate.Message\032G.asse" +
+      "tmantle.modules.assets.transactions.renu" +
+      "merate.TransactionResponse\"!\202\323\344\223\002\033\"\031/man" +
+      "tle/assets/renumerateB\365\002\n6com.assetmantl" +
+      "e.modules.assets.transactions.renumerate" +
+      "B\014ServiceProtoP\001Z?github.com/AssetMantle" +
+      "/modules/x/assets/transactions/renumerat" +
+      "e\242\002\005AMATR\252\0022Assetmantle.Modules.Assets.T" +
+      "ransactions.Renumerate\312\0022Assetmantle\\Mod" +
+      "ules\\Assets\\Transactions\\Renumerate\342\002>As" +
+      "setmantle\\Modules\\Assets\\Transactions\\Re" +
+      "numerate\\GPBMetadata\352\0026Assetmantle::Modu" +
+      "les::Assets::Transactions::Renumerateb\006p" +
+      "roto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

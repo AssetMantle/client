@@ -38,30 +38,30 @@ private static final long serialVersionUID = 0L;
             com.assetmantle.modules.classifications.queries.classification.QueryRequest.class, com.assetmantle.modules.classifications.queries.classification.QueryRequest.Builder.class);
   }
 
-  public static final int CLASSIFICATION_I_D_FIELD_NUMBER = 1;
-  private com.assetmantle.schema.ids.base.ClassificationID classificationID_;
+  public static final int KEY_FIELD_NUMBER = 1;
+  private com.assetmantle.modules.classifications.key.Key key_;
   /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
-   * @return Whether the classificationID field is set.
+   * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
+   * @return Whether the key field is set.
    */
   @java.lang.Override
-  public boolean hasClassificationID() {
-    return classificationID_ != null;
+  public boolean hasKey() {
+    return key_ != null;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
-   * @return The classificationID.
+   * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.ClassificationID getClassificationID() {
-    return classificationID_ == null ? com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance() : classificationID_;
+  public com.assetmantle.modules.classifications.key.Key getKey() {
+    return key_ == null ? com.assetmantle.modules.classifications.key.Key.getDefaultInstance() : key_;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+   * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.ClassificationIDOrBuilder getClassificationIDOrBuilder() {
-    return classificationID_ == null ? com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance() : classificationID_;
+  public com.assetmantle.modules.classifications.key.KeyOrBuilder getKeyOrBuilder() {
+    return key_ == null ? com.assetmantle.modules.classifications.key.Key.getDefaultInstance() : key_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -78,8 +78,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (classificationID_ != null) {
-      output.writeMessage(1, getClassificationID());
+    if (key_ != null) {
+      output.writeMessage(1, getKey());
     }
     getUnknownFields().writeTo(output);
   }
@@ -90,9 +90,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (classificationID_ != null) {
+    if (key_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getClassificationID());
+        .computeMessageSize(1, getKey());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -109,10 +109,10 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.modules.classifications.queries.classification.QueryRequest other = (com.assetmantle.modules.classifications.queries.classification.QueryRequest) obj;
 
-    if (hasClassificationID() != other.hasClassificationID()) return false;
-    if (hasClassificationID()) {
-      if (!getClassificationID()
-          .equals(other.getClassificationID())) return false;
+    if (hasKey() != other.hasKey()) return false;
+    if (hasKey()) {
+      if (!getKey()
+          .equals(other.getKey())) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -125,9 +125,9 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasClassificationID()) {
-      hash = (37 * hash) + CLASSIFICATION_I_D_FIELD_NUMBER;
-      hash = (53 * hash) + getClassificationID().hashCode();
+    if (hasKey()) {
+      hash = (37 * hash) + KEY_FIELD_NUMBER;
+      hash = (53 * hash) + getKey().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -258,10 +258,10 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      classificationID_ = null;
-      if (classificationIDBuilder_ != null) {
-        classificationIDBuilder_.dispose();
-        classificationIDBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
       return this;
     }
@@ -297,9 +297,9 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(com.assetmantle.modules.classifications.queries.classification.QueryRequest result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.classificationID_ = classificationIDBuilder_ == null
-            ? classificationID_
-            : classificationIDBuilder_.build();
+        result.key_ = keyBuilder_ == null
+            ? key_
+            : keyBuilder_.build();
       }
     }
 
@@ -347,8 +347,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.modules.classifications.queries.classification.QueryRequest other) {
       if (other == com.assetmantle.modules.classifications.queries.classification.QueryRequest.getDefaultInstance()) return this;
-      if (other.hasClassificationID()) {
-        mergeClassificationID(other.getClassificationID());
+      if (other.hasKey()) {
+        mergeKey(other.getKey());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -378,7 +378,7 @@ private static final long serialVersionUID = 0L;
               break;
             case 10: {
               input.readMessage(
-                  getClassificationIDFieldBuilder().getBuilder(),
+                  getKeyFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
@@ -400,123 +400,123 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private com.assetmantle.schema.ids.base.ClassificationID classificationID_;
+    private com.assetmantle.modules.classifications.key.Key key_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.ClassificationID, com.assetmantle.schema.ids.base.ClassificationID.Builder, com.assetmantle.schema.ids.base.ClassificationIDOrBuilder> classificationIDBuilder_;
+        com.assetmantle.modules.classifications.key.Key, com.assetmantle.modules.classifications.key.Key.Builder, com.assetmantle.modules.classifications.key.KeyOrBuilder> keyBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
-     * @return Whether the classificationID field is set.
+     * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
+     * @return Whether the key field is set.
      */
-    public boolean hasClassificationID() {
+    public boolean hasKey() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
-     * @return The classificationID.
+     * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
+     * @return The key.
      */
-    public com.assetmantle.schema.ids.base.ClassificationID getClassificationID() {
-      if (classificationIDBuilder_ == null) {
-        return classificationID_ == null ? com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance() : classificationID_;
+    public com.assetmantle.modules.classifications.key.Key getKey() {
+      if (keyBuilder_ == null) {
+        return key_ == null ? com.assetmantle.modules.classifications.key.Key.getDefaultInstance() : key_;
       } else {
-        return classificationIDBuilder_.getMessage();
+        return keyBuilder_.getMessage();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setClassificationID(com.assetmantle.schema.ids.base.ClassificationID value) {
-      if (classificationIDBuilder_ == null) {
+    public Builder setKey(com.assetmantle.modules.classifications.key.Key value) {
+      if (keyBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        classificationID_ = value;
+        key_ = value;
       } else {
-        classificationIDBuilder_.setMessage(value);
+        keyBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setClassificationID(
-        com.assetmantle.schema.ids.base.ClassificationID.Builder builderForValue) {
-      if (classificationIDBuilder_ == null) {
-        classificationID_ = builderForValue.build();
+    public Builder setKey(
+        com.assetmantle.modules.classifications.key.Key.Builder builderForValue) {
+      if (keyBuilder_ == null) {
+        key_ = builderForValue.build();
       } else {
-        classificationIDBuilder_.setMessage(builderForValue.build());
+        keyBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder mergeClassificationID(com.assetmantle.schema.ids.base.ClassificationID value) {
-      if (classificationIDBuilder_ == null) {
+    public Builder mergeKey(com.assetmantle.modules.classifications.key.Key value) {
+      if (keyBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0) &&
-          classificationID_ != null &&
-          classificationID_ != com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance()) {
-          getClassificationIDBuilder().mergeFrom(value);
+          key_ != null &&
+          key_ != com.assetmantle.modules.classifications.key.Key.getDefaultInstance()) {
+          getKeyBuilder().mergeFrom(value);
         } else {
-          classificationID_ = value;
+          key_ = value;
         }
       } else {
-        classificationIDBuilder_.mergeFrom(value);
+        keyBuilder_.mergeFrom(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder clearClassificationID() {
+    public Builder clearKey() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      classificationID_ = null;
-      if (classificationIDBuilder_ != null) {
-        classificationIDBuilder_.dispose();
-        classificationIDBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.assetmantle.schema.ids.base.ClassificationID.Builder getClassificationIDBuilder() {
+    public com.assetmantle.modules.classifications.key.Key.Builder getKeyBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return getClassificationIDFieldBuilder().getBuilder();
+      return getKeyFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.assetmantle.schema.ids.base.ClassificationIDOrBuilder getClassificationIDOrBuilder() {
-      if (classificationIDBuilder_ != null) {
-        return classificationIDBuilder_.getMessageOrBuilder();
+    public com.assetmantle.modules.classifications.key.KeyOrBuilder getKeyOrBuilder() {
+      if (keyBuilder_ != null) {
+        return keyBuilder_.getMessageOrBuilder();
       } else {
-        return classificationID_ == null ?
-            com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance() : classificationID_;
+        return key_ == null ?
+            com.assetmantle.modules.classifications.key.Key.getDefaultInstance() : key_;
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.ClassificationID, com.assetmantle.schema.ids.base.ClassificationID.Builder, com.assetmantle.schema.ids.base.ClassificationIDOrBuilder> 
-        getClassificationIDFieldBuilder() {
-      if (classificationIDBuilder_ == null) {
-        classificationIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.assetmantle.schema.ids.base.ClassificationID, com.assetmantle.schema.ids.base.ClassificationID.Builder, com.assetmantle.schema.ids.base.ClassificationIDOrBuilder>(
-                getClassificationID(),
+        com.assetmantle.modules.classifications.key.Key, com.assetmantle.modules.classifications.key.Key.Builder, com.assetmantle.modules.classifications.key.KeyOrBuilder> 
+        getKeyFieldBuilder() {
+      if (keyBuilder_ == null) {
+        keyBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.modules.classifications.key.Key, com.assetmantle.modules.classifications.key.Key.Builder, com.assetmantle.modules.classifications.key.KeyOrBuilder>(
+                getKey(),
                 getParentForChildren(),
                 isClean());
-        classificationID_ = null;
+        key_ = null;
       }
-      return classificationIDBuilder_;
+      return keyBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

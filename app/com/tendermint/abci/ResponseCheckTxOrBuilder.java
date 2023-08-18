@@ -106,4 +106,44 @@ public interface ResponseCheckTxOrBuilder extends
    */
   com.google.protobuf.ByteString
       getCodespaceBytes();
+
+  /**
+   * <code>string sender = 9 [json_name = "sender"];</code>
+   * @return The sender.
+   */
+  java.lang.String getSender();
+  /**
+   * <code>string sender = 9 [json_name = "sender"];</code>
+   * @return The bytes for sender.
+   */
+  com.google.protobuf.ByteString
+      getSenderBytes();
+
+  /**
+   * <code>int64 priority = 10 [json_name = "priority"];</code>
+   * @return The priority.
+   */
+  long getPriority();
+
+  /**
+   * <pre>
+   * mempool_error is set by CometBFT.
+   * ABCI applictions creating a ResponseCheckTX should not set mempool_error.
+   * </pre>
+   *
+   * <code>string mempool_error = 11 [json_name = "mempoolError"];</code>
+   * @return The mempoolError.
+   */
+  java.lang.String getMempoolError();
+  /**
+   * <pre>
+   * mempool_error is set by CometBFT.
+   * ABCI applictions creating a ResponseCheckTX should not set mempool_error.
+   * </pre>
+   *
+   * <code>string mempool_error = 11 [json_name = "mempoolError"];</code>
+   * @return The bytes for mempoolError.
+   */
+  com.google.protobuf.ByteString
+      getMempoolErrorBytes();
 }

@@ -222,13 +222,13 @@ public final class QueryProto {
       "olRequest\0327.cosmos.distribution.v1beta1." +
       "QueryCommunityPoolResponse\"3\202\323\344\223\002-\022+/cos" +
       "mos/distribution/v1beta1/community_poolB" +
-      "\213\002\n\037com.cosmos.distribution.v1beta1B\nQue" +
-      "ryProtoP\001ZNgithub.com/AssetMantle/module" +
-      "s/cosmos/distribution/v1beta1;distributi" +
-      "onv1beta1\242\002\003CDX\252\002\033Cosmos.Distribution.V1" +
-      "beta1\312\002\033Cosmos\\Distribution\\V1beta1\342\002\'Co" +
-      "smos\\Distribution\\V1beta1\\GPBMetadata\352\002\035" +
-      "Cosmos::Distribution::V1beta1b\006proto3"
+      "\356\001\n\037com.cosmos.distribution.v1beta1B\nQue" +
+      "ryProtoP\001Z1github.com/cosmos/cosmos-sdk/" +
+      "x/distribution/types\242\002\003CDX\252\002\033Cosmos.Dist" +
+      "ribution.V1beta1\312\002\033Cosmos\\Distribution\\V" +
+      "1beta1\342\002\'Cosmos\\Distribution\\V1beta1\\GPB" +
+      "Metadata\352\002\035Cosmos::Distribution::V1beta1" +
+      "b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

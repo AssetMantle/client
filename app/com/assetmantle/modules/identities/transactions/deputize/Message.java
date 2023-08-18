@@ -182,43 +182,32 @@ private static final long serialVersionUID = 0L;
     return maintainedProperties_ == null ? com.assetmantle.schema.lists.base.PropertyList.getDefaultInstance() : maintainedProperties_;
   }
 
-  public static final int CAN_MINT_ASSET_FIELD_NUMBER = 6;
-  private boolean canMintAsset_ = false;
+  public static final int CAN_ISSUE_IDENTITY_FIELD_NUMBER = 6;
+  private boolean canIssueIdentity_ = false;
   /**
-   * <code>bool can_mint_asset = 6 [json_name = "canMintAsset"];</code>
-   * @return The canMintAsset.
+   * <code>bool can_issue_identity = 6 [json_name = "canIssueIdentity"];</code>
+   * @return The canIssueIdentity.
    */
   @java.lang.Override
-  public boolean getCanMintAsset() {
-    return canMintAsset_;
+  public boolean getCanIssueIdentity() {
+    return canIssueIdentity_;
   }
 
-  public static final int CAN_BURN_ASSET_FIELD_NUMBER = 7;
-  private boolean canBurnAsset_ = false;
+  public static final int CAN_QUASH_IDENTITY_FIELD_NUMBER = 7;
+  private boolean canQuashIdentity_ = false;
   /**
-   * <code>bool can_burn_asset = 7 [json_name = "canBurnAsset"];</code>
-   * @return The canBurnAsset.
+   * <code>bool can_quash_identity = 7 [json_name = "canQuashIdentity"];</code>
+   * @return The canQuashIdentity.
    */
   @java.lang.Override
-  public boolean getCanBurnAsset() {
-    return canBurnAsset_;
+  public boolean getCanQuashIdentity() {
+    return canQuashIdentity_;
   }
 
-  public static final int CAN_RENUMERATE_ASSET_FIELD_NUMBER = 8;
-  private boolean canRenumerateAsset_ = false;
-  /**
-   * <code>bool can_renumerate_asset = 8 [json_name = "canRenumerateAsset"];</code>
-   * @return The canRenumerateAsset.
-   */
-  @java.lang.Override
-  public boolean getCanRenumerateAsset() {
-    return canRenumerateAsset_;
-  }
-
-  public static final int CAN_ADD_MAINTAINER_FIELD_NUMBER = 9;
+  public static final int CAN_ADD_MAINTAINER_FIELD_NUMBER = 8;
   private boolean canAddMaintainer_ = false;
   /**
-   * <code>bool can_add_maintainer = 9 [json_name = "canAddMaintainer"];</code>
+   * <code>bool can_add_maintainer = 8 [json_name = "canAddMaintainer"];</code>
    * @return The canAddMaintainer.
    */
   @java.lang.Override
@@ -226,10 +215,10 @@ private static final long serialVersionUID = 0L;
     return canAddMaintainer_;
   }
 
-  public static final int CAN_REMOVE_MAINTAINER_FIELD_NUMBER = 10;
+  public static final int CAN_REMOVE_MAINTAINER_FIELD_NUMBER = 9;
   private boolean canRemoveMaintainer_ = false;
   /**
-   * <code>bool can_remove_maintainer = 10 [json_name = "canRemoveMaintainer"];</code>
+   * <code>bool can_remove_maintainer = 9 [json_name = "canRemoveMaintainer"];</code>
    * @return The canRemoveMaintainer.
    */
   @java.lang.Override
@@ -237,10 +226,10 @@ private static final long serialVersionUID = 0L;
     return canRemoveMaintainer_;
   }
 
-  public static final int CAN_MUTATE_MAINTAINER_FIELD_NUMBER = 11;
+  public static final int CAN_MUTATE_MAINTAINER_FIELD_NUMBER = 10;
   private boolean canMutateMaintainer_ = false;
   /**
-   * <code>bool can_mutate_maintainer = 11 [json_name = "canMutateMaintainer"];</code>
+   * <code>bool can_mutate_maintainer = 10 [json_name = "canMutateMaintainer"];</code>
    * @return The canMutateMaintainer.
    */
   @java.lang.Override
@@ -277,23 +266,20 @@ private static final long serialVersionUID = 0L;
     if (maintainedProperties_ != null) {
       output.writeMessage(5, getMaintainedProperties());
     }
-    if (canMintAsset_ != false) {
-      output.writeBool(6, canMintAsset_);
+    if (canIssueIdentity_ != false) {
+      output.writeBool(6, canIssueIdentity_);
     }
-    if (canBurnAsset_ != false) {
-      output.writeBool(7, canBurnAsset_);
-    }
-    if (canRenumerateAsset_ != false) {
-      output.writeBool(8, canRenumerateAsset_);
+    if (canQuashIdentity_ != false) {
+      output.writeBool(7, canQuashIdentity_);
     }
     if (canAddMaintainer_ != false) {
-      output.writeBool(9, canAddMaintainer_);
+      output.writeBool(8, canAddMaintainer_);
     }
     if (canRemoveMaintainer_ != false) {
-      output.writeBool(10, canRemoveMaintainer_);
+      output.writeBool(9, canRemoveMaintainer_);
     }
     if (canMutateMaintainer_ != false) {
-      output.writeBool(11, canMutateMaintainer_);
+      output.writeBool(10, canMutateMaintainer_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -323,29 +309,25 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(5, getMaintainedProperties());
     }
-    if (canMintAsset_ != false) {
+    if (canIssueIdentity_ != false) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(6, canMintAsset_);
+        .computeBoolSize(6, canIssueIdentity_);
     }
-    if (canBurnAsset_ != false) {
+    if (canQuashIdentity_ != false) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(7, canBurnAsset_);
-    }
-    if (canRenumerateAsset_ != false) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(8, canRenumerateAsset_);
+        .computeBoolSize(7, canQuashIdentity_);
     }
     if (canAddMaintainer_ != false) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(9, canAddMaintainer_);
+        .computeBoolSize(8, canAddMaintainer_);
     }
     if (canRemoveMaintainer_ != false) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(10, canRemoveMaintainer_);
+        .computeBoolSize(9, canRemoveMaintainer_);
     }
     if (canMutateMaintainer_ != false) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(11, canMutateMaintainer_);
+        .computeBoolSize(10, canMutateMaintainer_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -384,12 +366,10 @@ private static final long serialVersionUID = 0L;
       if (!getMaintainedProperties()
           .equals(other.getMaintainedProperties())) return false;
     }
-    if (getCanMintAsset()
-        != other.getCanMintAsset()) return false;
-    if (getCanBurnAsset()
-        != other.getCanBurnAsset()) return false;
-    if (getCanRenumerateAsset()
-        != other.getCanRenumerateAsset()) return false;
+    if (getCanIssueIdentity()
+        != other.getCanIssueIdentity()) return false;
+    if (getCanQuashIdentity()
+        != other.getCanQuashIdentity()) return false;
     if (getCanAddMaintainer()
         != other.getCanAddMaintainer()) return false;
     if (getCanRemoveMaintainer()
@@ -425,15 +405,12 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + MAINTAINED_PROPERTIES_FIELD_NUMBER;
       hash = (53 * hash) + getMaintainedProperties().hashCode();
     }
-    hash = (37 * hash) + CAN_MINT_ASSET_FIELD_NUMBER;
+    hash = (37 * hash) + CAN_ISSUE_IDENTITY_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getCanMintAsset());
-    hash = (37 * hash) + CAN_BURN_ASSET_FIELD_NUMBER;
+        getCanIssueIdentity());
+    hash = (37 * hash) + CAN_QUASH_IDENTITY_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getCanBurnAsset());
-    hash = (37 * hash) + CAN_RENUMERATE_ASSET_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getCanRenumerateAsset());
+        getCanQuashIdentity());
     hash = (37 * hash) + CAN_ADD_MAINTAINER_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getCanAddMaintainer());
@@ -593,9 +570,8 @@ private static final long serialVersionUID = 0L;
         maintainedPropertiesBuilder_.dispose();
         maintainedPropertiesBuilder_ = null;
       }
-      canMintAsset_ = false;
-      canBurnAsset_ = false;
-      canRenumerateAsset_ = false;
+      canIssueIdentity_ = false;
+      canQuashIdentity_ = false;
       canAddMaintainer_ = false;
       canRemoveMaintainer_ = false;
       canMutateMaintainer_ = false;
@@ -656,21 +632,18 @@ private static final long serialVersionUID = 0L;
             : maintainedPropertiesBuilder_.build();
       }
       if (((from_bitField0_ & 0x00000020) != 0)) {
-        result.canMintAsset_ = canMintAsset_;
+        result.canIssueIdentity_ = canIssueIdentity_;
       }
       if (((from_bitField0_ & 0x00000040) != 0)) {
-        result.canBurnAsset_ = canBurnAsset_;
+        result.canQuashIdentity_ = canQuashIdentity_;
       }
       if (((from_bitField0_ & 0x00000080) != 0)) {
-        result.canRenumerateAsset_ = canRenumerateAsset_;
-      }
-      if (((from_bitField0_ & 0x00000100) != 0)) {
         result.canAddMaintainer_ = canAddMaintainer_;
       }
-      if (((from_bitField0_ & 0x00000200) != 0)) {
+      if (((from_bitField0_ & 0x00000100) != 0)) {
         result.canRemoveMaintainer_ = canRemoveMaintainer_;
       }
-      if (((from_bitField0_ & 0x00000400) != 0)) {
+      if (((from_bitField0_ & 0x00000200) != 0)) {
         result.canMutateMaintainer_ = canMutateMaintainer_;
       }
     }
@@ -736,14 +709,11 @@ private static final long serialVersionUID = 0L;
       if (other.hasMaintainedProperties()) {
         mergeMaintainedProperties(other.getMaintainedProperties());
       }
-      if (other.getCanMintAsset() != false) {
-        setCanMintAsset(other.getCanMintAsset());
+      if (other.getCanIssueIdentity() != false) {
+        setCanIssueIdentity(other.getCanIssueIdentity());
       }
-      if (other.getCanBurnAsset() != false) {
-        setCanBurnAsset(other.getCanBurnAsset());
-      }
-      if (other.getCanRenumerateAsset() != false) {
-        setCanRenumerateAsset(other.getCanRenumerateAsset());
+      if (other.getCanQuashIdentity() != false) {
+        setCanQuashIdentity(other.getCanQuashIdentity());
       }
       if (other.getCanAddMaintainer() != false) {
         setCanAddMaintainer(other.getCanAddMaintainer());
@@ -814,35 +784,30 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 42
             case 48: {
-              canMintAsset_ = input.readBool();
+              canIssueIdentity_ = input.readBool();
               bitField0_ |= 0x00000020;
               break;
             } // case 48
             case 56: {
-              canBurnAsset_ = input.readBool();
+              canQuashIdentity_ = input.readBool();
               bitField0_ |= 0x00000040;
               break;
             } // case 56
             case 64: {
-              canRenumerateAsset_ = input.readBool();
+              canAddMaintainer_ = input.readBool();
               bitField0_ |= 0x00000080;
               break;
             } // case 64
             case 72: {
-              canAddMaintainer_ = input.readBool();
+              canRemoveMaintainer_ = input.readBool();
               bitField0_ |= 0x00000100;
               break;
             } // case 72
             case 80: {
-              canRemoveMaintainer_ = input.readBool();
+              canMutateMaintainer_ = input.readBool();
               bitField0_ |= 0x00000200;
               break;
             } // case 80
-            case 88: {
-              canMutateMaintainer_ = input.readBool();
-              bitField0_ |= 0x00000400;
-              break;
-            } // case 88
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1408,105 +1373,73 @@ private static final long serialVersionUID = 0L;
       return maintainedPropertiesBuilder_;
     }
 
-    private boolean canMintAsset_ ;
+    private boolean canIssueIdentity_ ;
     /**
-     * <code>bool can_mint_asset = 6 [json_name = "canMintAsset"];</code>
-     * @return The canMintAsset.
+     * <code>bool can_issue_identity = 6 [json_name = "canIssueIdentity"];</code>
+     * @return The canIssueIdentity.
      */
     @java.lang.Override
-    public boolean getCanMintAsset() {
-      return canMintAsset_;
+    public boolean getCanIssueIdentity() {
+      return canIssueIdentity_;
     }
     /**
-     * <code>bool can_mint_asset = 6 [json_name = "canMintAsset"];</code>
-     * @param value The canMintAsset to set.
+     * <code>bool can_issue_identity = 6 [json_name = "canIssueIdentity"];</code>
+     * @param value The canIssueIdentity to set.
      * @return This builder for chaining.
      */
-    public Builder setCanMintAsset(boolean value) {
+    public Builder setCanIssueIdentity(boolean value) {
 
-      canMintAsset_ = value;
+      canIssueIdentity_ = value;
       bitField0_ |= 0x00000020;
       onChanged();
       return this;
     }
     /**
-     * <code>bool can_mint_asset = 6 [json_name = "canMintAsset"];</code>
+     * <code>bool can_issue_identity = 6 [json_name = "canIssueIdentity"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearCanMintAsset() {
+    public Builder clearCanIssueIdentity() {
       bitField0_ = (bitField0_ & ~0x00000020);
-      canMintAsset_ = false;
+      canIssueIdentity_ = false;
       onChanged();
       return this;
     }
 
-    private boolean canBurnAsset_ ;
+    private boolean canQuashIdentity_ ;
     /**
-     * <code>bool can_burn_asset = 7 [json_name = "canBurnAsset"];</code>
-     * @return The canBurnAsset.
+     * <code>bool can_quash_identity = 7 [json_name = "canQuashIdentity"];</code>
+     * @return The canQuashIdentity.
      */
     @java.lang.Override
-    public boolean getCanBurnAsset() {
-      return canBurnAsset_;
+    public boolean getCanQuashIdentity() {
+      return canQuashIdentity_;
     }
     /**
-     * <code>bool can_burn_asset = 7 [json_name = "canBurnAsset"];</code>
-     * @param value The canBurnAsset to set.
+     * <code>bool can_quash_identity = 7 [json_name = "canQuashIdentity"];</code>
+     * @param value The canQuashIdentity to set.
      * @return This builder for chaining.
      */
-    public Builder setCanBurnAsset(boolean value) {
+    public Builder setCanQuashIdentity(boolean value) {
 
-      canBurnAsset_ = value;
+      canQuashIdentity_ = value;
       bitField0_ |= 0x00000040;
       onChanged();
       return this;
     }
     /**
-     * <code>bool can_burn_asset = 7 [json_name = "canBurnAsset"];</code>
+     * <code>bool can_quash_identity = 7 [json_name = "canQuashIdentity"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearCanBurnAsset() {
+    public Builder clearCanQuashIdentity() {
       bitField0_ = (bitField0_ & ~0x00000040);
-      canBurnAsset_ = false;
-      onChanged();
-      return this;
-    }
-
-    private boolean canRenumerateAsset_ ;
-    /**
-     * <code>bool can_renumerate_asset = 8 [json_name = "canRenumerateAsset"];</code>
-     * @return The canRenumerateAsset.
-     */
-    @java.lang.Override
-    public boolean getCanRenumerateAsset() {
-      return canRenumerateAsset_;
-    }
-    /**
-     * <code>bool can_renumerate_asset = 8 [json_name = "canRenumerateAsset"];</code>
-     * @param value The canRenumerateAsset to set.
-     * @return This builder for chaining.
-     */
-    public Builder setCanRenumerateAsset(boolean value) {
-
-      canRenumerateAsset_ = value;
-      bitField0_ |= 0x00000080;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>bool can_renumerate_asset = 8 [json_name = "canRenumerateAsset"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearCanRenumerateAsset() {
-      bitField0_ = (bitField0_ & ~0x00000080);
-      canRenumerateAsset_ = false;
+      canQuashIdentity_ = false;
       onChanged();
       return this;
     }
 
     private boolean canAddMaintainer_ ;
     /**
-     * <code>bool can_add_maintainer = 9 [json_name = "canAddMaintainer"];</code>
+     * <code>bool can_add_maintainer = 8 [json_name = "canAddMaintainer"];</code>
      * @return The canAddMaintainer.
      */
     @java.lang.Override
@@ -1514,23 +1447,23 @@ private static final long serialVersionUID = 0L;
       return canAddMaintainer_;
     }
     /**
-     * <code>bool can_add_maintainer = 9 [json_name = "canAddMaintainer"];</code>
+     * <code>bool can_add_maintainer = 8 [json_name = "canAddMaintainer"];</code>
      * @param value The canAddMaintainer to set.
      * @return This builder for chaining.
      */
     public Builder setCanAddMaintainer(boolean value) {
 
       canAddMaintainer_ = value;
-      bitField0_ |= 0x00000100;
+      bitField0_ |= 0x00000080;
       onChanged();
       return this;
     }
     /**
-     * <code>bool can_add_maintainer = 9 [json_name = "canAddMaintainer"];</code>
+     * <code>bool can_add_maintainer = 8 [json_name = "canAddMaintainer"];</code>
      * @return This builder for chaining.
      */
     public Builder clearCanAddMaintainer() {
-      bitField0_ = (bitField0_ & ~0x00000100);
+      bitField0_ = (bitField0_ & ~0x00000080);
       canAddMaintainer_ = false;
       onChanged();
       return this;
@@ -1538,7 +1471,7 @@ private static final long serialVersionUID = 0L;
 
     private boolean canRemoveMaintainer_ ;
     /**
-     * <code>bool can_remove_maintainer = 10 [json_name = "canRemoveMaintainer"];</code>
+     * <code>bool can_remove_maintainer = 9 [json_name = "canRemoveMaintainer"];</code>
      * @return The canRemoveMaintainer.
      */
     @java.lang.Override
@@ -1546,23 +1479,23 @@ private static final long serialVersionUID = 0L;
       return canRemoveMaintainer_;
     }
     /**
-     * <code>bool can_remove_maintainer = 10 [json_name = "canRemoveMaintainer"];</code>
+     * <code>bool can_remove_maintainer = 9 [json_name = "canRemoveMaintainer"];</code>
      * @param value The canRemoveMaintainer to set.
      * @return This builder for chaining.
      */
     public Builder setCanRemoveMaintainer(boolean value) {
 
       canRemoveMaintainer_ = value;
-      bitField0_ |= 0x00000200;
+      bitField0_ |= 0x00000100;
       onChanged();
       return this;
     }
     /**
-     * <code>bool can_remove_maintainer = 10 [json_name = "canRemoveMaintainer"];</code>
+     * <code>bool can_remove_maintainer = 9 [json_name = "canRemoveMaintainer"];</code>
      * @return This builder for chaining.
      */
     public Builder clearCanRemoveMaintainer() {
-      bitField0_ = (bitField0_ & ~0x00000200);
+      bitField0_ = (bitField0_ & ~0x00000100);
       canRemoveMaintainer_ = false;
       onChanged();
       return this;
@@ -1570,7 +1503,7 @@ private static final long serialVersionUID = 0L;
 
     private boolean canMutateMaintainer_ ;
     /**
-     * <code>bool can_mutate_maintainer = 11 [json_name = "canMutateMaintainer"];</code>
+     * <code>bool can_mutate_maintainer = 10 [json_name = "canMutateMaintainer"];</code>
      * @return The canMutateMaintainer.
      */
     @java.lang.Override
@@ -1578,23 +1511,23 @@ private static final long serialVersionUID = 0L;
       return canMutateMaintainer_;
     }
     /**
-     * <code>bool can_mutate_maintainer = 11 [json_name = "canMutateMaintainer"];</code>
+     * <code>bool can_mutate_maintainer = 10 [json_name = "canMutateMaintainer"];</code>
      * @param value The canMutateMaintainer to set.
      * @return This builder for chaining.
      */
     public Builder setCanMutateMaintainer(boolean value) {
 
       canMutateMaintainer_ = value;
-      bitField0_ |= 0x00000400;
+      bitField0_ |= 0x00000200;
       onChanged();
       return this;
     }
     /**
-     * <code>bool can_mutate_maintainer = 11 [json_name = "canMutateMaintainer"];</code>
+     * <code>bool can_mutate_maintainer = 10 [json_name = "canMutateMaintainer"];</code>
      * @return This builder for chaining.
      */
     public Builder clearCanMutateMaintainer() {
-      bitField0_ = (bitField0_ & ~0x00000400);
+      bitField0_ = (bitField0_ & ~0x00000200);
       canMutateMaintainer_ = false;
       onChanged();
       return this;

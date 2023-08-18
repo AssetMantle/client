@@ -3,8 +3,8 @@ package schema.data.base
 import com.assetmantle.schema.data.base.{AnyData, AnyListableData, IDData => protoIDData}
 import com.assetmantle.schema.ids.base.{AnyID, DataID => protoDataID}
 import schema.data._
-import schema.id.base.{DataID, HashID, StringID}
-import schema.id.{ID, base}
+import schema.id.ID
+import schema.id.base.{HashID, StringID}
 
 case class IDData(value: ID) extends ListableData {
 
@@ -14,7 +14,7 @@ case class IDData(value: ID) extends ListableData {
 
   def getType: StringID = this.value.getType
 
-  def getDataID: DataID = base.DataID(typeID = this.getType, hashID = this.generateHashID)
+  def compare(listableData: ListableData): Int = this.value.compare(listableData.asInstanceOf[ID])
 
   def getBytes: Array[Byte] = this.getID.getBytes
 

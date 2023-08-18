@@ -51,13 +51,13 @@ public final class CommitmentProto {
       "R\tkeyPrefix\"B\n\nMerklePath\022.\n\010key_path\030\001 " +
       "\003(\tB\023\362\336\037\017yaml:\"key_path\"R\007keyPath:\004\230\240\037\000\"" +
       "=\n\013MerkleProof\022.\n\006proofs\030\001 \003(\0132\026.ics23.C" +
-      "ommitmentProofR\006proofsB\354\001\n\032com.ibc.core." +
-      "commitment.v1B\017CommitmentProtoP\001ZBgithub" +
-      ".com/AssetMantle/modules/ibc/core/commit" +
-      "ment/v1;commitmentv1\242\002\003ICC\252\002\026Ibc.Core.Co" +
-      "mmitment.V1\312\002\026Ibc\\Core\\Commitment\\V1\342\002\"I" +
-      "bc\\Core\\Commitment\\V1\\GPBMetadata\352\002\031Ibc:" +
-      ":Core::Commitment::V1b\006proto3"
+      "ommitmentProofR\006proofsB\346\001\n\032com.ibc.core." +
+      "commitment.v1B\017CommitmentProtoP\001Z<github" +
+      ".com/cosmos/ibc-go/v4/modules/core/23-co" +
+      "mmitment/types\242\002\003ICC\252\002\026Ibc.Core.Commitme" +
+      "nt.V1\312\002\026Ibc\\Core\\Commitment\\V1\342\002\"Ibc\\Cor" +
+      "e\\Commitment\\V1\\GPBMetadata\352\002\031Ibc::Core:" +
+      ":Commitment::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

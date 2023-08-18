@@ -134,13 +134,12 @@ public final class ServiceProto {
       "\022\227\001\n\017GetBlockWithTxs\022).cosmos.tx.v1beta1" +
       ".GetBlockWithTxsRequest\032*.cosmos.tx.v1be" +
       "ta1.GetBlockWithTxsResponse\"-\202\323\344\223\002\'\022%/co" +
-      "smos/tx/v1beta1/txs/block/{height}B\313\001\n\025c" +
-      "om.cosmos.tx.v1beta1B\014ServiceProtoP\001Z:gi" +
-      "thub.com/AssetMantle/modules/cosmos/tx/v" +
-      "1beta1;txv1beta1\242\002\003CTX\252\002\021Cosmos.Tx.V1bet" +
-      "a1\312\002\021Cosmos\\Tx\\V1beta1\342\002\035Cosmos\\Tx\\V1bet" +
-      "a1\\GPBMetadata\352\002\023Cosmos::Tx::V1beta1\300\343\036\001" +
-      "b\006proto3"
+      "smos/tx/v1beta1/txs/block/{height}B\266\001\n\025c" +
+      "om.cosmos.tx.v1beta1B\014ServiceProtoP\001Z%gi" +
+      "thub.com/cosmos/cosmos-sdk/types/tx\242\002\003CT" +
+      "X\252\002\021Cosmos.Tx.V1beta1\312\002\021Cosmos\\Tx\\V1beta" +
+      "1\342\002\035Cosmos\\Tx\\V1beta1\\GPBMetadata\352\002\023Cosm" +
+      "os::Tx::V1beta1\300\343\036\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -30,33 +30,33 @@ public final class QueryRequestProto {
     java.lang.String[] descriptorData = {
       "\n3maintainers/queries/maintainers/query_" +
       "request.proto\0223assetmantle.modules.maint" +
-      "ainers.queries.maintainers\032*cosmos/base/" +
-      "query/v1beta1/pagination.proto\"Y\n\014QueryR" +
-      "equest\022I\n\014page_request\030\001 \001(\0132&.cosmos.ba" +
-      "se.query.v1beta1.PageRequestR\013pageReques" +
-      "tB\200\003\n7com.assetmantle.modules.maintainer" +
-      "s.queries.maintainersB\021QueryRequestProto" +
-      "P\001Z@github.com/AssetMantle/modules/x/mai" +
-      "ntainers/queries/maintainers\242\002\005AMMQM\252\0023A" +
-      "ssetmantle.Modules.Maintainers.Queries.M" +
-      "aintainers\312\0023Assetmantle\\Modules\\Maintai" +
-      "ners\\Queries\\Maintainers\342\002?Assetmantle\\M" +
-      "odules\\Maintainers\\Queries\\Maintainers\\G" +
-      "PBMetadata\352\0027Assetmantle::Modules::Maint" +
-      "ainers::Queries::Maintainersb\006proto3"
+      "ainers.queries.maintainers\032\031maintainers/" +
+      "key/key.proto\"`\n\014QueryRequest\022:\n\003key\030\001 \001" +
+      "(\0132(.assetmantle.modules.maintainers.key" +
+      ".KeyR\003key\022\024\n\005limit\030\002 \001(\005R\005limitB\200\003\n7com." +
+      "assetmantle.modules.maintainers.queries." +
+      "maintainersB\021QueryRequestProtoP\001Z@github" +
+      ".com/AssetMantle/modules/x/maintainers/q" +
+      "ueries/maintainers\242\002\005AMMQM\252\0023Assetmantle" +
+      ".Modules.Maintainers.Queries.Maintainers" +
+      "\312\0023Assetmantle\\Modules\\Maintainers\\Queri" +
+      "es\\Maintainers\342\002?Assetmantle\\Modules\\Mai" +
+      "ntainers\\Queries\\Maintainers\\GPBMetadata" +
+      "\352\0027Assetmantle::Modules::Maintainers::Qu" +
+      "eries::Maintainersb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.cosmos.base.query.v1beta1.PaginationProto.getDescriptor(),
+          com.assetmantle.modules.maintainers.key.KeyProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_maintainers_queries_maintainers_QueryRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_maintainers_queries_maintainers_QueryRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_maintainers_queries_maintainers_QueryRequest_descriptor,
-        new java.lang.String[] { "PageRequest", });
-    com.cosmos.base.query.v1beta1.PaginationProto.getDescriptor();
+        new java.lang.String[] { "Key", "Limit", });
+    com.assetmantle.modules.maintainers.key.KeyProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

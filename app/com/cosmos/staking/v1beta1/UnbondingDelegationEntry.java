@@ -191,6 +191,36 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int UNBONDING_ID_FIELD_NUMBER = 5;
+  private long unbondingId_ = 0L;
+  /**
+   * <pre>
+   * Incrementing id that uniquely identifies this entry
+   * </pre>
+   *
+   * <code>uint64 unbonding_id = 5 [json_name = "unbondingId"];</code>
+   * @return The unbondingId.
+   */
+  @java.lang.Override
+  public long getUnbondingId() {
+    return unbondingId_;
+  }
+
+  public static final int UNBONDING_ON_HOLD_REF_COUNT_FIELD_NUMBER = 6;
+  private long unbondingOnHoldRefCount_ = 0L;
+  /**
+   * <pre>
+   * Strictly positive if this entry's unbonding has been stopped by external modules
+   * </pre>
+   *
+   * <code>int64 unbonding_on_hold_ref_count = 6 [json_name = "unbondingOnHoldRefCount"];</code>
+   * @return The unbondingOnHoldRefCount.
+   */
+  @java.lang.Override
+  public long getUnbondingOnHoldRefCount() {
+    return unbondingOnHoldRefCount_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -217,6 +247,12 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(balance_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 4, balance_);
     }
+    if (unbondingId_ != 0L) {
+      output.writeUInt64(5, unbondingId_);
+    }
+    if (unbondingOnHoldRefCount_ != 0L) {
+      output.writeInt64(6, unbondingOnHoldRefCount_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -239,6 +275,14 @@ private static final long serialVersionUID = 0L;
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(balance_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, balance_);
+    }
+    if (unbondingId_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeUInt64Size(5, unbondingId_);
+    }
+    if (unbondingOnHoldRefCount_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt64Size(6, unbondingOnHoldRefCount_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -266,6 +310,10 @@ private static final long serialVersionUID = 0L;
         .equals(other.getInitialBalance())) return false;
     if (!getBalance()
         .equals(other.getBalance())) return false;
+    if (getUnbondingId()
+        != other.getUnbondingId()) return false;
+    if (getUnbondingOnHoldRefCount()
+        != other.getUnbondingOnHoldRefCount()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -288,6 +336,12 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getInitialBalance().hashCode();
     hash = (37 * hash) + BALANCE_FIELD_NUMBER;
     hash = (53 * hash) + getBalance().hashCode();
+    hash = (37 * hash) + UNBONDING_ID_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getUnbondingId());
+    hash = (37 * hash) + UNBONDING_ON_HOLD_REF_COUNT_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getUnbondingOnHoldRefCount());
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -429,6 +483,8 @@ private static final long serialVersionUID = 0L;
       }
       initialBalance_ = "";
       balance_ = "";
+      unbondingId_ = 0L;
+      unbondingOnHoldRefCount_ = 0L;
       return this;
     }
 
@@ -475,6 +531,12 @@ private static final long serialVersionUID = 0L;
       }
       if (((from_bitField0_ & 0x00000008) != 0)) {
         result.balance_ = balance_;
+      }
+      if (((from_bitField0_ & 0x00000010) != 0)) {
+        result.unbondingId_ = unbondingId_;
+      }
+      if (((from_bitField0_ & 0x00000020) != 0)) {
+        result.unbondingOnHoldRefCount_ = unbondingOnHoldRefCount_;
       }
     }
 
@@ -538,6 +600,12 @@ private static final long serialVersionUID = 0L;
         bitField0_ |= 0x00000008;
         onChanged();
       }
+      if (other.getUnbondingId() != 0L) {
+        setUnbondingId(other.getUnbondingId());
+      }
+      if (other.getUnbondingOnHoldRefCount() != 0L) {
+        setUnbondingOnHoldRefCount(other.getUnbondingOnHoldRefCount());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -586,6 +654,16 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000008;
               break;
             } // case 34
+            case 40: {
+              unbondingId_ = input.readUInt64();
+              bitField0_ |= 0x00000010;
+              break;
+            } // case 40
+            case 48: {
+              unbondingOnHoldRefCount_ = input.readInt64();
+              bitField0_ |= 0x00000020;
+              break;
+            } // case 48
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -982,6 +1060,94 @@ private static final long serialVersionUID = 0L;
       checkByteStringIsUtf8(value);
       balance_ = value;
       bitField0_ |= 0x00000008;
+      onChanged();
+      return this;
+    }
+
+    private long unbondingId_ ;
+    /**
+     * <pre>
+     * Incrementing id that uniquely identifies this entry
+     * </pre>
+     *
+     * <code>uint64 unbonding_id = 5 [json_name = "unbondingId"];</code>
+     * @return The unbondingId.
+     */
+    @java.lang.Override
+    public long getUnbondingId() {
+      return unbondingId_;
+    }
+    /**
+     * <pre>
+     * Incrementing id that uniquely identifies this entry
+     * </pre>
+     *
+     * <code>uint64 unbonding_id = 5 [json_name = "unbondingId"];</code>
+     * @param value The unbondingId to set.
+     * @return This builder for chaining.
+     */
+    public Builder setUnbondingId(long value) {
+
+      unbondingId_ = value;
+      bitField0_ |= 0x00000010;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Incrementing id that uniquely identifies this entry
+     * </pre>
+     *
+     * <code>uint64 unbonding_id = 5 [json_name = "unbondingId"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearUnbondingId() {
+      bitField0_ = (bitField0_ & ~0x00000010);
+      unbondingId_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private long unbondingOnHoldRefCount_ ;
+    /**
+     * <pre>
+     * Strictly positive if this entry's unbonding has been stopped by external modules
+     * </pre>
+     *
+     * <code>int64 unbonding_on_hold_ref_count = 6 [json_name = "unbondingOnHoldRefCount"];</code>
+     * @return The unbondingOnHoldRefCount.
+     */
+    @java.lang.Override
+    public long getUnbondingOnHoldRefCount() {
+      return unbondingOnHoldRefCount_;
+    }
+    /**
+     * <pre>
+     * Strictly positive if this entry's unbonding has been stopped by external modules
+     * </pre>
+     *
+     * <code>int64 unbonding_on_hold_ref_count = 6 [json_name = "unbondingOnHoldRefCount"];</code>
+     * @param value The unbondingOnHoldRefCount to set.
+     * @return This builder for chaining.
+     */
+    public Builder setUnbondingOnHoldRefCount(long value) {
+
+      unbondingOnHoldRefCount_ = value;
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * Strictly positive if this entry's unbonding has been stopped by external modules
+     * </pre>
+     *
+     * <code>int64 unbonding_on_hold_ref_count = 6 [json_name = "unbondingOnHoldRefCount"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearUnbondingOnHoldRefCount() {
+      bitField0_ = (bitField0_ & ~0x00000020);
+      unbondingOnHoldRefCount_ = 0L;
       onChanged();
       return this;
     }

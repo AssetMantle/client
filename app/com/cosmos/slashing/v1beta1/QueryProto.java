@@ -84,13 +84,13 @@ public final class QueryProto {
       "cosmos.slashing.v1beta1.QuerySigningInfo" +
       "sRequest\0322.cosmos.slashing.v1beta1.Query" +
       "SigningInfosResponse\".\202\323\344\223\002(\022&/cosmos/sl" +
-      "ashing/v1beta1/signing_infosB\357\001\n\033com.cos" +
-      "mos.slashing.v1beta1B\nQueryProtoP\001ZFgith" +
-      "ub.com/AssetMantle/modules/cosmos/slashi" +
-      "ng/v1beta1;slashingv1beta1\242\002\003CSX\252\002\027Cosmo" +
-      "s.Slashing.V1beta1\312\002\027Cosmos\\Slashing\\V1b" +
-      "eta1\342\002#Cosmos\\Slashing\\V1beta1\\GPBMetada" +
-      "ta\352\002\031Cosmos::Slashing::V1beta1b\006proto3"
+      "ashing/v1beta1/signing_infosB\326\001\n\033com.cos" +
+      "mos.slashing.v1beta1B\nQueryProtoP\001Z-gith" +
+      "ub.com/cosmos/cosmos-sdk/x/slashing/type" +
+      "s\242\002\003CSX\252\002\027Cosmos.Slashing.V1beta1\312\002\027Cosm" +
+      "os\\Slashing\\V1beta1\342\002#Cosmos\\Slashing\\V1" +
+      "beta1\\GPBMetadata\352\002\031Cosmos::Slashing::V1" +
+      "beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

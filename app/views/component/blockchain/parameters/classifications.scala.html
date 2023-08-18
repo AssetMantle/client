@@ -1,5 +1,6 @@
 @import views.html.base.cards._
 @import models.common.Parameters.ClassificationParameter
+@import views.html.base.commonIcon
 
 @(classificationParameter: ClassificationParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -10,8 +11,22 @@
         <tr>
             <td>
                 <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.DEFINE_ENABLED):</div>
+                    <div class="tableFieldValue">
+                    @if(classificationParameter.defineEnabled) {
+                        <span class="statusCheck">@commonIcon("check")</span>
+                    } else {
+                        <span class="statusClose">@commonIcon("close")</span>
+                    }
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
                     <div class="tableFieldTitle">@Messages(constants.View.BOND_RATE):</div>
-                    <div class="tableFieldValue">@classificationParameter.bondRate<div>
+                    <div class="tableFieldValue">
+                    @classificationParameter.bondRate
+                    </div>
                 </div>
             </td>
             <td>

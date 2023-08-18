@@ -16,7 +16,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private TransactionResponse() {
-    assetID_ = "";
   }
 
   @java.lang.Override
@@ -40,42 +39,29 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int ASSET_I_D_FIELD_NUMBER = 1;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object assetID_ = "";
+  private com.assetmantle.schema.ids.base.AssetID assetID_;
   /**
-   * <code>string asset_i_d = 1 [json_name = "assetID"];</code>
+   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+   * @return Whether the assetID field is set.
+   */
+  @java.lang.Override
+  public boolean hasAssetID() {
+    return assetID_ != null;
+  }
+  /**
+   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
    * @return The assetID.
    */
   @java.lang.Override
-  public java.lang.String getAssetID() {
-    java.lang.Object ref = assetID_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      assetID_ = s;
-      return s;
-    }
+  public com.assetmantle.schema.ids.base.AssetID getAssetID() {
+    return assetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
   }
   /**
-   * <code>string asset_i_d = 1 [json_name = "assetID"];</code>
-   * @return The bytes for assetID.
+   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
-      getAssetIDBytes() {
-    java.lang.Object ref = assetID_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      assetID_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public com.assetmantle.schema.ids.base.AssetIDOrBuilder getAssetIDOrBuilder() {
+    return assetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -92,8 +78,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(assetID_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, assetID_);
+    if (assetID_ != null) {
+      output.writeMessage(1, getAssetID());
     }
     getUnknownFields().writeTo(output);
   }
@@ -104,8 +90,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(assetID_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, assetID_);
+    if (assetID_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(1, getAssetID());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -122,8 +109,11 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.modules.assets.transactions.mint.TransactionResponse other = (com.assetmantle.modules.assets.transactions.mint.TransactionResponse) obj;
 
-    if (!getAssetID()
-        .equals(other.getAssetID())) return false;
+    if (hasAssetID() != other.hasAssetID()) return false;
+    if (hasAssetID()) {
+      if (!getAssetID()
+          .equals(other.getAssetID())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -135,8 +125,10 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + ASSET_I_D_FIELD_NUMBER;
-    hash = (53 * hash) + getAssetID().hashCode();
+    if (hasAssetID()) {
+      hash = (37 * hash) + ASSET_I_D_FIELD_NUMBER;
+      hash = (53 * hash) + getAssetID().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -266,7 +258,11 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      assetID_ = "";
+      assetID_ = null;
+      if (assetIDBuilder_ != null) {
+        assetIDBuilder_.dispose();
+        assetIDBuilder_ = null;
+      }
       return this;
     }
 
@@ -301,7 +297,9 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(com.assetmantle.modules.assets.transactions.mint.TransactionResponse result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.assetID_ = assetID_;
+        result.assetID_ = assetIDBuilder_ == null
+            ? assetID_
+            : assetIDBuilder_.build();
       }
     }
 
@@ -349,10 +347,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.modules.assets.transactions.mint.TransactionResponse other) {
       if (other == com.assetmantle.modules.assets.transactions.mint.TransactionResponse.getDefaultInstance()) return this;
-      if (!other.getAssetID().isEmpty()) {
-        assetID_ = other.assetID_;
-        bitField0_ |= 0x00000001;
-        onChanged();
+      if (other.hasAssetID()) {
+        mergeAssetID(other.getAssetID());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -381,7 +377,9 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 10: {
-              assetID_ = input.readStringRequireUtf8();
+              input.readMessage(
+                  getAssetIDFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
             } // case 10
@@ -402,76 +400,123 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.lang.Object assetID_ = "";
+    private com.assetmantle.schema.ids.base.AssetID assetID_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder> assetIDBuilder_;
     /**
-     * <code>string asset_i_d = 1 [json_name = "assetID"];</code>
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     * @return Whether the assetID field is set.
+     */
+    public boolean hasAssetID() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
      * @return The assetID.
      */
-    public java.lang.String getAssetID() {
-      java.lang.Object ref = assetID_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        assetID_ = s;
-        return s;
+    public com.assetmantle.schema.ids.base.AssetID getAssetID() {
+      if (assetIDBuilder_ == null) {
+        return assetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
       } else {
-        return (java.lang.String) ref;
+        return assetIDBuilder_.getMessage();
       }
     }
     /**
-     * <code>string asset_i_d = 1 [json_name = "assetID"];</code>
-     * @return The bytes for assetID.
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
      */
-    public com.google.protobuf.ByteString
-        getAssetIDBytes() {
-      java.lang.Object ref = assetID_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        assetID_ = b;
-        return b;
+    public Builder setAssetID(com.assetmantle.schema.ids.base.AssetID value) {
+      if (assetIDBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        assetID_ = value;
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        assetIDBuilder_.setMessage(value);
       }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
     }
     /**
-     * <code>string asset_i_d = 1 [json_name = "assetID"];</code>
-     * @param value The assetID to set.
-     * @return This builder for chaining.
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
      */
     public Builder setAssetID(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      assetID_ = value;
+        com.assetmantle.schema.ids.base.AssetID.Builder builderForValue) {
+      if (assetIDBuilder_ == null) {
+        assetID_ = builderForValue.build();
+      } else {
+        assetIDBuilder_.setMessage(builderForValue.build());
+      }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>string asset_i_d = 1 [json_name = "assetID"];</code>
-     * @return This builder for chaining.
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     */
+    public Builder mergeAssetID(com.assetmantle.schema.ids.base.AssetID value) {
+      if (assetIDBuilder_ == null) {
+        if (((bitField0_ & 0x00000001) != 0) &&
+          assetID_ != null &&
+          assetID_ != com.assetmantle.schema.ids.base.AssetID.getDefaultInstance()) {
+          getAssetIDBuilder().mergeFrom(value);
+        } else {
+          assetID_ = value;
+        }
+      } else {
+        assetIDBuilder_.mergeFrom(value);
+      }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
      */
     public Builder clearAssetID() {
-      assetID_ = getDefaultInstance().getAssetID();
       bitField0_ = (bitField0_ & ~0x00000001);
+      assetID_ = null;
+      if (assetIDBuilder_ != null) {
+        assetIDBuilder_.dispose();
+        assetIDBuilder_ = null;
+      }
       onChanged();
       return this;
     }
     /**
-     * <code>string asset_i_d = 1 [json_name = "assetID"];</code>
-     * @param value The bytes for assetID to set.
-     * @return This builder for chaining.
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
      */
-    public Builder setAssetIDBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      assetID_ = value;
+    public com.assetmantle.schema.ids.base.AssetID.Builder getAssetIDBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return this;
+      return getAssetIDFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     */
+    public com.assetmantle.schema.ids.base.AssetIDOrBuilder getAssetIDOrBuilder() {
+      if (assetIDBuilder_ != null) {
+        return assetIDBuilder_.getMessageOrBuilder();
+      } else {
+        return assetID_ == null ?
+            com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
+      }
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder> 
+        getAssetIDFieldBuilder() {
+      if (assetIDBuilder_ == null) {
+        assetIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder>(
+                getAssetID(),
+                getParentForChildren(),
+                isClean());
+        assetID_ = null;
+      }
+      return assetIDBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

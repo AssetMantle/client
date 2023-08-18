@@ -8,17 +8,17 @@ public interface QueryRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
-   * @return Whether the classificationID field is set.
+   * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
+   * @return Whether the key field is set.
    */
-  boolean hasClassificationID();
+  boolean hasKey();
   /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
-   * @return The classificationID.
+   * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
-  com.assetmantle.schema.ids.base.ClassificationID getClassificationID();
+  com.assetmantle.modules.classifications.key.Key getKey();
   /**
-   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+   * <code>.assetmantle.modules.classifications.key.Key key = 1 [json_name = "key"];</code>
    */
-  com.assetmantle.schema.ids.base.ClassificationIDOrBuilder getClassificationIDOrBuilder();
+  com.assetmantle.modules.classifications.key.KeyOrBuilder getKeyOrBuilder();
 }

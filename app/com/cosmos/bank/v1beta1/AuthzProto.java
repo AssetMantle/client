@@ -35,12 +35,12 @@ public final class AuthzProto {
       "\013spend_limit\030\001 \003(\0132\031.cosmos.base.v1beta1" +
       ".CoinB0\310\336\037\000\252\337\037(github.com/cosmos/cosmos-" +
       "sdk/types.CoinsR\nspendLimit:\021\322\264-\rAuthori" +
-      "zationB\323\001\n\027com.cosmos.bank.v1beta1B\nAuth" +
-      "zProtoP\001Z>github.com/AssetMantle/modules" +
-      "/cosmos/bank/v1beta1;bankv1beta1\242\002\003CBX\252\002" +
-      "\023Cosmos.Bank.V1beta1\312\002\023Cosmos\\Bank\\V1bet" +
-      "a1\342\002\037Cosmos\\Bank\\V1beta1\\GPBMetadata\352\002\025C" +
-      "osmos::Bank::V1beta1b\006proto3"
+      "zationB\276\001\n\027com.cosmos.bank.v1beta1B\nAuth" +
+      "zProtoP\001Z)github.com/cosmos/cosmos-sdk/x" +
+      "/bank/types\242\002\003CBX\252\002\023Cosmos.Bank.V1beta1\312" +
+      "\002\023Cosmos\\Bank\\V1beta1\342\002\037Cosmos\\Bank\\V1be" +
+      "ta1\\GPBMetadata\352\002\025Cosmos::Bank::V1beta1b" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

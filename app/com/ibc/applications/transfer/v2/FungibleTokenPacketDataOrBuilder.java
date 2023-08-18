@@ -86,4 +86,24 @@ public interface FungibleTokenPacketDataOrBuilder extends
    */
   com.google.protobuf.ByteString
       getReceiverBytes();
+
+  /**
+   * <pre>
+   * optional memo
+   * </pre>
+   *
+   * <code>string memo = 5 [json_name = "memo"];</code>
+   * @return The memo.
+   */
+  java.lang.String getMemo();
+  /**
+   * <pre>
+   * optional memo
+   * </pre>
+   *
+   * <code>string memo = 5 [json_name = "memo"];</code>
+   * @return The bytes for memo.
+   */
+  com.google.protobuf.ByteString
+      getMemoBytes();
 }

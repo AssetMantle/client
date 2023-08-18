@@ -28,22 +28,22 @@ public final class ServiceProto {
       "eries.identities\032\034google/api/annotations" +
       ".proto\0321identities/queries/identities/qu" +
       "ery_request.proto\0322identities/queries/id" +
-      "entities/query_response.proto2\306\001\n\007Servic" +
-      "e\022\272\001\n\006Handle\022?.assetmantle.modules.ident" +
-      "ities.queries.identities.QueryRequest\032@." +
-      "assetmantle.modules.identities.queries.i" +
-      "dentities.QueryResponse\"-\202\323\344\223\002\'\022%/mantle" +
-      "/identities/v1beta1/identitiesB\357\002\n5com.a" +
-      "ssetmantle.modules.identities.queries.id" +
-      "entitiesB\014ServiceProtoP\001Z>github.com/Ass" +
-      "etMantle/modules/x/identities/queries/id" +
-      "entities\242\002\005AMIQI\252\0021Assetmantle.Modules.I" +
-      "dentities.Queries.Identities\312\0021Assetmant" +
-      "le\\Modules\\Identities\\Queries\\Identities" +
-      "\342\002=Assetmantle\\Modules\\Identities\\Querie" +
-      "s\\Identities\\GPBMetadata\352\0025Assetmantle::" +
-      "Modules::Identities::Queries::Identities" +
-      "b\006proto3"
+      "entities/query_response.proto2\304\001\n\005Query\022" +
+      "\272\001\n\006Handle\022?.assetmantle.modules.identit" +
+      "ies.queries.identities.QueryRequest\032@.as" +
+      "setmantle.modules.identities.queries.ide" +
+      "ntities.QueryResponse\"-\202\323\344\223\002\'\022%/mantle/i" +
+      "dentities/v1beta1/identitiesB\357\002\n5com.ass" +
+      "etmantle.modules.identities.queries.iden" +
+      "titiesB\014ServiceProtoP\001Z>github.com/Asset" +
+      "Mantle/modules/x/identities/queries/iden" +
+      "tities\242\002\005AMIQI\252\0021Assetmantle.Modules.Ide" +
+      "ntities.Queries.Identities\312\0021Assetmantle" +
+      "\\Modules\\Identities\\Queries\\Identities\342\002" +
+      "=Assetmantle\\Modules\\Identities\\Queries\\" +
+      "Identities\\GPBMetadata\352\0025Assetmantle::Mo" +
+      "dules::Identities::Queries::Identitiesb\006" +
+      "proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

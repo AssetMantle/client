@@ -32,6 +32,7 @@ private static final long serialVersionUID = 0L;
     tokens_ = "";
     delegatorShares_ = "";
     minSelfDelegation_ = "";
+    unbondingIds_ = emptyLongList();
   }
 
   @java.lang.Override
@@ -450,6 +451,62 @@ private static final long serialVersionUID = 0L;
     }
   }
 
+  public static final int UNBONDING_ON_HOLD_REF_COUNT_FIELD_NUMBER = 12;
+  private long unbondingOnHoldRefCount_ = 0L;
+  /**
+   * <pre>
+   * strictly positive if this validator's unbonding has been stopped by external modules
+   * </pre>
+   *
+   * <code>int64 unbonding_on_hold_ref_count = 12 [json_name = "unbondingOnHoldRefCount"];</code>
+   * @return The unbondingOnHoldRefCount.
+   */
+  @java.lang.Override
+  public long getUnbondingOnHoldRefCount() {
+    return unbondingOnHoldRefCount_;
+  }
+
+  public static final int UNBONDING_IDS_FIELD_NUMBER = 13;
+  @SuppressWarnings("serial")
+  private com.google.protobuf.Internal.LongList unbondingIds_;
+  /**
+   * <pre>
+   * list of unbonding ids, each uniquely identifing an unbonding of this validator
+   * </pre>
+   *
+   * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+   * @return A list containing the unbondingIds.
+   */
+  @java.lang.Override
+  public java.util.List<java.lang.Long>
+      getUnbondingIdsList() {
+    return unbondingIds_;
+  }
+  /**
+   * <pre>
+   * list of unbonding ids, each uniquely identifing an unbonding of this validator
+   * </pre>
+   *
+   * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+   * @return The count of unbondingIds.
+   */
+  public int getUnbondingIdsCount() {
+    return unbondingIds_.size();
+  }
+  /**
+   * <pre>
+   * list of unbonding ids, each uniquely identifing an unbonding of this validator
+   * </pre>
+   *
+   * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+   * @param index The index of the element to return.
+   * @return The unbondingIds at the given index.
+   */
+  public long getUnbondingIds(int index) {
+    return unbondingIds_.getLong(index);
+  }
+  private int unbondingIdsMemoizedSerializedSize = -1;
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -464,6 +521,7 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
+    getSerializedSize();
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(operatorAddress_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 1, operatorAddress_);
     }
@@ -496,6 +554,16 @@ private static final long serialVersionUID = 0L;
     }
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(minSelfDelegation_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 11, minSelfDelegation_);
+    }
+    if (unbondingOnHoldRefCount_ != 0L) {
+      output.writeInt64(12, unbondingOnHoldRefCount_);
+    }
+    if (getUnbondingIdsList().size() > 0) {
+      output.writeUInt32NoTag(106);
+      output.writeUInt32NoTag(unbondingIdsMemoizedSerializedSize);
+    }
+    for (int i = 0; i < unbondingIds_.size(); i++) {
+      output.writeUInt64NoTag(unbondingIds_.getLong(i));
     }
     getUnknownFields().writeTo(output);
   }
@@ -546,6 +614,24 @@ private static final long serialVersionUID = 0L;
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(minSelfDelegation_)) {
       size += com.google.protobuf.GeneratedMessageV3.computeStringSize(11, minSelfDelegation_);
     }
+    if (unbondingOnHoldRefCount_ != 0L) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt64Size(12, unbondingOnHoldRefCount_);
+    }
+    {
+      int dataSize = 0;
+      for (int i = 0; i < unbondingIds_.size(); i++) {
+        dataSize += com.google.protobuf.CodedOutputStream
+          .computeUInt64SizeNoTag(unbondingIds_.getLong(i));
+      }
+      size += dataSize;
+      if (!getUnbondingIdsList().isEmpty()) {
+        size += 1;
+        size += com.google.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(dataSize);
+      }
+      unbondingIdsMemoizedSerializedSize = dataSize;
+    }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
     return size;
@@ -594,6 +680,10 @@ private static final long serialVersionUID = 0L;
     }
     if (!getMinSelfDelegation()
         .equals(other.getMinSelfDelegation())) return false;
+    if (getUnbondingOnHoldRefCount()
+        != other.getUnbondingOnHoldRefCount()) return false;
+    if (!getUnbondingIdsList()
+        .equals(other.getUnbondingIdsList())) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -637,6 +727,13 @@ private static final long serialVersionUID = 0L;
     }
     hash = (37 * hash) + MIN_SELF_DELEGATION_FIELD_NUMBER;
     hash = (53 * hash) + getMinSelfDelegation().hashCode();
+    hash = (37 * hash) + UNBONDING_ON_HOLD_REF_COUNT_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+        getUnbondingOnHoldRefCount());
+    if (getUnbondingIdsCount() > 0) {
+      hash = (37 * hash) + UNBONDING_IDS_FIELD_NUMBER;
+      hash = (53 * hash) + getUnbondingIdsList().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -804,6 +901,8 @@ private static final long serialVersionUID = 0L;
         commissionBuilder_ = null;
       }
       minSelfDelegation_ = "";
+      unbondingOnHoldRefCount_ = 0L;
+      unbondingIds_ = emptyLongList();
       return this;
     }
 
@@ -830,9 +929,18 @@ private static final long serialVersionUID = 0L;
     @java.lang.Override
     public com.cosmos.staking.v1beta1.Validator buildPartial() {
       com.cosmos.staking.v1beta1.Validator result = new com.cosmos.staking.v1beta1.Validator(this);
+      buildPartialRepeatedFields(result);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartialRepeatedFields(com.cosmos.staking.v1beta1.Validator result) {
+      if (((bitField0_ & 0x00001000) != 0)) {
+        unbondingIds_.makeImmutable();
+        bitField0_ = (bitField0_ & ~0x00001000);
+      }
+      result.unbondingIds_ = unbondingIds_;
     }
 
     private void buildPartial0(com.cosmos.staking.v1beta1.Validator result) {
@@ -877,6 +985,9 @@ private static final long serialVersionUID = 0L;
       }
       if (((from_bitField0_ & 0x00000400) != 0)) {
         result.minSelfDelegation_ = minSelfDelegation_;
+      }
+      if (((from_bitField0_ & 0x00000800) != 0)) {
+        result.unbondingOnHoldRefCount_ = unbondingOnHoldRefCount_;
       }
     }
 
@@ -963,6 +1074,19 @@ private static final long serialVersionUID = 0L;
       if (!other.getMinSelfDelegation().isEmpty()) {
         minSelfDelegation_ = other.minSelfDelegation_;
         bitField0_ |= 0x00000400;
+        onChanged();
+      }
+      if (other.getUnbondingOnHoldRefCount() != 0L) {
+        setUnbondingOnHoldRefCount(other.getUnbondingOnHoldRefCount());
+      }
+      if (!other.unbondingIds_.isEmpty()) {
+        if (unbondingIds_.isEmpty()) {
+          unbondingIds_ = other.unbondingIds_;
+          bitField0_ = (bitField0_ & ~0x00001000);
+        } else {
+          ensureUnbondingIdsIsMutable();
+          unbondingIds_.addAll(other.unbondingIds_);
+        }
         onChanged();
       }
       this.mergeUnknownFields(other.getUnknownFields());
@@ -1054,6 +1178,27 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000400;
               break;
             } // case 90
+            case 96: {
+              unbondingOnHoldRefCount_ = input.readInt64();
+              bitField0_ |= 0x00000800;
+              break;
+            } // case 96
+            case 104: {
+              long v = input.readUInt64();
+              ensureUnbondingIdsIsMutable();
+              unbondingIds_.addLong(v);
+              break;
+            } // case 104
+            case 106: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              ensureUnbondingIdsIsMutable();
+              while (input.getBytesUntilLimit() > 0) {
+                unbondingIds_.addLong(input.readUInt64());
+              }
+              input.popLimit(limit);
+              break;
+            } // case 106
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -2216,6 +2361,159 @@ private static final long serialVersionUID = 0L;
       checkByteStringIsUtf8(value);
       minSelfDelegation_ = value;
       bitField0_ |= 0x00000400;
+      onChanged();
+      return this;
+    }
+
+    private long unbondingOnHoldRefCount_ ;
+    /**
+     * <pre>
+     * strictly positive if this validator's unbonding has been stopped by external modules
+     * </pre>
+     *
+     * <code>int64 unbonding_on_hold_ref_count = 12 [json_name = "unbondingOnHoldRefCount"];</code>
+     * @return The unbondingOnHoldRefCount.
+     */
+    @java.lang.Override
+    public long getUnbondingOnHoldRefCount() {
+      return unbondingOnHoldRefCount_;
+    }
+    /**
+     * <pre>
+     * strictly positive if this validator's unbonding has been stopped by external modules
+     * </pre>
+     *
+     * <code>int64 unbonding_on_hold_ref_count = 12 [json_name = "unbondingOnHoldRefCount"];</code>
+     * @param value The unbondingOnHoldRefCount to set.
+     * @return This builder for chaining.
+     */
+    public Builder setUnbondingOnHoldRefCount(long value) {
+
+      unbondingOnHoldRefCount_ = value;
+      bitField0_ |= 0x00000800;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * strictly positive if this validator's unbonding has been stopped by external modules
+     * </pre>
+     *
+     * <code>int64 unbonding_on_hold_ref_count = 12 [json_name = "unbondingOnHoldRefCount"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearUnbondingOnHoldRefCount() {
+      bitField0_ = (bitField0_ & ~0x00000800);
+      unbondingOnHoldRefCount_ = 0L;
+      onChanged();
+      return this;
+    }
+
+    private com.google.protobuf.Internal.LongList unbondingIds_ = emptyLongList();
+    private void ensureUnbondingIdsIsMutable() {
+      if (!((bitField0_ & 0x00001000) != 0)) {
+        unbondingIds_ = mutableCopy(unbondingIds_);
+        bitField0_ |= 0x00001000;
+      }
+    }
+    /**
+     * <pre>
+     * list of unbonding ids, each uniquely identifing an unbonding of this validator
+     * </pre>
+     *
+     * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+     * @return A list containing the unbondingIds.
+     */
+    public java.util.List<java.lang.Long>
+        getUnbondingIdsList() {
+      return ((bitField0_ & 0x00001000) != 0) ?
+               java.util.Collections.unmodifiableList(unbondingIds_) : unbondingIds_;
+    }
+    /**
+     * <pre>
+     * list of unbonding ids, each uniquely identifing an unbonding of this validator
+     * </pre>
+     *
+     * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+     * @return The count of unbondingIds.
+     */
+    public int getUnbondingIdsCount() {
+      return unbondingIds_.size();
+    }
+    /**
+     * <pre>
+     * list of unbonding ids, each uniquely identifing an unbonding of this validator
+     * </pre>
+     *
+     * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+     * @param index The index of the element to return.
+     * @return The unbondingIds at the given index.
+     */
+    public long getUnbondingIds(int index) {
+      return unbondingIds_.getLong(index);
+    }
+    /**
+     * <pre>
+     * list of unbonding ids, each uniquely identifing an unbonding of this validator
+     * </pre>
+     *
+     * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+     * @param index The index to set the value at.
+     * @param value The unbondingIds to set.
+     * @return This builder for chaining.
+     */
+    public Builder setUnbondingIds(
+        int index, long value) {
+
+      ensureUnbondingIdsIsMutable();
+      unbondingIds_.setLong(index, value);
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * list of unbonding ids, each uniquely identifing an unbonding of this validator
+     * </pre>
+     *
+     * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+     * @param value The unbondingIds to add.
+     * @return This builder for chaining.
+     */
+    public Builder addUnbondingIds(long value) {
+
+      ensureUnbondingIdsIsMutable();
+      unbondingIds_.addLong(value);
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * list of unbonding ids, each uniquely identifing an unbonding of this validator
+     * </pre>
+     *
+     * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+     * @param values The unbondingIds to add.
+     * @return This builder for chaining.
+     */
+    public Builder addAllUnbondingIds(
+        java.lang.Iterable<? extends java.lang.Long> values) {
+      ensureUnbondingIdsIsMutable();
+      com.google.protobuf.AbstractMessageLite.Builder.addAll(
+          values, unbondingIds_);
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * list of unbonding ids, each uniquely identifing an unbonding of this validator
+     * </pre>
+     *
+     * <code>repeated uint64 unbonding_ids = 13 [json_name = "unbondingIds"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearUnbondingIds() {
+      unbondingIds_ = emptyLongList();
+      bitField0_ = (bitField0_ & ~0x00001000);
       onChanged();
       return this;
     }

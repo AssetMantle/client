@@ -31,26 +31,26 @@ public final class QueryResponseProto {
       "\n4maintainers/queries/maintainers/query_" +
       "response.proto\0223assetmantle.modules.main" +
       "tainers.queries.maintainers\032\024gogoproto/g" +
-      "ogo.proto\032#maintainers/mappable/mappable" +
-      ".proto\"]\n\rQueryResponse\022F\n\004list\030\001 \003(\01322." +
-      "assetmantle.modules.maintainers.mappable" +
-      ".MappableR\004list:\004\210\240\037\000B\201\003\n7com.assetmantl" +
-      "e.modules.maintainers.queries.maintainer" +
-      "sB\022QueryResponseProtoP\001Z@github.com/Asse" +
-      "tMantle/modules/x/maintainers/queries/ma" +
-      "intainers\242\002\005AMMQM\252\0023Assetmantle.Modules." +
-      "Maintainers.Queries.Maintainers\312\0023Assetm" +
-      "antle\\Modules\\Maintainers\\Queries\\Mainta" +
-      "iners\342\002?Assetmantle\\Modules\\Maintainers\\" +
-      "Queries\\Maintainers\\GPBMetadata\352\0027Assetm" +
-      "antle::Modules::Maintainers::Queries::Ma" +
-      "intainersb\006proto3"
+      "ogo.proto\032\037maintainers/record/record.pro" +
+      "to\"Y\n\rQueryResponse\022B\n\004list\030\001 \003(\0132..asse" +
+      "tmantle.modules.maintainers.record.Recor" +
+      "dR\004list:\004\210\240\037\000B\201\003\n7com.assetmantle.module" +
+      "s.maintainers.queries.maintainersB\022Query" +
+      "ResponseProtoP\001Z@github.com/AssetMantle/" +
+      "modules/x/maintainers/queries/maintainer" +
+      "s\242\002\005AMMQM\252\0023Assetmantle.Modules.Maintain" +
+      "ers.Queries.Maintainers\312\0023Assetmantle\\Mo" +
+      "dules\\Maintainers\\Queries\\Maintainers\342\002?" +
+      "Assetmantle\\Modules\\Maintainers\\Queries\\" +
+      "Maintainers\\GPBMetadata\352\0027Assetmantle::M" +
+      "odules::Maintainers::Queries::Maintainer" +
+      "sb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.gogoproto.GogoProto.getDescriptor(),
-          com.assetmantle.modules.maintainers.mappable.MappableProto.getDescriptor(),
+          com.assetmantle.modules.maintainers.record.RecordProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_maintainers_queries_maintainers_QueryResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -64,7 +64,7 @@ public final class QueryResponseProto {
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
-    com.assetmantle.modules.maintainers.mappable.MappableProto.getDescriptor();
+    com.assetmantle.modules.maintainers.record.RecordProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

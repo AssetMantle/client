@@ -38,30 +38,41 @@ private static final long serialVersionUID = 0L;
             com.assetmantle.modules.maintainers.queries.maintainers.QueryRequest.class, com.assetmantle.modules.maintainers.queries.maintainers.QueryRequest.Builder.class);
   }
 
-  public static final int PAGE_REQUEST_FIELD_NUMBER = 1;
-  private com.cosmos.base.query.v1beta1.PageRequest pageRequest_;
+  public static final int KEY_FIELD_NUMBER = 1;
+  private com.assetmantle.modules.maintainers.key.Key key_;
   /**
-   * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
-   * @return Whether the pageRequest field is set.
+   * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
+   * @return Whether the key field is set.
    */
   @java.lang.Override
-  public boolean hasPageRequest() {
-    return pageRequest_ != null;
+  public boolean hasKey() {
+    return key_ != null;
   }
   /**
-   * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
-   * @return The pageRequest.
+   * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
   @java.lang.Override
-  public com.cosmos.base.query.v1beta1.PageRequest getPageRequest() {
-    return pageRequest_ == null ? com.cosmos.base.query.v1beta1.PageRequest.getDefaultInstance() : pageRequest_;
+  public com.assetmantle.modules.maintainers.key.Key getKey() {
+    return key_ == null ? com.assetmantle.modules.maintainers.key.Key.getDefaultInstance() : key_;
   }
   /**
-   * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
+   * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
    */
   @java.lang.Override
-  public com.cosmos.base.query.v1beta1.PageRequestOrBuilder getPageRequestOrBuilder() {
-    return pageRequest_ == null ? com.cosmos.base.query.v1beta1.PageRequest.getDefaultInstance() : pageRequest_;
+  public com.assetmantle.modules.maintainers.key.KeyOrBuilder getKeyOrBuilder() {
+    return key_ == null ? com.assetmantle.modules.maintainers.key.Key.getDefaultInstance() : key_;
+  }
+
+  public static final int LIMIT_FIELD_NUMBER = 2;
+  private int limit_ = 0;
+  /**
+   * <code>int32 limit = 2 [json_name = "limit"];</code>
+   * @return The limit.
+   */
+  @java.lang.Override
+  public int getLimit() {
+    return limit_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -78,8 +89,11 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (pageRequest_ != null) {
-      output.writeMessage(1, getPageRequest());
+    if (key_ != null) {
+      output.writeMessage(1, getKey());
+    }
+    if (limit_ != 0) {
+      output.writeInt32(2, limit_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -90,9 +104,13 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (pageRequest_ != null) {
+    if (key_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getPageRequest());
+        .computeMessageSize(1, getKey());
+    }
+    if (limit_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(2, limit_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -109,11 +127,13 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.modules.maintainers.queries.maintainers.QueryRequest other = (com.assetmantle.modules.maintainers.queries.maintainers.QueryRequest) obj;
 
-    if (hasPageRequest() != other.hasPageRequest()) return false;
-    if (hasPageRequest()) {
-      if (!getPageRequest()
-          .equals(other.getPageRequest())) return false;
+    if (hasKey() != other.hasKey()) return false;
+    if (hasKey()) {
+      if (!getKey()
+          .equals(other.getKey())) return false;
     }
+    if (getLimit()
+        != other.getLimit()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -125,10 +145,12 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasPageRequest()) {
-      hash = (37 * hash) + PAGE_REQUEST_FIELD_NUMBER;
-      hash = (53 * hash) + getPageRequest().hashCode();
+    if (hasKey()) {
+      hash = (37 * hash) + KEY_FIELD_NUMBER;
+      hash = (53 * hash) + getKey().hashCode();
     }
+    hash = (37 * hash) + LIMIT_FIELD_NUMBER;
+    hash = (53 * hash) + getLimit();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -258,11 +280,12 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      pageRequest_ = null;
-      if (pageRequestBuilder_ != null) {
-        pageRequestBuilder_.dispose();
-        pageRequestBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
+      limit_ = 0;
       return this;
     }
 
@@ -297,9 +320,12 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(com.assetmantle.modules.maintainers.queries.maintainers.QueryRequest result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.pageRequest_ = pageRequestBuilder_ == null
-            ? pageRequest_
-            : pageRequestBuilder_.build();
+        result.key_ = keyBuilder_ == null
+            ? key_
+            : keyBuilder_.build();
+      }
+      if (((from_bitField0_ & 0x00000002) != 0)) {
+        result.limit_ = limit_;
       }
     }
 
@@ -347,8 +373,11 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.modules.maintainers.queries.maintainers.QueryRequest other) {
       if (other == com.assetmantle.modules.maintainers.queries.maintainers.QueryRequest.getDefaultInstance()) return this;
-      if (other.hasPageRequest()) {
-        mergePageRequest(other.getPageRequest());
+      if (other.hasKey()) {
+        mergeKey(other.getKey());
+      }
+      if (other.getLimit() != 0) {
+        setLimit(other.getLimit());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -378,11 +407,16 @@ private static final long serialVersionUID = 0L;
               break;
             case 10: {
               input.readMessage(
-                  getPageRequestFieldBuilder().getBuilder(),
+                  getKeyFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
             } // case 10
+            case 16: {
+              limit_ = input.readInt32();
+              bitField0_ |= 0x00000002;
+              break;
+            } // case 16
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -400,123 +434,155 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private com.cosmos.base.query.v1beta1.PageRequest pageRequest_;
+    private com.assetmantle.modules.maintainers.key.Key key_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.cosmos.base.query.v1beta1.PageRequest, com.cosmos.base.query.v1beta1.PageRequest.Builder, com.cosmos.base.query.v1beta1.PageRequestOrBuilder> pageRequestBuilder_;
+        com.assetmantle.modules.maintainers.key.Key, com.assetmantle.modules.maintainers.key.Key.Builder, com.assetmantle.modules.maintainers.key.KeyOrBuilder> keyBuilder_;
     /**
-     * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
-     * @return Whether the pageRequest field is set.
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
+     * @return Whether the key field is set.
      */
-    public boolean hasPageRequest() {
+    public boolean hasKey() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
-     * @return The pageRequest.
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
+     * @return The key.
      */
-    public com.cosmos.base.query.v1beta1.PageRequest getPageRequest() {
-      if (pageRequestBuilder_ == null) {
-        return pageRequest_ == null ? com.cosmos.base.query.v1beta1.PageRequest.getDefaultInstance() : pageRequest_;
+    public com.assetmantle.modules.maintainers.key.Key getKey() {
+      if (keyBuilder_ == null) {
+        return key_ == null ? com.assetmantle.modules.maintainers.key.Key.getDefaultInstance() : key_;
       } else {
-        return pageRequestBuilder_.getMessage();
+        return keyBuilder_.getMessage();
       }
     }
     /**
-     * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setPageRequest(com.cosmos.base.query.v1beta1.PageRequest value) {
-      if (pageRequestBuilder_ == null) {
+    public Builder setKey(com.assetmantle.modules.maintainers.key.Key value) {
+      if (keyBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        pageRequest_ = value;
+        key_ = value;
       } else {
-        pageRequestBuilder_.setMessage(value);
+        keyBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setPageRequest(
-        com.cosmos.base.query.v1beta1.PageRequest.Builder builderForValue) {
-      if (pageRequestBuilder_ == null) {
-        pageRequest_ = builderForValue.build();
+    public Builder setKey(
+        com.assetmantle.modules.maintainers.key.Key.Builder builderForValue) {
+      if (keyBuilder_ == null) {
+        key_ = builderForValue.build();
       } else {
-        pageRequestBuilder_.setMessage(builderForValue.build());
+        keyBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder mergePageRequest(com.cosmos.base.query.v1beta1.PageRequest value) {
-      if (pageRequestBuilder_ == null) {
+    public Builder mergeKey(com.assetmantle.modules.maintainers.key.Key value) {
+      if (keyBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0) &&
-          pageRequest_ != null &&
-          pageRequest_ != com.cosmos.base.query.v1beta1.PageRequest.getDefaultInstance()) {
-          getPageRequestBuilder().mergeFrom(value);
+          key_ != null &&
+          key_ != com.assetmantle.modules.maintainers.key.Key.getDefaultInstance()) {
+          getKeyBuilder().mergeFrom(value);
         } else {
-          pageRequest_ = value;
+          key_ = value;
         }
       } else {
-        pageRequestBuilder_.mergeFrom(value);
+        keyBuilder_.mergeFrom(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder clearPageRequest() {
+    public Builder clearKey() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      pageRequest_ = null;
-      if (pageRequestBuilder_ != null) {
-        pageRequestBuilder_.dispose();
-        pageRequestBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.cosmos.base.query.v1beta1.PageRequest.Builder getPageRequestBuilder() {
+    public com.assetmantle.modules.maintainers.key.Key.Builder getKeyBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return getPageRequestFieldBuilder().getBuilder();
+      return getKeyFieldBuilder().getBuilder();
     }
     /**
-     * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.cosmos.base.query.v1beta1.PageRequestOrBuilder getPageRequestOrBuilder() {
-      if (pageRequestBuilder_ != null) {
-        return pageRequestBuilder_.getMessageOrBuilder();
+    public com.assetmantle.modules.maintainers.key.KeyOrBuilder getKeyOrBuilder() {
+      if (keyBuilder_ != null) {
+        return keyBuilder_.getMessageOrBuilder();
       } else {
-        return pageRequest_ == null ?
-            com.cosmos.base.query.v1beta1.PageRequest.getDefaultInstance() : pageRequest_;
+        return key_ == null ?
+            com.assetmantle.modules.maintainers.key.Key.getDefaultInstance() : key_;
       }
     }
     /**
-     * <code>.cosmos.base.query.v1beta1.PageRequest page_request = 1 [json_name = "pageRequest"];</code>
+     * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.cosmos.base.query.v1beta1.PageRequest, com.cosmos.base.query.v1beta1.PageRequest.Builder, com.cosmos.base.query.v1beta1.PageRequestOrBuilder> 
-        getPageRequestFieldBuilder() {
-      if (pageRequestBuilder_ == null) {
-        pageRequestBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.cosmos.base.query.v1beta1.PageRequest, com.cosmos.base.query.v1beta1.PageRequest.Builder, com.cosmos.base.query.v1beta1.PageRequestOrBuilder>(
-                getPageRequest(),
+        com.assetmantle.modules.maintainers.key.Key, com.assetmantle.modules.maintainers.key.Key.Builder, com.assetmantle.modules.maintainers.key.KeyOrBuilder> 
+        getKeyFieldBuilder() {
+      if (keyBuilder_ == null) {
+        keyBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.modules.maintainers.key.Key, com.assetmantle.modules.maintainers.key.Key.Builder, com.assetmantle.modules.maintainers.key.KeyOrBuilder>(
+                getKey(),
                 getParentForChildren(),
                 isClean());
-        pageRequest_ = null;
+        key_ = null;
       }
-      return pageRequestBuilder_;
+      return keyBuilder_;
+    }
+
+    private int limit_ ;
+    /**
+     * <code>int32 limit = 2 [json_name = "limit"];</code>
+     * @return The limit.
+     */
+    @java.lang.Override
+    public int getLimit() {
+      return limit_;
+    }
+    /**
+     * <code>int32 limit = 2 [json_name = "limit"];</code>
+     * @param value The limit to set.
+     * @return This builder for chaining.
+     */
+    public Builder setLimit(int value) {
+
+      limit_ = value;
+      bitField0_ |= 0x00000002;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>int32 limit = 2 [json_name = "limit"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearLimit() {
+      bitField0_ = (bitField0_ & ~0x00000002);
+      limit_ = 0;
+      onChanged();
+      return this;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

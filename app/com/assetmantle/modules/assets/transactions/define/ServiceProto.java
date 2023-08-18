@@ -28,20 +28,20 @@ public final class ServiceProto {
       "ons.define\032\034google/api/annotations.proto" +
       "\032(assets/transactions/define/message.pro" +
       "to\0325assets/transactions/define/transacti" +
-      "on_response.proto2\261\001\n\007Service\022\245\001\n\006Handle" +
-      "\0227.assetmantle.modules.assets.transactio" +
-      "ns.define.Message\032C.assetmantle.modules." +
-      "assets.transactions.define.TransactionRe" +
-      "sponse\"\035\202\323\344\223\002\027\"\025/mantle/assets/defineB\335\002" +
-      "\n2com.assetmantle.modules.assets.transac" +
-      "tions.defineB\014ServiceProtoP\001Z;github.com" +
-      "/AssetMantle/modules/x/assets/transactio" +
-      "ns/define\242\002\005AMATD\252\002.Assetmantle.Modules." +
-      "Assets.Transactions.Define\312\002.Assetmantle" +
-      "\\Modules\\Assets\\Transactions\\Define\342\002:As" +
-      "setmantle\\Modules\\Assets\\Transactions\\De" +
-      "fine\\GPBMetadata\352\0022Assetmantle::Modules:" +
-      ":Assets::Transactions::Defineb\006proto3"
+      "on_response.proto2\255\001\n\003Msg\022\245\001\n\006Handle\0227.a" +
+      "ssetmantle.modules.assets.transactions.d" +
+      "efine.Message\032C.assetmantle.modules.asse" +
+      "ts.transactions.define.TransactionRespon" +
+      "se\"\035\202\323\344\223\002\027\"\025/mantle/assets/defineB\335\002\n2co" +
+      "m.assetmantle.modules.assets.transaction" +
+      "s.defineB\014ServiceProtoP\001Z;github.com/Ass" +
+      "etMantle/modules/x/assets/transactions/d" +
+      "efine\242\002\005AMATD\252\002.Assetmantle.Modules.Asse" +
+      "ts.Transactions.Define\312\002.Assetmantle\\Mod" +
+      "ules\\Assets\\Transactions\\Define\342\002:Assetm" +
+      "antle\\Modules\\Assets\\Transactions\\Define" +
+      "\\GPBMetadata\352\0022Assetmantle::Modules::Ass" +
+      "ets::Transactions::Defineb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

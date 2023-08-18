@@ -31,42 +31,41 @@ public final class QueryResponseProto {
       "\n;classifications/queries/classification" +
       "/query_response.proto\022:assetmantle.modul" +
       "es.classifications.queries.classificatio" +
-      "n\032\024gogoproto/gogo.proto\032\'classifications" +
-      "/mappable/mappable.proto\"a\n\rQueryRespons" +
-      "e\022J\n\004list\030\001 \003(\01326.assetmantle.modules.cl" +
-      "assifications.mappable.MappableR\004list:\004\210" +
-      "\240\037\000B\253\003\n>com.assetmantle.modules.classifi" +
-      "cations.queries.classificationB\022QueryRes" +
-      "ponseProtoP\001ZGgithub.com/AssetMantle/mod" +
-      "ules/x/classifications/queries/classific" +
-      "ation\242\002\005AMCQC\252\002:Assetmantle.Modules.Clas" +
-      "sifications.Queries.Classification\312\002:Ass" +
-      "etmantle\\Modules\\Classifications\\Queries" +
-      "\\Classification\342\002FAssetmantle\\Modules\\Cl" +
-      "assifications\\Queries\\Classification\\GPB" +
-      "Metadata\352\002>Assetmantle::Modules::Classif" +
-      "ications::Queries::Classificationb\006proto" +
-      "3"
+      "n\032\024gogoproto/gogo.proto\032#classifications" +
+      "/record/record.proto\"a\n\rQueryResponse\022J\n" +
+      "\006record\030\001 \001(\01322.assetmantle.modules.clas" +
+      "sifications.record.RecordR\006record:\004\210\240\037\000B" +
+      "\253\003\n>com.assetmantle.modules.classificati" +
+      "ons.queries.classificationB\022QueryRespons" +
+      "eProtoP\001ZGgithub.com/AssetMantle/modules" +
+      "/x/classifications/queries/classificatio" +
+      "n\242\002\005AMCQC\252\002:Assetmantle.Modules.Classifi" +
+      "cations.Queries.Classification\312\002:Assetma" +
+      "ntle\\Modules\\Classifications\\Queries\\Cla" +
+      "ssification\342\002FAssetmantle\\Modules\\Classi" +
+      "fications\\Queries\\Classification\\GPBMeta" +
+      "data\352\002>Assetmantle::Modules::Classificat" +
+      "ions::Queries::Classificationb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.gogoproto.GogoProto.getDescriptor(),
-          com.assetmantle.modules.classifications.mappable.MappableProto.getDescriptor(),
+          com.assetmantle.modules.classifications.record.RecordProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_classifications_queries_classification_QueryResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_classifications_queries_classification_QueryResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_classifications_queries_classification_QueryResponse_descriptor,
-        new java.lang.String[] { "List", });
+        new java.lang.String[] { "Record", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
-    com.assetmantle.modules.classifications.mappable.MappableProto.getDescriptor();
+    com.assetmantle.modules.classifications.record.RecordProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -37,13 +37,13 @@ public final class KvProto {
       "s.base.kv.v1beta1\032\024gogoproto/gogo.proto\"" +
       "A\n\005Pairs\0228\n\005pairs\030\001 \003(\0132\034.cosmos.base.kv" +
       ".v1beta1.PairB\004\310\336\037\000R\005pairs\".\n\004Pair\022\020\n\003ke" +
-      "y\030\001 \001(\014R\003key\022\024\n\005value\030\002 \001(\014R\005valueB\341\001\n\032c" +
-      "om.cosmos.base.kv.v1beta1B\007KvProtoP\001Z?gi" +
-      "thub.com/AssetMantle/modules/cosmos/base" +
-      "/kv/v1beta1;kvv1beta1\242\002\003CBK\252\002\026Cosmos.Bas" +
-      "e.Kv.V1beta1\312\002\026Cosmos\\Base\\Kv\\V1beta1\342\002\"" +
-      "Cosmos\\Base\\Kv\\V1beta1\\GPBMetadata\352\002\031Cos" +
-      "mos::Base::Kv::V1beta1b\006proto3"
+      "y\030\001 \001(\014R\003key\022\024\n\005value\030\002 \001(\014R\005valueB\307\001\n\032c" +
+      "om.cosmos.base.kv.v1beta1B\007KvProtoP\001Z%gi" +
+      "thub.com/cosmos/cosmos-sdk/types/kv\242\002\003CB" +
+      "K\252\002\026Cosmos.Base.Kv.V1beta1\312\002\026Cosmos\\Base" +
+      "\\Kv\\V1beta1\342\002\"Cosmos\\Base\\Kv\\V1beta1\\GPB" +
+      "Metadata\352\002\031Cosmos::Base::Kv::V1beta1b\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -34,12 +34,12 @@ public final class GenesisProto {
       "isState\0229\n\006minter\030\001 \001(\0132\033.cosmos.mint.v1" +
       "beta1.MinterB\004\310\336\037\000R\006minter\0229\n\006params\030\002 \001" +
       "(\0132\033.cosmos.mint.v1beta1.ParamsB\004\310\336\037\000R\006p" +
-      "aramsB\325\001\n\027com.cosmos.mint.v1beta1B\014Genes" +
-      "isProtoP\001Z>github.com/AssetMantle/module" +
-      "s/cosmos/mint/v1beta1;mintv1beta1\242\002\003CMX\252" +
-      "\002\023Cosmos.Mint.V1beta1\312\002\023Cosmos\\Mint\\V1be" +
-      "ta1\342\002\037Cosmos\\Mint\\V1beta1\\GPBMetadata\352\002\025" +
-      "Cosmos::Mint::V1beta1b\006proto3"
+      "aramsB\300\001\n\027com.cosmos.mint.v1beta1B\014Genes" +
+      "isProtoP\001Z)github.com/cosmos/cosmos-sdk/" +
+      "x/mint/types\242\002\003CMX\252\002\023Cosmos.Mint.V1beta1" +
+      "\312\002\023Cosmos\\Mint\\V1beta1\342\002\037Cosmos\\Mint\\V1b" +
+      "eta1\\GPBMetadata\352\002\025Cosmos::Mint::V1beta1" +
+      "b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

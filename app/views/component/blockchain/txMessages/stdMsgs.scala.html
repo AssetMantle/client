@@ -4,7 +4,6 @@
 @import com.assetmantle.modules.identities.{transactions => identitiesTransactions}
 @import com.assetmantle.modules.metas.{transactions => metasTransactions}
 @import com.assetmantle.modules.orders.{transactions => ordersTransactions}
-@import com.assetmantle.modules.splits.{transactions => splitsTransactions}
 
 @(title: String, txHash: String, messages: Seq[protoAny])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -162,14 +161,20 @@
                     case schema.constants.Messages.ASSET_RENUMERATE => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.asset.renumerate(assetsTransactions.renumerate.Message.parseFrom(msg.getValue))
                     }
+                    case schema.constants.Messages.ASSET_SEND => {
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.send(assetsTransactions.send.Message.parseFrom(msg.getValue))
+                    }
+                    case schema.constants.Messages.ASSET_WRAP => {
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.wrap(assetsTransactions.wrap.Message.parseFrom(msg.getValue))
+                    }
+                    case schema.constants.Messages.ASSET_UNWRAP => {
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.asset.unwrap(assetsTransactions.unwrap.Message.parseFrom(msg.getValue))
+                    }
                     case schema.constants.Messages.IDENTITY_DEFINE => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.identity.define(identitiesTransactions.define.Message.parseFrom(msg.getValue))
                     }
                     case schema.constants.Messages.IDENTITY_ISSUE => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.identity.issue(identitiesTransactions.issue.Message.parseFrom(msg.getValue))
-                    }
-                    case schema.constants.Messages.IDENTITY_MUTATE => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.mutate(identitiesTransactions.mutate.Message.parseFrom(msg.getValue))
                     }
                     case schema.constants.Messages.IDENTITY_PROVISION => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.identity.provision(identitiesTransactions.provision.Message.parseFrom(msg.getValue))
@@ -177,8 +182,8 @@
                     case schema.constants.Messages.IDENTITY_UNPROVISION => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.identity.unprovision(identitiesTransactions.unprovision.Message.parseFrom(msg.getValue))
                     }
-                    case schema.constants.Messages.IDENTITY_NUB => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.nub(identitiesTransactions.nub.Message.parseFrom(msg.getValue))
+                    case schema.constants.Messages.IDENTITY_NAME => {
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.name(identitiesTransactions.name.Message.parseFrom(msg.getValue))
                     }
                     case schema.constants.Messages.IDENTITY_QUASH => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.identity.quash(identitiesTransactions.quash.Message.parseFrom(msg.getValue))
@@ -189,14 +194,8 @@
                     case schema.constants.Messages.IDENTITY_DEPUTIZE => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.identity.deputize(identitiesTransactions.deputize.Message.parseFrom(msg.getValue))
                     }
-                    case schema.constants.Messages.SPLIT_SEND => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.split.send(splitsTransactions.send.Message.parseFrom(msg.getValue))
-                    }
-                    case schema.constants.Messages.SPLIT_WRAP => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.split.wrap(splitsTransactions.wrap.Message.parseFrom(msg.getValue))
-                    }
-                    case schema.constants.Messages.SPLIT_UNWRAP => {
-                        @views.html.component.blockchain.txMessages.assetMantleMsg.split.unwrap(splitsTransactions.unwrap.Message.parseFrom(msg.getValue))
+                    case schema.constants.Messages.IDENTITY_UPDATE => {
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.identity.update(identitiesTransactions.update.Message.parseFrom(msg.getValue))
                     }
                     case schema.constants.Messages.ORDER_DEFINE => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.order.define(ordersTransactions.define.Message.parseFrom(msg.getValue))
@@ -221,6 +220,12 @@
                     }
                     case schema.constants.Messages.ORDER_IMMEDIATE => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.order.immediate(ordersTransactions.immediate.Message.parseFrom(msg.getValue))
+                    }
+                    case schema.constants.Messages.ORDER_PUT => {
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.put(ordersTransactions.put.Message.parseFrom(msg.getValue))
+                    }
+                    case schema.constants.Messages.ORDER_GET => {
+                        @views.html.component.blockchain.txMessages.assetMantleMsg.order.get(ordersTransactions.get.Message.parseFrom(msg.getValue))
                     }
                     case schema.constants.Messages.META_REVEAL => {
                         @views.html.component.blockchain.txMessages.assetMantleMsg.meta.reveal(metasTransactions.reveal.Message.parseFrom(msg.getValue))

@@ -11,7 +11,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetMintingInflation @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class GetMintingInflation @Inject()()(implicit wsClient: WSClient, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.QUERIES_GET_MINTING_INFLATION
 

@@ -5,7 +5,6 @@ import com.assetmantle.modules.assets.{transactions => assetsTransactions}
 import com.assetmantle.modules.identities.{transactions => identitiesTransactions}
 import com.assetmantle.modules.metas.{transactions => metasTransactions}
 import com.assetmantle.modules.orders.{transactions => ordersTransactions}
-import com.assetmantle.modules.splits.{transactions => splitsTransactions}
 import com.cosmos.authz.{v1beta1 => authzTx}
 import com.cosmos.bank.{v1beta1 => bankTx}
 import com.cosmos.crisis.{v1beta1 => crisisTx}
@@ -310,16 +309,19 @@ class Block @Inject()(
       case schema.constants.Messages.ASSET_MUTATE => blockchainAssets.Utility.onMutate(assetsTransactions.mutate.Message.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.ASSET_RENUMERATE => blockchainAssets.Utility.onRenumerate(assetsTransactions.renumerate.Message.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.ASSET_REVOKE => blockchainAssets.Utility.onRevoke(assetsTransactions.revoke.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ASSET_SEND => blockchainAssets.Utility.onSend(assetsTransactions.send.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ASSET_WRAP => blockchainAssets.Utility.onWrap(assetsTransactions.wrap.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ASSET_UNWRAP => blockchainAssets.Utility.onUnwrap(assetsTransactions.unwrap.Message.parseFrom(stdMsg.getValue))
       //identities
       case schema.constants.Messages.IDENTITY_DEFINE => blockchainIdentities.Utility.onDefine(identitiesTransactions.define.Message.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.IDENTITY_DEPUTIZE => blockchainIdentities.Utility.onDeputize(identitiesTransactions.deputize.Message.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.IDENTITY_ISSUE => blockchainIdentities.Utility.onIssue(identitiesTransactions.issue.Message.parseFrom(stdMsg.getValue))
-      case schema.constants.Messages.IDENTITY_MUTATE => blockchainIdentities.Utility.onMutate(identitiesTransactions.mutate.Message.parseFrom(stdMsg.getValue))
-      case schema.constants.Messages.IDENTITY_NUB => blockchainIdentities.Utility.onNub(identitiesTransactions.nub.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.IDENTITY_NAME => blockchainIdentities.Utility.onName(identitiesTransactions.name.Message.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.IDENTITY_PROVISION => blockchainIdentities.Utility.onProvision(identitiesTransactions.provision.Message.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.IDENTITY_QUASH => blockchainIdentities.Utility.onQuash(identitiesTransactions.quash.Message.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.IDENTITY_REVOKE => blockchainIdentities.Utility.onRevoke(identitiesTransactions.revoke.Message.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.IDENTITY_UNPROVISION => blockchainIdentities.Utility.onUnprovision(identitiesTransactions.unprovision.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.IDENTITY_UPDATE => blockchainIdentities.Utility.onUpdate(identitiesTransactions.update.Message.parseFrom(stdMsg.getValue))
       //orders
       case schema.constants.Messages.ORDER_CANCEL => blockchainOrders.Utility.onCancel(ordersTransactions.cancel.Message.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.ORDER_DEFINE => blockchainOrders.Utility.onDefine(ordersTransactions.define.Message.parseFrom(stdMsg.getValue))
@@ -329,12 +331,10 @@ class Block @Inject()(
       case schema.constants.Messages.ORDER_MODIFY => blockchainOrders.Utility.onModify(ordersTransactions.modify.Message.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.ORDER_REVOKE => blockchainOrders.Utility.onRevoke(ordersTransactions.revoke.Message.parseFrom(stdMsg.getValue))
       case schema.constants.Messages.ORDER_TAKE => blockchainOrders.Utility.onTake(ordersTransactions.take.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ORDER_PUT => blockchainOrders.Utility.onPut(ordersTransactions.put.Message.parseFrom(stdMsg.getValue))
+      case schema.constants.Messages.ORDER_GET => blockchainOrders.Utility.onGet(ordersTransactions.get.Message.parseFrom(stdMsg.getValue))
       //metas
       case schema.constants.Messages.META_REVEAL => blockchainMetas.Utility.onRevealMeta(metasTransactions.reveal.Message.parseFrom(stdMsg.getValue))
-      // splits
-      case schema.constants.Messages.SPLIT_SEND => blockchainSplits.Utility.onSend(splitsTransactions.send.Message.parseFrom(stdMsg.getValue))
-      case schema.constants.Messages.SPLIT_WRAP => blockchainSplits.Utility.onWrap(splitsTransactions.wrap.Message.parseFrom(stdMsg.getValue))
-      case schema.constants.Messages.SPLIT_UNWRAP => blockchainSplits.Utility.onUnwrap(splitsTransactions.unwrap.Message.parseFrom(stdMsg.getValue))
       case _ => logger.error(constants.Response.TRANSACTION_TYPE_NOT_FOUND.logMessage + ": " + stdMsg.getTypeUrl)
         Future("")
     }

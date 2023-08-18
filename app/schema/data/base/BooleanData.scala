@@ -2,20 +2,26 @@ package schema.data.base
 
 import com.assetmantle.schema.data.base.{AnyData, AnyListableData, BooleanData => protoBooleanData}
 import schema.data._
-import schema.id.base.{DataID, HashID, StringID}
+import schema.id.base.{HashID, StringID}
 
 case class BooleanData(value: Boolean) extends ListableData {
+
   def getType: StringID = constants.BooleanDataTypeID
 
   def getBondWeight: Int = constants.BooleanBondWeight
-
-  def getDataID: DataID = DataID(typeID = constants.BooleanDataTypeID, hashID = this.generateHashID)
 
   def zeroValue: BooleanData = BooleanData(false)
 
   def getBytes: Array[Byte] = {
     val res: Byte = if (this.value) 1 else 0
     Seq(res).toArray
+  }
+
+  def compare(listableData: ListableData): Int = {
+    val compareData = listableData.asInstanceOf[BooleanData]
+    if (this.value == compareData.value) 0
+    else if (this.value && !compareData.value) 1
+    else -1
   }
 
   def generateHashID: HashID = if (!this.value) schema.utilities.ID.generateHashID() else schema.utilities.ID.generateHashID(this.getBytes)

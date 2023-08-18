@@ -44,6 +44,16 @@ public final class QueryProto {
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_cosmos_auth_v1beta1_QueryParamsResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_cosmos_auth_v1beta1_QueryModuleAccountByNameRequest_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_cosmos_auth_v1beta1_QueryModuleAccountByNameRequest_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_cosmos_auth_v1beta1_QueryModuleAccountByNameResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_cosmos_auth_v1beta1_QueryModuleAccountByNameResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -71,23 +81,31 @@ public final class QueryProto {
       "ogle.protobuf.AnyB\014\312\264-\010AccountIR\007account" +
       "\"\024\n\022QueryParamsRequest\"P\n\023QueryParamsRes" +
       "ponse\0229\n\006params\030\001 \001(\0132\033.cosmos.auth.v1be" +
-      "ta1.ParamsB\004\310\336\037\000R\006params2\247\003\n\005Query\022\210\001\n\010A" +
-      "ccounts\022).cosmos.auth.v1beta1.QueryAccou" +
-      "ntsRequest\032*.cosmos.auth.v1beta1.QueryAc" +
-      "countsResponse\"%\202\323\344\223\002\037\022\035/cosmos/auth/v1b" +
-      "eta1/accounts\022\217\001\n\007Account\022(.cosmos.auth." +
-      "v1beta1.QueryAccountRequest\032).cosmos.aut" +
-      "h.v1beta1.QueryAccountResponse\"/\202\323\344\223\002)\022\'" +
-      "/cosmos/auth/v1beta1/accounts/{address}\022" +
-      "\200\001\n\006Params\022\'.cosmos.auth.v1beta1.QueryPa" +
-      "ramsRequest\032(.cosmos.auth.v1beta1.QueryP" +
-      "aramsResponse\"#\202\323\344\223\002\035\022\033/cosmos/auth/v1be" +
-      "ta1/paramsB\323\001\n\027com.cosmos.auth.v1beta1B\n" +
-      "QueryProtoP\001Z>github.com/AssetMantle/mod" +
-      "ules/cosmos/auth/v1beta1;authv1beta1\242\002\003C" +
-      "AX\252\002\023Cosmos.Auth.V1beta1\312\002\023Cosmos\\Auth\\V" +
-      "1beta1\342\002\037Cosmos\\Auth\\V1beta1\\GPBMetadata" +
-      "\352\002\025Cosmos::Auth::V1beta1b\006proto3"
+      "ta1.ParamsB\004\310\336\037\000R\006params\"5\n\037QueryModuleA" +
+      "ccountByNameRequest\022\022\n\004name\030\001 \001(\tR\004name\"" +
+      "f\n QueryModuleAccountByNameResponse\022B\n\007a" +
+      "ccount\030\001 \001(\0132\024.google.protobuf.AnyB\022\312\264-\016" +
+      "ModuleAccountIR\007account2\341\004\n\005Query\022\210\001\n\010Ac" +
+      "counts\022).cosmos.auth.v1beta1.QueryAccoun" +
+      "tsRequest\032*.cosmos.auth.v1beta1.QueryAcc" +
+      "ountsResponse\"%\202\323\344\223\002\037\022\035/cosmos/auth/v1be" +
+      "ta1/accounts\022\217\001\n\007Account\022(.cosmos.auth.v" +
+      "1beta1.QueryAccountRequest\032).cosmos.auth" +
+      ".v1beta1.QueryAccountResponse\"/\202\323\344\223\002)\022\'/" +
+      "cosmos/auth/v1beta1/accounts/{address}\022\200" +
+      "\001\n\006Params\022\'.cosmos.auth.v1beta1.QueryPar" +
+      "amsRequest\032(.cosmos.auth.v1beta1.QueryPa" +
+      "ramsResponse\"#\202\323\344\223\002\035\022\033/cosmos/auth/v1bet" +
+      "a1/params\022\267\001\n\023ModuleAccountByName\0224.cosm" +
+      "os.auth.v1beta1.QueryModuleAccountByName" +
+      "Request\0325.cosmos.auth.v1beta1.QueryModul" +
+      "eAccountByNameResponse\"3\202\323\344\223\002-\022+/cosmos/" +
+      "auth/v1beta1/module_accounts/{name}B\276\001\n\027" +
+      "com.cosmos.auth.v1beta1B\nQueryProtoP\001Z)g" +
+      "ithub.com/cosmos/cosmos-sdk/x/auth/types" +
+      "\242\002\003CAX\252\002\023Cosmos.Auth.V1beta1\312\002\023Cosmos\\Au" +
+      "th\\V1beta1\342\002\037Cosmos\\Auth\\V1beta1\\GPBMeta" +
+      "data\352\002\025Cosmos::Auth::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -135,6 +153,18 @@ public final class QueryProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_cosmos_auth_v1beta1_QueryParamsResponse_descriptor,
         new java.lang.String[] { "Params", });
+    internal_static_cosmos_auth_v1beta1_QueryModuleAccountByNameRequest_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_cosmos_auth_v1beta1_QueryModuleAccountByNameRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_cosmos_auth_v1beta1_QueryModuleAccountByNameRequest_descriptor,
+        new java.lang.String[] { "Name", });
+    internal_static_cosmos_auth_v1beta1_QueryModuleAccountByNameResponse_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_cosmos_auth_v1beta1_QueryModuleAccountByNameResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_cosmos_auth_v1beta1_QueryModuleAccountByNameResponse_descriptor,
+        new java.lang.String[] { "Account", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.cosmos_proto.CosmosProto.acceptsInterface);

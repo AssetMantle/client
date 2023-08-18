@@ -193,26 +193,26 @@ private static final long serialVersionUID = 0L;
     return canMintAsset_;
   }
 
-  public static final int CAN_BURN_ASSET_FIELD_NUMBER = 7;
-  private boolean canBurnAsset_ = false;
-  /**
-   * <code>bool can_burn_asset = 7 [json_name = "canBurnAsset"];</code>
-   * @return The canBurnAsset.
-   */
-  @java.lang.Override
-  public boolean getCanBurnAsset() {
-    return canBurnAsset_;
-  }
-
-  public static final int CAN_RENUMERATE_ASSET_FIELD_NUMBER = 8;
+  public static final int CAN_RENUMERATE_ASSET_FIELD_NUMBER = 7;
   private boolean canRenumerateAsset_ = false;
   /**
-   * <code>bool can_renumerate_asset = 8 [json_name = "canRenumerateAsset"];</code>
+   * <code>bool can_renumerate_asset = 7 [json_name = "canRenumerateAsset"];</code>
    * @return The canRenumerateAsset.
    */
   @java.lang.Override
   public boolean getCanRenumerateAsset() {
     return canRenumerateAsset_;
+  }
+
+  public static final int CAN_BURN_ASSET_FIELD_NUMBER = 8;
+  private boolean canBurnAsset_ = false;
+  /**
+   * <code>bool can_burn_asset = 8 [json_name = "canBurnAsset"];</code>
+   * @return The canBurnAsset.
+   */
+  @java.lang.Override
+  public boolean getCanBurnAsset() {
+    return canBurnAsset_;
   }
 
   public static final int CAN_ADD_MAINTAINER_FIELD_NUMBER = 9;
@@ -280,11 +280,11 @@ private static final long serialVersionUID = 0L;
     if (canMintAsset_ != false) {
       output.writeBool(6, canMintAsset_);
     }
-    if (canBurnAsset_ != false) {
-      output.writeBool(7, canBurnAsset_);
-    }
     if (canRenumerateAsset_ != false) {
-      output.writeBool(8, canRenumerateAsset_);
+      output.writeBool(7, canRenumerateAsset_);
+    }
+    if (canBurnAsset_ != false) {
+      output.writeBool(8, canBurnAsset_);
     }
     if (canAddMaintainer_ != false) {
       output.writeBool(9, canAddMaintainer_);
@@ -327,13 +327,13 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeBoolSize(6, canMintAsset_);
     }
-    if (canBurnAsset_ != false) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(7, canBurnAsset_);
-    }
     if (canRenumerateAsset_ != false) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(8, canRenumerateAsset_);
+        .computeBoolSize(7, canRenumerateAsset_);
+    }
+    if (canBurnAsset_ != false) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeBoolSize(8, canBurnAsset_);
     }
     if (canAddMaintainer_ != false) {
       size += com.google.protobuf.CodedOutputStream
@@ -386,10 +386,10 @@ private static final long serialVersionUID = 0L;
     }
     if (getCanMintAsset()
         != other.getCanMintAsset()) return false;
-    if (getCanBurnAsset()
-        != other.getCanBurnAsset()) return false;
     if (getCanRenumerateAsset()
         != other.getCanRenumerateAsset()) return false;
+    if (getCanBurnAsset()
+        != other.getCanBurnAsset()) return false;
     if (getCanAddMaintainer()
         != other.getCanAddMaintainer()) return false;
     if (getCanRemoveMaintainer()
@@ -428,12 +428,12 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + CAN_MINT_ASSET_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getCanMintAsset());
-    hash = (37 * hash) + CAN_BURN_ASSET_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-        getCanBurnAsset());
     hash = (37 * hash) + CAN_RENUMERATE_ASSET_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getCanRenumerateAsset());
+    hash = (37 * hash) + CAN_BURN_ASSET_FIELD_NUMBER;
+    hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+        getCanBurnAsset());
     hash = (37 * hash) + CAN_ADD_MAINTAINER_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
         getCanAddMaintainer());
@@ -594,8 +594,8 @@ private static final long serialVersionUID = 0L;
         maintainedPropertiesBuilder_ = null;
       }
       canMintAsset_ = false;
-      canBurnAsset_ = false;
       canRenumerateAsset_ = false;
+      canBurnAsset_ = false;
       canAddMaintainer_ = false;
       canRemoveMaintainer_ = false;
       canMutateMaintainer_ = false;
@@ -659,10 +659,10 @@ private static final long serialVersionUID = 0L;
         result.canMintAsset_ = canMintAsset_;
       }
       if (((from_bitField0_ & 0x00000040) != 0)) {
-        result.canBurnAsset_ = canBurnAsset_;
+        result.canRenumerateAsset_ = canRenumerateAsset_;
       }
       if (((from_bitField0_ & 0x00000080) != 0)) {
-        result.canRenumerateAsset_ = canRenumerateAsset_;
+        result.canBurnAsset_ = canBurnAsset_;
       }
       if (((from_bitField0_ & 0x00000100) != 0)) {
         result.canAddMaintainer_ = canAddMaintainer_;
@@ -739,11 +739,11 @@ private static final long serialVersionUID = 0L;
       if (other.getCanMintAsset() != false) {
         setCanMintAsset(other.getCanMintAsset());
       }
-      if (other.getCanBurnAsset() != false) {
-        setCanBurnAsset(other.getCanBurnAsset());
-      }
       if (other.getCanRenumerateAsset() != false) {
         setCanRenumerateAsset(other.getCanRenumerateAsset());
+      }
+      if (other.getCanBurnAsset() != false) {
+        setCanBurnAsset(other.getCanBurnAsset());
       }
       if (other.getCanAddMaintainer() != false) {
         setCanAddMaintainer(other.getCanAddMaintainer());
@@ -819,12 +819,12 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 48
             case 56: {
-              canBurnAsset_ = input.readBool();
+              canRenumerateAsset_ = input.readBool();
               bitField0_ |= 0x00000040;
               break;
             } // case 56
             case 64: {
-              canRenumerateAsset_ = input.readBool();
+              canBurnAsset_ = input.readBool();
               bitField0_ |= 0x00000080;
               break;
             } // case 64
@@ -1440,41 +1440,9 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private boolean canBurnAsset_ ;
-    /**
-     * <code>bool can_burn_asset = 7 [json_name = "canBurnAsset"];</code>
-     * @return The canBurnAsset.
-     */
-    @java.lang.Override
-    public boolean getCanBurnAsset() {
-      return canBurnAsset_;
-    }
-    /**
-     * <code>bool can_burn_asset = 7 [json_name = "canBurnAsset"];</code>
-     * @param value The canBurnAsset to set.
-     * @return This builder for chaining.
-     */
-    public Builder setCanBurnAsset(boolean value) {
-
-      canBurnAsset_ = value;
-      bitField0_ |= 0x00000040;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>bool can_burn_asset = 7 [json_name = "canBurnAsset"];</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearCanBurnAsset() {
-      bitField0_ = (bitField0_ & ~0x00000040);
-      canBurnAsset_ = false;
-      onChanged();
-      return this;
-    }
-
     private boolean canRenumerateAsset_ ;
     /**
-     * <code>bool can_renumerate_asset = 8 [json_name = "canRenumerateAsset"];</code>
+     * <code>bool can_renumerate_asset = 7 [json_name = "canRenumerateAsset"];</code>
      * @return The canRenumerateAsset.
      */
     @java.lang.Override
@@ -1482,24 +1450,56 @@ private static final long serialVersionUID = 0L;
       return canRenumerateAsset_;
     }
     /**
-     * <code>bool can_renumerate_asset = 8 [json_name = "canRenumerateAsset"];</code>
+     * <code>bool can_renumerate_asset = 7 [json_name = "canRenumerateAsset"];</code>
      * @param value The canRenumerateAsset to set.
      * @return This builder for chaining.
      */
     public Builder setCanRenumerateAsset(boolean value) {
 
       canRenumerateAsset_ = value;
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>bool can_renumerate_asset = 7 [json_name = "canRenumerateAsset"];</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearCanRenumerateAsset() {
+      bitField0_ = (bitField0_ & ~0x00000040);
+      canRenumerateAsset_ = false;
+      onChanged();
+      return this;
+    }
+
+    private boolean canBurnAsset_ ;
+    /**
+     * <code>bool can_burn_asset = 8 [json_name = "canBurnAsset"];</code>
+     * @return The canBurnAsset.
+     */
+    @java.lang.Override
+    public boolean getCanBurnAsset() {
+      return canBurnAsset_;
+    }
+    /**
+     * <code>bool can_burn_asset = 8 [json_name = "canBurnAsset"];</code>
+     * @param value The canBurnAsset to set.
+     * @return This builder for chaining.
+     */
+    public Builder setCanBurnAsset(boolean value) {
+
+      canBurnAsset_ = value;
       bitField0_ |= 0x00000080;
       onChanged();
       return this;
     }
     /**
-     * <code>bool can_renumerate_asset = 8 [json_name = "canRenumerateAsset"];</code>
+     * <code>bool can_burn_asset = 8 [json_name = "canBurnAsset"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearCanRenumerateAsset() {
+    public Builder clearCanBurnAsset() {
       bitField0_ = (bitField0_ & ~0x00000080);
-      canRenumerateAsset_ = false;
+      canBurnAsset_ = false;
       onChanged();
       return this;
     }

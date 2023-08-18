@@ -32,7 +32,7 @@ public final class MessageProto {
       "roto\0220assetmantle.modules.orders.transac" +
       "tions.deputize\032 ids/base/classification_" +
       "id.proto\032\032ids/base/identity_id.proto\032\036li" +
-      "sts/base/property_list.proto\"\362\004\n\007Message" +
+      "sts/base/property_list.proto\"\304\004\n\007Message" +
       "\022\022\n\004from\030\001 \001(\tR\004from\022A\n\010from_i_d\030\002 \001(\0132\'" +
       ".assetmantle.schema.ids.base.IdentityIDR" +
       "\006fromID\022=\n\006to_i_d\030\003 \001(\0132\'.assetmantle.sc" +
@@ -41,23 +41,22 @@ public final class MessageProto {
       "ids.base.ClassificationIDR\020classificatio" +
       "nID\022`\n\025maintained_properties\030\005 \001(\0132+.ass" +
       "etmantle.schema.lists.base.PropertyListR" +
-      "\024maintainedProperties\022$\n\016can_mint_asset\030" +
-      "\006 \001(\010R\014canMintAsset\022$\n\016can_burn_asset\030\007 " +
-      "\001(\010R\014canBurnAsset\0220\n\024can_renumerate_asse" +
-      "t\030\010 \001(\010R\022canRenumerateAsset\022,\n\022can_add_m" +
-      "aintainer\030\t \001(\010R\020canAddMaintainer\0222\n\025can" +
-      "_remove_maintainer\030\n \001(\010R\023canRemoveMaint" +
-      "ainer\0222\n\025can_mutate_maintainer\030\013 \001(\010R\023ca" +
-      "nMutateMaintainerB\351\002\n4com.assetmantle.mo" +
-      "dules.orders.transactions.deputizeB\014Mess" +
-      "ageProtoP\001Z=github.com/AssetMantle/modul" +
-      "es/x/orders/transactions/deputize\242\002\005AMOT" +
-      "D\252\0020Assetmantle.Modules.Orders.Transacti" +
-      "ons.Deputize\312\0020Assetmantle\\Modules\\Order" +
-      "s\\Transactions\\Deputize\342\002<Assetmantle\\Mo" +
-      "dules\\Orders\\Transactions\\Deputize\\GPBMe" +
-      "tadata\352\0024Assetmantle::Modules::Orders::T" +
-      "ransactions::Deputizeb\006proto3"
+      "\024maintainedProperties\022$\n\016can_make_order\030" +
+      "\006 \001(\010R\014canMakeOrder\022(\n\020can_cancel_order\030" +
+      "\007 \001(\010R\016canCancelOrder\022,\n\022can_add_maintai" +
+      "ner\030\010 \001(\010R\020canAddMaintainer\0222\n\025can_remov" +
+      "e_maintainer\030\t \001(\010R\023canRemoveMaintainer\022" +
+      "2\n\025can_mutate_maintainer\030\n \001(\010R\023canMutat" +
+      "eMaintainerB\351\002\n4com.assetmantle.modules." +
+      "orders.transactions.deputizeB\014MessagePro" +
+      "toP\001Z=github.com/AssetMantle/modules/x/o" +
+      "rders/transactions/deputize\242\002\005AMOTD\252\0020As" +
+      "setmantle.Modules.Orders.Transactions.De" +
+      "putize\312\0020Assetmantle\\Modules\\Orders\\Tran" +
+      "sactions\\Deputize\342\002<Assetmantle\\Modules\\" +
+      "Orders\\Transactions\\Deputize\\GPBMetadata" +
+      "\352\0024Assetmantle::Modules::Orders::Transac" +
+      "tions::Deputizeb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -71,7 +70,7 @@ public final class MessageProto {
     internal_static_assetmantle_modules_orders_transactions_deputize_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_orders_transactions_deputize_Message_descriptor,
-        new java.lang.String[] { "From", "FromID", "ToID", "ClassificationID", "MaintainedProperties", "CanMintAsset", "CanBurnAsset", "CanRenumerateAsset", "CanAddMaintainer", "CanRemoveMaintainer", "CanMutateMaintainer", });
+        new java.lang.String[] { "From", "FromID", "ToID", "ClassificationID", "MaintainedProperties", "CanMakeOrder", "CanCancelOrder", "CanAddMaintainer", "CanRemoveMaintainer", "CanMutateMaintainer", });
     com.assetmantle.schema.ids.base.ClassificationIdProto.getDescriptor();
     com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor();
     com.assetmantle.schema.lists.base.PropertyListProto.getDescriptor();

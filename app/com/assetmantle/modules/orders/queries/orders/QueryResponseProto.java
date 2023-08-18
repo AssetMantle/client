@@ -30,25 +30,24 @@ public final class QueryResponseProto {
     java.lang.String[] descriptorData = {
       "\n*orders/queries/orders/query_response.p" +
       "roto\022)assetmantle.modules.orders.queries" +
-      ".orders\032\024gogoproto/gogo.proto\032\036orders/ma" +
-      "ppable/mappable.proto\"X\n\rQueryResponse\022A" +
-      "\n\004list\030\001 \003(\0132-.assetmantle.modules.order" +
-      "s.mappable.MappableR\004list:\004\210\240\037\000B\305\002\n-com." +
-      "assetmantle.modules.orders.queries.order" +
-      "sB\022QueryResponseProtoP\001Z6github.com/Asse" +
-      "tMantle/modules/x/orders/queries/orders\242" +
-      "\002\005AMOQO\252\002)Assetmantle.Modules.Orders.Que" +
-      "ries.Orders\312\002)Assetmantle\\Modules\\Orders" +
-      "\\Queries\\Orders\342\0025Assetmantle\\Modules\\Or" +
-      "ders\\Queries\\Orders\\GPBMetadata\352\002-Assetm" +
-      "antle::Modules::Orders::Queries::Ordersb" +
-      "\006proto3"
+      ".orders\032\024gogoproto/gogo.proto\032\032orders/re" +
+      "cord/record.proto\"T\n\rQueryResponse\022=\n\004li" +
+      "st\030\001 \003(\0132).assetmantle.modules.orders.re" +
+      "cord.RecordR\004list:\004\210\240\037\000B\305\002\n-com.assetman" +
+      "tle.modules.orders.queries.ordersB\022Query" +
+      "ResponseProtoP\001Z6github.com/AssetMantle/" +
+      "modules/x/orders/queries/orders\242\002\005AMOQO\252" +
+      "\002)Assetmantle.Modules.Orders.Queries.Ord" +
+      "ers\312\002)Assetmantle\\Modules\\Orders\\Queries" +
+      "\\Orders\342\0025Assetmantle\\Modules\\Orders\\Que" +
+      "ries\\Orders\\GPBMetadata\352\002-Assetmantle::M" +
+      "odules::Orders::Queries::Ordersb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.gogoproto.GogoProto.getDescriptor(),
-          com.assetmantle.modules.orders.mappable.MappableProto.getDescriptor(),
+          com.assetmantle.modules.orders.record.RecordProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_orders_queries_orders_QueryResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -62,7 +61,7 @@ public final class QueryResponseProto {
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
-    com.assetmantle.modules.orders.mappable.MappableProto.getDescriptor();
+    com.assetmantle.modules.orders.record.RecordProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

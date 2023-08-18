@@ -54,12 +54,12 @@ public final class MintProto {
       "cosmos/cosmos-sdk/types.Dec\362\336\037\022yaml:\"goa" +
       "l_bonded\"R\ngoalBonded\022B\n\017blocks_per_year" +
       "\030\006 \001(\004B\032\362\336\037\026yaml:\"blocks_per_year\"R\rbloc" +
-      "ksPerYear:\004\230\240\037\000B\322\001\n\027com.cosmos.mint.v1be" +
-      "ta1B\tMintProtoP\001Z>github.com/AssetMantle" +
-      "/modules/cosmos/mint/v1beta1;mintv1beta1" +
-      "\242\002\003CMX\252\002\023Cosmos.Mint.V1beta1\312\002\023Cosmos\\Mi" +
-      "nt\\V1beta1\342\002\037Cosmos\\Mint\\V1beta1\\GPBMeta" +
-      "data\352\002\025Cosmos::Mint::V1beta1b\006proto3"
+      "ksPerYear:\004\230\240\037\000B\275\001\n\027com.cosmos.mint.v1be" +
+      "ta1B\tMintProtoP\001Z)github.com/cosmos/cosm" +
+      "os-sdk/x/mint/types\242\002\003CMX\252\002\023Cosmos.Mint." +
+      "V1beta1\312\002\023Cosmos\\Mint\\V1beta1\342\002\037Cosmos\\M" +
+      "int\\V1beta1\\GPBMetadata\352\002\025Cosmos::Mint::" +
+      "V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -27,20 +27,20 @@ public final class ServiceProto {
       "ssetmantle.modules.splits.queries.splits" +
       "\032\034google/api/annotations.proto\032)splits/q" +
       "ueries/splits/query_request.proto\032*split" +
-      "s/queries/splits/query_response.proto2\256\001" +
-      "\n\007Service\022\242\001\n\006Handle\0227.assetmantle.modul" +
-      "es.splits.queries.splits.QueryRequest\0328." +
-      "assetmantle.modules.splits.queries.split" +
-      "s.QueryResponse\"%\202\323\344\223\002\037\022\035/mantle/splits/" +
-      "v1beta1/splitsB\277\002\n-com.assetmantle.modul" +
-      "es.splits.queries.splitsB\014ServiceProtoP\001" +
-      "Z6github.com/AssetMantle/modules/x/split" +
-      "s/queries/splits\242\002\005AMSQS\252\002)Assetmantle.M" +
-      "odules.Splits.Queries.Splits\312\002)Assetmant" +
-      "le\\Modules\\Splits\\Queries\\Splits\342\0025Asset" +
-      "mantle\\Modules\\Splits\\Queries\\Splits\\GPB" +
-      "Metadata\352\002-Assetmantle::Modules::Splits:" +
-      ":Queries::Splitsb\006proto3"
+      "s/queries/splits/query_response.proto2\254\001" +
+      "\n\005Query\022\242\001\n\006Handle\0227.assetmantle.modules" +
+      ".splits.queries.splits.QueryRequest\0328.as" +
+      "setmantle.modules.splits.queries.splits." +
+      "QueryResponse\"%\202\323\344\223\002\037\022\035/mantle/splits/v1" +
+      "beta1/splitsB\277\002\n-com.assetmantle.modules" +
+      ".splits.queries.splitsB\014ServiceProtoP\001Z6" +
+      "github.com/AssetMantle/modules/x/splits/" +
+      "queries/splits\242\002\005AMSQS\252\002)Assetmantle.Mod" +
+      "ules.Splits.Queries.Splits\312\002)Assetmantle" +
+      "\\Modules\\Splits\\Queries\\Splits\342\0025Assetma" +
+      "ntle\\Modules\\Splits\\Queries\\Splits\\GPBMe" +
+      "tadata\352\002-Assetmantle::Modules::Splits::Q" +
+      "ueries::Splitsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

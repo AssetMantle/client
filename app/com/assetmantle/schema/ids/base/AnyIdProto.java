@@ -29,53 +29,46 @@ public final class AnyIdProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\025ids/base/any_id.proto\022\033assetmantle.sch" +
-      "ema.ids.base\032\024gogoproto/gogo.proto\032\035ids/" +
-      "base/any_ownable_id.proto\032\027ids/base/asse" +
-      "t_id.proto\032 ids/base/classification_id.p" +
-      "roto\032\026ids/base/coin_id.proto\032\026ids/base/d" +
-      "ata_id.proto\032\026ids/base/hash_id.proto\032\032id" +
-      "s/base/identity_id.proto\032\034ids/base/maint" +
-      "ainer_id.proto\032\027ids/base/order_id.proto\032" +
-      "\032ids/base/property_id.proto\032\027ids/base/sp" +
-      "lit_id.proto\032\030ids/base/string_id.proto\"\204" +
-      "\007\n\005AnyID\022B\n\tasset_i_d\030\001 \001(\0132$.assetmantl" +
-      "e.schema.ids.base.AssetIDH\000R\007assetID\022]\n\022" +
-      "classification_i_d\030\002 \001(\0132-.assetmantle.s" +
-      "chema.ids.base.ClassificationIDH\000R\020class" +
-      "ificationID\022?\n\010coin_i_d\030\003 \001(\0132#.assetman" +
-      "tle.schema.ids.base.CoinIDH\000R\006coinID\022?\n\010" +
-      "data_i_d\030\004 \001(\0132#.assetmantle.schema.ids." +
-      "base.DataIDH\000R\006dataID\022?\n\010hash_i_d\030\005 \001(\0132" +
+      "ema.ids.base\032\024gogoproto/gogo.proto\032\027ids/" +
+      "base/asset_id.proto\032 ids/base/classifica" +
+      "tion_id.proto\032\026ids/base/data_id.proto\032\026i" +
+      "ds/base/hash_id.proto\032\032ids/base/identity" +
+      "_id.proto\032\034ids/base/maintainer_id.proto\032" +
+      "\027ids/base/order_id.proto\032\032ids/base/prope" +
+      "rty_id.proto\032\027ids/base/split_id.proto\032\030i" +
+      "ds/base/string_id.proto\"\366\005\n\005AnyID\022B\n\tass" +
+      "et_i_d\030\001 \001(\0132$.assetmantle.schema.ids.ba" +
+      "se.AssetIDH\000R\007assetID\022]\n\022classification_" +
+      "i_d\030\002 \001(\0132-.assetmantle.schema.ids.base." +
+      "ClassificationIDH\000R\020classificationID\022?\n\010" +
+      "data_i_d\030\003 \001(\0132#.assetmantle.schema.ids." +
+      "base.DataIDH\000R\006dataID\022?\n\010hash_i_d\030\004 \001(\0132" +
       "#.assetmantle.schema.ids.base.HashIDH\000R\006" +
-      "hashID\022K\n\014identity_i_d\030\006 \001(\0132\'.assetmant" +
+      "hashID\022K\n\014identity_i_d\030\005 \001(\0132\'.assetmant" +
       "le.schema.ids.base.IdentityIDH\000R\nidentit" +
-      "yID\022Q\n\016maintainer_i_d\030\007 \001(\0132).assetmantl" +
+      "yID\022Q\n\016maintainer_i_d\030\006 \001(\0132).assetmantl" +
       "e.schema.ids.base.MaintainerIDH\000R\014mainta" +
-      "inerID\022B\n\torder_i_d\030\010 \001(\0132$.assetmantle." +
-      "schema.ids.base.OrderIDH\000R\007orderID\022K\n\013ow" +
-      "nable_i_d\030\t \001(\0132).assetmantle.schema.ids" +
-      ".base.AnyOwnableIDH\000R\townableID\022K\n\014prope" +
-      "rty_i_d\030\n \001(\0132\'.assetmantle.schema.ids.b" +
-      "ase.PropertyIDH\000R\npropertyID\022B\n\tsplit_i_" +
-      "d\030\013 \001(\0132$.assetmantle.schema.ids.base.Sp" +
-      "litIDH\000R\007splitID\022E\n\nstring_i_d\030\014 \001(\0132%.a" +
-      "ssetmantle.schema.ids.base.StringIDH\000R\010s" +
-      "tringID:\004\210\240\037\000B\006\n\004implB\350\001\n\037com.assetmantl" +
-      "e.schema.ids.baseB\nAnyIdProtoP\001Z)github." +
-      "com/AssetMantle/schema/go/ids/base\242\002\004ASI" +
-      "B\252\002\033Assetmantle.Schema.Ids.Base\312\002\033Assetm" +
-      "antle\\Schema\\Ids\\Base\342\002\'Assetmantle\\Sche" +
-      "ma\\Ids\\Base\\GPBMetadata\352\002\036Assetmantle::S" +
-      "chema::Ids::Baseb\006proto3"
+      "inerID\022B\n\torder_i_d\030\007 \001(\0132$.assetmantle." +
+      "schema.ids.base.OrderIDH\000R\007orderID\022K\n\014pr" +
+      "operty_i_d\030\010 \001(\0132\'.assetmantle.schema.id" +
+      "s.base.PropertyIDH\000R\npropertyID\022B\n\tsplit" +
+      "_i_d\030\t \001(\0132$.assetmantle.schema.ids.base" +
+      ".SplitIDH\000R\007splitID\022E\n\nstring_i_d\030\n \001(\0132" +
+      "%.assetmantle.schema.ids.base.StringIDH\000" +
+      "R\010stringID:\004\210\240\037\000B\006\n\004implB\350\001\n\037com.assetma" +
+      "ntle.schema.ids.baseB\nAnyIdProtoP\001Z)gith" +
+      "ub.com/AssetMantle/schema/go/ids/base\242\002\004" +
+      "ASIB\252\002\033Assetmantle.Schema.Ids.Base\312\002\033Ass" +
+      "etmantle\\Schema\\Ids\\Base\342\002\'Assetmantle\\S" +
+      "chema\\Ids\\Base\\GPBMetadata\352\002\036Assetmantle" +
+      "::Schema::Ids::Baseb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.gogoproto.GogoProto.getDescriptor(),
-          com.assetmantle.schema.ids.base.AnyOwnableIdProto.getDescriptor(),
           com.assetmantle.schema.ids.base.AssetIdProto.getDescriptor(),
           com.assetmantle.schema.ids.base.ClassificationIdProto.getDescriptor(),
-          com.assetmantle.schema.ids.base.CoinIdProto.getDescriptor(),
           com.assetmantle.schema.ids.base.DataIdProto.getDescriptor(),
           com.assetmantle.schema.ids.base.HashIdProto.getDescriptor(),
           com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor(),
@@ -90,17 +83,15 @@ public final class AnyIdProto {
     internal_static_assetmantle_schema_ids_base_AnyID_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_schema_ids_base_AnyID_descriptor,
-        new java.lang.String[] { "AssetID", "ClassificationID", "CoinID", "DataID", "HashID", "IdentityID", "MaintainerID", "OrderID", "OwnableID", "PropertyID", "SplitID", "StringID", "Impl", });
+        new java.lang.String[] { "AssetID", "ClassificationID", "DataID", "HashID", "IdentityID", "MaintainerID", "OrderID", "PropertyID", "SplitID", "StringID", "Impl", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
-    com.assetmantle.schema.ids.base.AnyOwnableIdProto.getDescriptor();
     com.assetmantle.schema.ids.base.AssetIdProto.getDescriptor();
     com.assetmantle.schema.ids.base.ClassificationIdProto.getDescriptor();
-    com.assetmantle.schema.ids.base.CoinIdProto.getDescriptor();
     com.assetmantle.schema.ids.base.DataIdProto.getDescriptor();
     com.assetmantle.schema.ids.base.HashIdProto.getDescriptor();
     com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor();

@@ -16,9 +16,8 @@ import queries.responses.blockchain.GenesisResponse._
 import queries.responses.blockchain.MintingInflationResponse.{Response => MintingInflationResponse}
 import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPoolResponse}
 import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
+import queries.responses.blockchain.common._
 import queries.responses.common.Header
-import schema.list.PropertyList
-import schema.qualified.{Immutables, Mutables}
 import utilities.Date.RFC3339
 import utilities.MicroNumber
 
@@ -76,21 +75,6 @@ class Startup @Inject()(
 
   archiving.setLastArchiveHeight()
 
-  private def insertInitialClassificationIDs() = {
-    val nubClassificationID = models.blockchain.Classification(
-      id = schema.constants.Document.NubClassificationID.getBytes,
-      idString = schema.constants.Document.NubClassificationID.asString,
-      immutables = Immutables(PropertyList(Seq(schema.constants.Properties.NubProperty))).getProtoBytes,
-      mutables = Mutables(PropertyList(Seq(schema.constants.Properties.AuthenticationProperty))).getProtoBytes)
-    val maintainerClassificationID = models.blockchain.Classification(
-      id = schema.constants.Document.MaintainerClassificationID.getBytes,
-      idString = schema.constants.Document.MaintainerClassificationID.asString,
-      immutables = schema.constants.Properties.MaintainerClassificationImmutables.getProtoBytes,
-      mutables = schema.constants.Properties.MaintainerClassificationMutables.getProtoBytes)
-
-    blockchainClassifications.Service.insertOrUpdate(nubClassificationID) //Seq(nubClassificationID, maintainerClassificationID))
-  }
-
   private def onGenesis(): Future[Unit] = {
     val genesis = Future {
       val genesisSource = ScalaSource.fromFile(genesisFilePath)
@@ -100,7 +84,7 @@ class Startup @Inject()(
 
     (for {
       genesis <- genesis
-      _ <- insertParametersOnStart(Seq(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter) ++ Seq(genesis.app_state.assets.map(_.getParameter), genesis.app_state.classifications.map(_.getParameter), genesis.app_state.identities.map(_.getParameter), genesis.app_state.maintainers.map(_.getParameter), genesis.app_state.metas.map(_.getParameter), genesis.app_state.orders.map(_.getParameter), genesis.app_state.splits.map(_.getParameter)).flatten)
+      _ <- insertParametersOnStart(Seq(genesis.app_state.auth.params.toParameter, genesis.app_state.bank.params.toParameter, genesis.app_state.distribution.params.toParameter, genesis.app_state.gov.toParameter, genesis.app_state.mint.params.toParameter, genesis.app_state.slashing.params.toParameter, genesis.app_state.staking.params.toParameter) ++ Seq(genesis.app_state.assets.map(_.parameter_list.getAssetParameter), genesis.app_state.classifications.map(_.parameter_list.getClassificationParameter), genesis.app_state.identities.map(_.parameter_list.getIdentityParameter), genesis.app_state.maintainers.map(_.parameter_list.getMaintainerParameter), genesis.app_state.metas.map(_.parameter_list.getMetaParameter), genesis.app_state.orders.map(_.parameter_list.getOrderParameter), genesis.app_state.splits.map(_.parameter_list.getSplitParameter)).flatten)
       _ <- insertAccountsOnStart(genesis.app_state.auth.accounts)
       _ <- insertBalancesOnStart(genesis.app_state.bank.balances)
       _ <- updateStakingOnStart(genesis.app_state.staking)
@@ -109,14 +93,13 @@ class Startup @Inject()(
       _ <- insertAllTokensOnStart()
       _ <- insertAuthorizationsOnStart(genesis.app_state.authz.authorization)
       _ <- insertFeeGrantsOnStart(genesis.app_state.feegrant.allowances)
-      _ <- if (genesis.app_state.metas.isDefined) insertMetasOnStart(genesis.app_state.metas.get.mappables) else Future()
-      _ <- insertInitialClassificationIDs()
-      _ <- if (genesis.app_state.classifications.isDefined) insertClassificationsOnStart(genesis.app_state.classifications.get.mappables) else Future()
-      _ <- if (genesis.app_state.maintainers.isDefined) insertMaintainersOnStart(genesis.app_state.maintainers.get.mappables) else Future()
-      _ <- if (genesis.app_state.assets.isDefined) insertAssetsOnStart(genesis.app_state.assets.get.mappables) else Future()
-      _ <- if (genesis.app_state.identities.isDefined) insertIdentitiesOnStart(genesis.app_state.identities.get.mappables) else Future()
-      _ <- if (genesis.app_state.splits.isDefined) insertSplitsOnStart(genesis.app_state.splits.get.mappables) else Future()
-      _ <- if (genesis.app_state.orders.isDefined) insertOrdersOnStart(genesis.app_state.orders.get.mappables) else Future()
+      _ <- if (genesis.app_state.metas.isDefined) insertMetasOnStart(genesis.app_state.metas.get.records.map(_.mappable)) else Future()
+      _ <- if (genesis.app_state.classifications.isDefined) insertClassificationsOnStart(genesis.app_state.classifications.get.records.map(_.mappable)) else Future()
+      _ <- if (genesis.app_state.maintainers.isDefined) insertMaintainersOnStart(genesis.app_state.maintainers.get.records.map(_.mappable)) else Future()
+      _ <- if (genesis.app_state.assets.isDefined) insertAssetsOnStart(genesis.app_state.assets.get.records.map(_.mappable)) else Future()
+      _ <- if (genesis.app_state.identities.isDefined) insertIdentitiesOnStart(genesis.app_state.identities.get.records.map(_.mappable)) else Future()
+      _ <- if (genesis.app_state.splits.isDefined) insertSplitsOnStart(genesis.app_state.splits.get.records.map(_.mappable)) else Future()
+      _ <- if (genesis.app_state.orders.isDefined) insertOrdersOnStart(genesis.app_state.orders.get.records.map(_.mappable)) else Future()
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
@@ -313,6 +296,37 @@ class Startup @Inject()(
     } yield ()
   }
 
+  private var beforeStartRan = false
+
+  private def beforeStart: Future[Unit] = if (!beforeStartRan) {
+    def updateParameters = blockchainParameters.Utility.updateParameters(Seq(
+      constants.Blockchain.ParameterType.GOVERNANCE,
+      constants.Blockchain.ParameterType.ASSETS,
+      constants.Blockchain.ParameterType.CLASSIFICATIONS,
+      constants.Blockchain.ParameterType.IDENTITIES,
+      constants.Blockchain.ParameterType.MAINTAINERS,
+      constants.Blockchain.ParameterType.METAS,
+      constants.Blockchain.ParameterType.ORDERS,
+      constants.Blockchain.ParameterType.SPLITS
+    ))
+    val classifications = blockchainClassifications.Utility.beforeRun
+
+    //Should be run only after classifications
+    def identities = blockchainIdentities.Utility.beforeRun
+
+    (for {
+      _ <- classifications
+      _ <- identities
+      _ <- updateParameters
+    } yield ()).recover{
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        beforeStartRan = true
+    }
+  } else {
+    beforeStartRan = true
+    Future()
+  }
+
   private val explorerRunnable = new Runnable {
     def run(): Unit = if (!utilities.Scheduler.getSignalReceived) {
       //TODO Bug Source: Continuously emits sometimes when app starts - queries.blockchain.GetABCIInfo in application-akka.actor.default-dispatcher-66  - LOG.ILLEGAL_STATE_EXCEPTION
@@ -350,6 +364,7 @@ class Startup @Inject()(
       }
 
       val forComplete = (for {
+        _ <- beforeStart
         abciInfo <- abciInfo
         latestExplorerBlockHeight <- latestExplorerBlockHeight
         _ <- checkAndInsertBlock(abciInfo.result.response.last_block_height.toInt, latestExplorerBlockHeight)

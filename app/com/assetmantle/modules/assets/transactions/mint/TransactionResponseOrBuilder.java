@@ -8,14 +8,17 @@ public interface TransactionResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string asset_i_d = 1 [json_name = "assetID"];</code>
+   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+   * @return Whether the assetID field is set.
+   */
+  boolean hasAssetID();
+  /**
+   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
    * @return The assetID.
    */
-  java.lang.String getAssetID();
+  com.assetmantle.schema.ids.base.AssetID getAssetID();
   /**
-   * <code>string asset_i_d = 1 [json_name = "assetID"];</code>
-   * @return The bytes for assetID.
+   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
    */
-  com.google.protobuf.ByteString
-      getAssetIDBytes();
+  com.assetmantle.schema.ids.base.AssetIDOrBuilder getAssetIDOrBuilder();
 }

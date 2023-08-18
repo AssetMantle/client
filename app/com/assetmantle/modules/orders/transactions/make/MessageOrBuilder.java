@@ -65,34 +65,34 @@ public interface MessageOrBuilder extends
   com.assetmantle.schema.ids.base.IdentityIDOrBuilder getTakerIDOrBuilder();
 
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
-   * @return Whether the makerOwnableID field is set.
+   * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
+   * @return Whether the makerAssetID field is set.
    */
-  boolean hasMakerOwnableID();
+  boolean hasMakerAssetID();
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
-   * @return The makerOwnableID.
+   * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
+   * @return The makerAssetID.
    */
-  com.assetmantle.schema.ids.base.AnyOwnableID getMakerOwnableID();
+  com.assetmantle.schema.ids.base.AssetID getMakerAssetID();
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID maker_ownable_i_d = 5 [json_name = "makerOwnableID"];</code>
+   * <code>.assetmantle.schema.ids.base.AssetID maker_asset_i_d = 5 [json_name = "makerAssetID"];</code>
    */
-  com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder getMakerOwnableIDOrBuilder();
+  com.assetmantle.schema.ids.base.AssetIDOrBuilder getMakerAssetIDOrBuilder();
 
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
-   * @return Whether the takerOwnableID field is set.
+   * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
+   * @return Whether the takerAssetID field is set.
    */
-  boolean hasTakerOwnableID();
+  boolean hasTakerAssetID();
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
-   * @return The takerOwnableID.
+   * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
+   * @return The takerAssetID.
    */
-  com.assetmantle.schema.ids.base.AnyOwnableID getTakerOwnableID();
+  com.assetmantle.schema.ids.base.AssetID getTakerAssetID();
   /**
-   * <code>.assetmantle.schema.ids.base.AnyOwnableID taker_ownable_i_d = 6 [json_name = "takerOwnableID"];</code>
+   * <code>.assetmantle.schema.ids.base.AssetID taker_asset_i_d = 6 [json_name = "takerAssetID"];</code>
    */
-  com.assetmantle.schema.ids.base.AnyOwnableIDOrBuilder getTakerOwnableIDOrBuilder();
+  com.assetmantle.schema.ids.base.AssetIDOrBuilder getTakerAssetIDOrBuilder();
 
   /**
    * <code>.assetmantle.schema.types.base.Height expires_in = 7 [json_name = "expiresIn"];</code>
@@ -110,28 +110,28 @@ public interface MessageOrBuilder extends
   com.assetmantle.schema.types.base.HeightOrBuilder getExpiresInOrBuilder();
 
   /**
-   * <code>string maker_ownable_split = 8 [json_name = "makerOwnableSplit"];</code>
-   * @return The makerOwnableSplit.
+   * <code>string maker_split = 8 [json_name = "makerSplit"];</code>
+   * @return The makerSplit.
    */
-  java.lang.String getMakerOwnableSplit();
+  java.lang.String getMakerSplit();
   /**
-   * <code>string maker_ownable_split = 8 [json_name = "makerOwnableSplit"];</code>
-   * @return The bytes for makerOwnableSplit.
+   * <code>string maker_split = 8 [json_name = "makerSplit"];</code>
+   * @return The bytes for makerSplit.
    */
   com.google.protobuf.ByteString
-      getMakerOwnableSplitBytes();
+      getMakerSplitBytes();
 
   /**
-   * <code>string taker_ownable_split = 9 [json_name = "takerOwnableSplit"];</code>
-   * @return The takerOwnableSplit.
+   * <code>string taker_split = 9 [json_name = "takerSplit"];</code>
+   * @return The takerSplit.
    */
-  java.lang.String getTakerOwnableSplit();
+  java.lang.String getTakerSplit();
   /**
-   * <code>string taker_ownable_split = 9 [json_name = "takerOwnableSplit"];</code>
-   * @return The bytes for takerOwnableSplit.
+   * <code>string taker_split = 9 [json_name = "takerSplit"];</code>
+   * @return The bytes for takerSplit.
    */
   com.google.protobuf.ByteString
-      getTakerOwnableSplitBytes();
+      getTakerSplitBytes();
 
   /**
    * <code>.assetmantle.schema.lists.base.PropertyList immutable_meta_properties = 10 [json_name = "immutableMetaProperties"];</code>

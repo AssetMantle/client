@@ -32,13 +32,13 @@ public final class GenesisProto {
       "cosmos.genutil.v1beta1\032\024gogoproto/gogo.p" +
       "roto\"`\n\014GenesisState\022P\n\007gen_txs\030\001 \003(\014B7\352" +
       "\336\037\006gentxs\362\336\037\ryaml:\"gentxs\"\372\336\037\030encoding/j" +
-      "son.RawMessageR\006genTxsB\352\001\n\032com.cosmos.ge" +
-      "nutil.v1beta1B\014GenesisProtoP\001ZDgithub.co" +
-      "m/AssetMantle/modules/cosmos/genutil/v1b" +
-      "eta1;genutilv1beta1\242\002\003CGX\252\002\026Cosmos.Genut" +
-      "il.V1beta1\312\002\026Cosmos\\Genutil\\V1beta1\342\002\"Co" +
-      "smos\\Genutil\\V1beta1\\GPBMetadata\352\002\030Cosmo" +
-      "s::Genutil::V1beta1b\006proto3"
+      "son.RawMessageR\006genTxsB\322\001\n\032com.cosmos.ge" +
+      "nutil.v1beta1B\014GenesisProtoP\001Z,github.co" +
+      "m/cosmos/cosmos-sdk/x/genutil/types\242\002\003CG" +
+      "X\252\002\026Cosmos.Genutil.V1beta1\312\002\026Cosmos\\Genu" +
+      "til\\V1beta1\342\002\"Cosmos\\Genutil\\V1beta1\\GPB" +
+      "Metadata\352\002\030Cosmos::Genutil::V1beta1b\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

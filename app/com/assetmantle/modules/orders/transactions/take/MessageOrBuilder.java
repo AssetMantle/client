@@ -35,16 +35,16 @@ public interface MessageOrBuilder extends
   com.assetmantle.schema.ids.base.IdentityIDOrBuilder getFromIDOrBuilder();
 
   /**
-   * <code>string taker_ownable_split = 3 [json_name = "takerOwnableSplit"];</code>
-   * @return The takerOwnableSplit.
+   * <code>string taker_split = 3 [json_name = "takerSplit"];</code>
+   * @return The takerSplit.
    */
-  java.lang.String getTakerOwnableSplit();
+  java.lang.String getTakerSplit();
   /**
-   * <code>string taker_ownable_split = 3 [json_name = "takerOwnableSplit"];</code>
-   * @return The bytes for takerOwnableSplit.
+   * <code>string taker_split = 3 [json_name = "takerSplit"];</code>
+   * @return The bytes for takerSplit.
    */
   com.google.protobuf.ByteString
-      getTakerOwnableSplitBytes();
+      getTakerSplitBytes();
 
   /**
    * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 4 [json_name = "orderID"];</code>

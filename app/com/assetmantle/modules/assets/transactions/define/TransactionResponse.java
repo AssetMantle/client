@@ -16,7 +16,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private TransactionResponse() {
-    classificationID_ = "";
   }
 
   @java.lang.Override
@@ -40,42 +39,29 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int CLASSIFICATION_I_D_FIELD_NUMBER = 1;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object classificationID_ = "";
+  private com.assetmantle.schema.ids.base.ClassificationID classificationID_;
   /**
-   * <code>string classification_i_d = 1 [json_name = "classificationID"];</code>
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+   * @return Whether the classificationID field is set.
+   */
+  @java.lang.Override
+  public boolean hasClassificationID() {
+    return classificationID_ != null;
+  }
+  /**
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
    * @return The classificationID.
    */
   @java.lang.Override
-  public java.lang.String getClassificationID() {
-    java.lang.Object ref = classificationID_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      classificationID_ = s;
-      return s;
-    }
+  public com.assetmantle.schema.ids.base.ClassificationID getClassificationID() {
+    return classificationID_ == null ? com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance() : classificationID_;
   }
   /**
-   * <code>string classification_i_d = 1 [json_name = "classificationID"];</code>
-   * @return The bytes for classificationID.
+   * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
-      getClassificationIDBytes() {
-    java.lang.Object ref = classificationID_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      classificationID_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public com.assetmantle.schema.ids.base.ClassificationIDOrBuilder getClassificationIDOrBuilder() {
+    return classificationID_ == null ? com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance() : classificationID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -92,8 +78,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(classificationID_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, classificationID_);
+    if (classificationID_ != null) {
+      output.writeMessage(1, getClassificationID());
     }
     getUnknownFields().writeTo(output);
   }
@@ -104,8 +90,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(classificationID_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, classificationID_);
+    if (classificationID_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(1, getClassificationID());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -122,8 +109,11 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.modules.assets.transactions.define.TransactionResponse other = (com.assetmantle.modules.assets.transactions.define.TransactionResponse) obj;
 
-    if (!getClassificationID()
-        .equals(other.getClassificationID())) return false;
+    if (hasClassificationID() != other.hasClassificationID()) return false;
+    if (hasClassificationID()) {
+      if (!getClassificationID()
+          .equals(other.getClassificationID())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -135,8 +125,10 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + CLASSIFICATION_I_D_FIELD_NUMBER;
-    hash = (53 * hash) + getClassificationID().hashCode();
+    if (hasClassificationID()) {
+      hash = (37 * hash) + CLASSIFICATION_I_D_FIELD_NUMBER;
+      hash = (53 * hash) + getClassificationID().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -266,7 +258,11 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      classificationID_ = "";
+      classificationID_ = null;
+      if (classificationIDBuilder_ != null) {
+        classificationIDBuilder_.dispose();
+        classificationIDBuilder_ = null;
+      }
       return this;
     }
 
@@ -301,7 +297,9 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(com.assetmantle.modules.assets.transactions.define.TransactionResponse result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.classificationID_ = classificationID_;
+        result.classificationID_ = classificationIDBuilder_ == null
+            ? classificationID_
+            : classificationIDBuilder_.build();
       }
     }
 
@@ -349,10 +347,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.modules.assets.transactions.define.TransactionResponse other) {
       if (other == com.assetmantle.modules.assets.transactions.define.TransactionResponse.getDefaultInstance()) return this;
-      if (!other.getClassificationID().isEmpty()) {
-        classificationID_ = other.classificationID_;
-        bitField0_ |= 0x00000001;
-        onChanged();
+      if (other.hasClassificationID()) {
+        mergeClassificationID(other.getClassificationID());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -381,7 +377,9 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 10: {
-              classificationID_ = input.readStringRequireUtf8();
+              input.readMessage(
+                  getClassificationIDFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
             } // case 10
@@ -402,76 +400,123 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.lang.Object classificationID_ = "";
+    private com.assetmantle.schema.ids.base.ClassificationID classificationID_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.assetmantle.schema.ids.base.ClassificationID, com.assetmantle.schema.ids.base.ClassificationID.Builder, com.assetmantle.schema.ids.base.ClassificationIDOrBuilder> classificationIDBuilder_;
     /**
-     * <code>string classification_i_d = 1 [json_name = "classificationID"];</code>
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+     * @return Whether the classificationID field is set.
+     */
+    public boolean hasClassificationID() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
      * @return The classificationID.
      */
-    public java.lang.String getClassificationID() {
-      java.lang.Object ref = classificationID_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        classificationID_ = s;
-        return s;
+    public com.assetmantle.schema.ids.base.ClassificationID getClassificationID() {
+      if (classificationIDBuilder_ == null) {
+        return classificationID_ == null ? com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance() : classificationID_;
       } else {
-        return (java.lang.String) ref;
+        return classificationIDBuilder_.getMessage();
       }
     }
     /**
-     * <code>string classification_i_d = 1 [json_name = "classificationID"];</code>
-     * @return The bytes for classificationID.
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
      */
-    public com.google.protobuf.ByteString
-        getClassificationIDBytes() {
-      java.lang.Object ref = classificationID_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        classificationID_ = b;
-        return b;
+    public Builder setClassificationID(com.assetmantle.schema.ids.base.ClassificationID value) {
+      if (classificationIDBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        classificationID_ = value;
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        classificationIDBuilder_.setMessage(value);
       }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
     }
     /**
-     * <code>string classification_i_d = 1 [json_name = "classificationID"];</code>
-     * @param value The classificationID to set.
-     * @return This builder for chaining.
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
      */
     public Builder setClassificationID(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      classificationID_ = value;
+        com.assetmantle.schema.ids.base.ClassificationID.Builder builderForValue) {
+      if (classificationIDBuilder_ == null) {
+        classificationID_ = builderForValue.build();
+      } else {
+        classificationIDBuilder_.setMessage(builderForValue.build());
+      }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>string classification_i_d = 1 [json_name = "classificationID"];</code>
-     * @return This builder for chaining.
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+     */
+    public Builder mergeClassificationID(com.assetmantle.schema.ids.base.ClassificationID value) {
+      if (classificationIDBuilder_ == null) {
+        if (((bitField0_ & 0x00000001) != 0) &&
+          classificationID_ != null &&
+          classificationID_ != com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance()) {
+          getClassificationIDBuilder().mergeFrom(value);
+        } else {
+          classificationID_ = value;
+        }
+      } else {
+        classificationIDBuilder_.mergeFrom(value);
+      }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
      */
     public Builder clearClassificationID() {
-      classificationID_ = getDefaultInstance().getClassificationID();
       bitField0_ = (bitField0_ & ~0x00000001);
+      classificationID_ = null;
+      if (classificationIDBuilder_ != null) {
+        classificationIDBuilder_.dispose();
+        classificationIDBuilder_ = null;
+      }
       onChanged();
       return this;
     }
     /**
-     * <code>string classification_i_d = 1 [json_name = "classificationID"];</code>
-     * @param value The bytes for classificationID to set.
-     * @return This builder for chaining.
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
      */
-    public Builder setClassificationIDBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      classificationID_ = value;
+    public com.assetmantle.schema.ids.base.ClassificationID.Builder getClassificationIDBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return this;
+      return getClassificationIDFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+     */
+    public com.assetmantle.schema.ids.base.ClassificationIDOrBuilder getClassificationIDOrBuilder() {
+      if (classificationIDBuilder_ != null) {
+        return classificationIDBuilder_.getMessageOrBuilder();
+      } else {
+        return classificationID_ == null ?
+            com.assetmantle.schema.ids.base.ClassificationID.getDefaultInstance() : classificationID_;
+      }
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.ClassificationID classification_i_d = 1 [json_name = "classificationID"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.assetmantle.schema.ids.base.ClassificationID, com.assetmantle.schema.ids.base.ClassificationID.Builder, com.assetmantle.schema.ids.base.ClassificationIDOrBuilder> 
+        getClassificationIDFieldBuilder() {
+      if (classificationIDBuilder_ == null) {
+        classificationIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.schema.ids.base.ClassificationID, com.assetmantle.schema.ids.base.ClassificationID.Builder, com.assetmantle.schema.ids.base.ClassificationIDOrBuilder>(
+                getClassificationID(),
+                getParentForChildren(),
+                isClean());
+        classificationID_ = null;
+      }
+      return classificationIDBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

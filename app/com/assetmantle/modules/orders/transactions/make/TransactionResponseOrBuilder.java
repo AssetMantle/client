@@ -8,14 +8,17 @@ public interface TransactionResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>string order_i_d = 1 [json_name = "orderID"];</code>
+   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
+   * @return Whether the orderID field is set.
+   */
+  boolean hasOrderID();
+  /**
+   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
    * @return The orderID.
    */
-  java.lang.String getOrderID();
+  com.assetmantle.schema.ids.base.OrderID getOrderID();
   /**
-   * <code>string order_i_d = 1 [json_name = "orderID"];</code>
-   * @return The bytes for orderID.
+   * <code>.assetmantle.schema.ids.base.OrderID order_i_d = 1 [json_name = "orderID"];</code>
    */
-  com.google.protobuf.ByteString
-      getOrderIDBytes();
+  com.assetmantle.schema.ids.base.OrderIDOrBuilder getOrderIDOrBuilder();
 }

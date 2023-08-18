@@ -8,7 +8,6 @@
 
 @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
 @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
-@commonHtmlInfo(constants.View.TO, commonJavascriptLink(msg.getTo, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getTo}'))")))
 @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonJavascriptLink(ClassificationID(msg.getClassificationID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${ClassificationID(msg.getClassificationID).asString}'))")))
 @Messages(constants.View.IMMUTABLE_META_PROPERTIES):
 @metaProperties(msg.getImmutableMetaProperties)

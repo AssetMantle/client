@@ -1,7 +1,7 @@
-@import views.html.base.infos._
-@import views.html.base.cards._
 @import models.blockchain.Proposal
 @import models.common.ProposalContents._
+@import views.html.base.cards._
+@import views.html.base.infos._
 
 @(proposal: Proposal)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -139,24 +139,20 @@
         </tr>
         @proposal.content.toProto.getTypeUrl match {
             case constants.Blockchain.Proposal.PARAMETER_CHANGE => {
-                @defining(proposal.content.asInstanceOf[ParameterChange])(parameterChange => {
-                    views.html.component.blockchain.proposal.govParamterChanges(parameterChange)
-                })
+                @defining(proposal.content.asInstanceOf[ParameterChange]) { parameterChange =>
+                    @views.html.component.blockchain.proposal.govParamterChanges(parameterChange)
+                }
             }
             case constants.Blockchain.Proposal.TEXT => {}
             case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => {
-                @defining(proposal.content.asInstanceOf[CommunityPoolSpend])(communityPoolSpend => {
-                    commonTextInfo(constants.View.RECIPIENT, communityPoolSpend.recipient)
-                    commonTextInfo(constants.View.AMOUNT, communityPoolSpend.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", "))
-                })
+                @defining(proposal.content.asInstanceOf[CommunityPoolSpend]) { communityPoolSpend =>
+                    @views.html.component.blockchain.proposal.communityPoolSpend(communityPoolSpend)
+                }
             }
             case constants.Blockchain.Proposal.SOFTWARE_UPGRADE => {
-                @defining(proposal.content.asInstanceOf[SoftwareUpgrade])(softwareUpgrade => {
-                    commonTextInfo(constants.View.NAME, softwareUpgrade.plan.name)
-                    commonTextInfo(constants.View.HEIGHT, softwareUpgrade.plan.height)
-                    commonEpochInfo(constants.View.TIME, softwareUpgrade.plan.time)
-                    commonTextInfo(constants.View.INFO, softwareUpgrade.plan.info)
-                })
+                @defining(proposal.content.asInstanceOf[SoftwareUpgrade]) { softwareUpgrade =>
+                    @views.html.component.blockchain.proposal.softwareUpgrade(softwareUpgrade)
+                }
             }
             case constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE => {}
             case _ => {}
@@ -164,8 +160,8 @@
     }
 }
 <script>
-        convertUTCDateToLocalDate("@proposal.submitTime.toString", "proposalSubmitTime");
-        convertUTCDateToLocalDate("@proposal.depositEndTime.toString", "proposalDepositEndTime");
-        convertUTCDateToLocalDate("@proposal.votingStartTime.toString", "proposalVotingStartTime");
-        convertUTCDateToLocalDate("@proposal.votingEndTime.toString", "proposalVotingEndTime");
+        fromEpochDateToLocal("@proposal.submitTime.epoch", 'proposalSubmitTime');
+        fromEpochDateToLocal("@proposal.depositEndTime.epoch", 'proposalDepositEndTime');
+        fromEpochDateToLocal("@proposal.votingStartTime.epoch", 'proposalVotingStartTime');
+        fromEpochDateToLocal("@proposal.votingEndTime.epoch", 'proposalVotingEndTime');
 </script>

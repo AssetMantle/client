@@ -28,21 +28,21 @@ public final class ServiceProto {
       "tions.deputize\032\034google/api/annotations.p" +
       "roto\032*orders/transactions/deputize/messa" +
       "ge.proto\0327orders/transactions/deputize/t" +
-      "ransaction_response.proto2\267\001\n\007Service\022\253\001" +
-      "\n\006Handle\0229.assetmantle.modules.orders.tr" +
-      "ansactions.deputize.Message\032E.assetmantl" +
-      "e.modules.orders.transactions.deputize.T" +
-      "ransactionResponse\"\037\202\323\344\223\002\031\"\027/mantle/orde" +
-      "rs/deputizeB\351\002\n4com.assetmantle.modules." +
-      "orders.transactions.deputizeB\014ServicePro" +
-      "toP\001Z=github.com/AssetMantle/modules/x/o" +
-      "rders/transactions/deputize\242\002\005AMOTD\252\0020As" +
-      "setmantle.Modules.Orders.Transactions.De" +
-      "putize\312\0020Assetmantle\\Modules\\Orders\\Tran" +
-      "sactions\\Deputize\342\002<Assetmantle\\Modules\\" +
-      "Orders\\Transactions\\Deputize\\GPBMetadata" +
-      "\352\0024Assetmantle::Modules::Orders::Transac" +
-      "tions::Deputizeb\006proto3"
+      "ransaction_response.proto2\263\001\n\003Msg\022\253\001\n\006Ha" +
+      "ndle\0229.assetmantle.modules.orders.transa" +
+      "ctions.deputize.Message\032E.assetmantle.mo" +
+      "dules.orders.transactions.deputize.Trans" +
+      "actionResponse\"\037\202\323\344\223\002\031\"\027/mantle/orders/d" +
+      "eputizeB\351\002\n4com.assetmantle.modules.orde" +
+      "rs.transactions.deputizeB\014ServiceProtoP\001" +
+      "Z=github.com/AssetMantle/modules/x/order" +
+      "s/transactions/deputize\242\002\005AMOTD\252\0020Assetm" +
+      "antle.Modules.Orders.Transactions.Deputi" +
+      "ze\312\0020Assetmantle\\Modules\\Orders\\Transact" +
+      "ions\\Deputize\342\002<Assetmantle\\Modules\\Orde" +
+      "rs\\Transactions\\Deputize\\GPBMetadata\352\0024A" +
+      "ssetmantle::Modules::Orders::Transaction" +
+      "s::Deputizeb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -8,26 +8,26 @@ public interface QueryResponseOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>repeated .assetmantle.modules.assets.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>repeated .assetmantle.modules.assets.record.Record list = 1 [json_name = "list"];</code>
    */
-  java.util.List<com.assetmantle.modules.assets.mappable.Mappable> 
+  java.util.List<com.assetmantle.modules.assets.record.Record> 
       getListList();
   /**
-   * <code>repeated .assetmantle.modules.assets.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>repeated .assetmantle.modules.assets.record.Record list = 1 [json_name = "list"];</code>
    */
-  com.assetmantle.modules.assets.mappable.Mappable getList(int index);
+  com.assetmantle.modules.assets.record.Record getList(int index);
   /**
-   * <code>repeated .assetmantle.modules.assets.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>repeated .assetmantle.modules.assets.record.Record list = 1 [json_name = "list"];</code>
    */
   int getListCount();
   /**
-   * <code>repeated .assetmantle.modules.assets.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>repeated .assetmantle.modules.assets.record.Record list = 1 [json_name = "list"];</code>
    */
-  java.util.List<? extends com.assetmantle.modules.assets.mappable.MappableOrBuilder> 
+  java.util.List<? extends com.assetmantle.modules.assets.record.RecordOrBuilder> 
       getListOrBuilderList();
   /**
-   * <code>repeated .assetmantle.modules.assets.mappable.Mappable list = 1 [json_name = "list"];</code>
+   * <code>repeated .assetmantle.modules.assets.record.Record list = 1 [json_name = "list"];</code>
    */
-  com.assetmantle.modules.assets.mappable.MappableOrBuilder getListOrBuilder(
+  com.assetmantle.modules.assets.record.RecordOrBuilder getListOrBuilder(
       int index);
 }

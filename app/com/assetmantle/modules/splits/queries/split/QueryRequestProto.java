@@ -30,30 +30,30 @@ public final class QueryRequestProto {
     java.lang.String[] descriptorData = {
       "\n(splits/queries/split/query_request.pro" +
       "to\022(assetmantle.modules.splits.queries.s" +
-      "plit\032\027ids/base/split_id.proto\"P\n\014QueryRe" +
-      "quest\022@\n\tsplit_i_d\030\001 \001(\0132$.assetmantle.s" +
-      "chema.ids.base.SplitIDR\007splitIDB\276\002\n,com." +
-      "assetmantle.modules.splits.queries.split" +
-      "B\021QueryRequestProtoP\001Z5github.com/AssetM" +
-      "antle/modules/x/splits/queries/split\242\002\005A" +
-      "MSQS\252\002(Assetmantle.Modules.Splits.Querie" +
-      "s.Split\312\002(Assetmantle\\Modules\\Splits\\Que" +
-      "ries\\Split\342\0024Assetmantle\\Modules\\Splits\\" +
-      "Queries\\Split\\GPBMetadata\352\002,Assetmantle:" +
-      ":Modules::Splits::Queries::Splitb\006proto3"
+      "plit\032\024splits/key/key.proto\"E\n\014QueryReque" +
+      "st\0225\n\003key\030\001 \001(\0132#.assetmantle.modules.sp" +
+      "lits.key.KeyR\003keyB\276\002\n,com.assetmantle.mo" +
+      "dules.splits.queries.splitB\021QueryRequest" +
+      "ProtoP\001Z5github.com/AssetMantle/modules/" +
+      "x/splits/queries/split\242\002\005AMSQS\252\002(Assetma" +
+      "ntle.Modules.Splits.Queries.Split\312\002(Asse" +
+      "tmantle\\Modules\\Splits\\Queries\\Split\342\0024A" +
+      "ssetmantle\\Modules\\Splits\\Queries\\Split\\" +
+      "GPBMetadata\352\002,Assetmantle::Modules::Spli" +
+      "ts::Queries::Splitb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.assetmantle.schema.ids.base.SplitIdProto.getDescriptor(),
+          com.assetmantle.modules.splits.key.KeyProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_splits_queries_split_QueryRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_splits_queries_split_QueryRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_splits_queries_split_QueryRequest_descriptor,
-        new java.lang.String[] { "SplitID", });
-    com.assetmantle.schema.ids.base.SplitIdProto.getDescriptor();
+        new java.lang.String[] { "Key", });
+    com.assetmantle.modules.splits.key.KeyProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

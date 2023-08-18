@@ -40,13 +40,12 @@ public final class TxProto {
       "Addr:\010\210\240\037\000\230\240\037\001\"\023\n\021MsgUnjailResponse2_\n\003M" +
       "sg\022X\n\006Unjail\022\".cosmos.slashing.v1beta1.M" +
       "sgUnjail\032*.cosmos.slashing.v1beta1.MsgUn" +
-      "jailResponseB\360\001\n\033com.cosmos.slashing.v1b" +
-      "eta1B\007TxProtoP\001ZFgithub.com/AssetMantle/" +
-      "modules/cosmos/slashing/v1beta1;slashing" +
-      "v1beta1\242\002\003CSX\252\002\027Cosmos.Slashing.V1beta1\312" +
-      "\002\027Cosmos\\Slashing\\V1beta1\342\002#Cosmos\\Slash" +
-      "ing\\V1beta1\\GPBMetadata\352\002\031Cosmos::Slashi" +
-      "ng::V1beta1\250\342\036\001b\006proto3"
+      "jailResponseB\327\001\n\033com.cosmos.slashing.v1b" +
+      "eta1B\007TxProtoP\001Z-github.com/cosmos/cosmo" +
+      "s-sdk/x/slashing/types\242\002\003CSX\252\002\027Cosmos.Sl" +
+      "ashing.V1beta1\312\002\027Cosmos\\Slashing\\V1beta1" +
+      "\342\002#Cosmos\\Slashing\\V1beta1\\GPBMetadata\352\002" +
+      "\031Cosmos::Slashing::V1beta1\250\342\036\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

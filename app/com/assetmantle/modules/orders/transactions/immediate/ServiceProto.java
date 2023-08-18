@@ -28,21 +28,21 @@ public final class ServiceProto {
       "ctions.immediate\032\034google/api/annotations" +
       ".proto\032+orders/transactions/immediate/me" +
       "ssage.proto\0328orders/transactions/immedia" +
-      "te/transaction_response.proto2\272\001\n\007Servic" +
-      "e\022\256\001\n\006Handle\022:.assetmantle.modules.order" +
-      "s.transactions.immediate.Message\032F.asset" +
-      "mantle.modules.orders.transactions.immed" +
-      "iate.TransactionResponse\" \202\323\344\223\002\032\"\030/mantl" +
-      "e/orders/immediateB\357\002\n5com.assetmantle.m" +
-      "odules.orders.transactions.immediateB\014Se" +
-      "rviceProtoP\001Z>github.com/AssetMantle/mod" +
-      "ules/x/orders/transactions/immediate\242\002\005A" +
-      "MOTI\252\0021Assetmantle.Modules.Orders.Transa" +
-      "ctions.Immediate\312\0021Assetmantle\\Modules\\O" +
-      "rders\\Transactions\\Immediate\342\002=Assetmant" +
-      "le\\Modules\\Orders\\Transactions\\Immediate" +
-      "\\GPBMetadata\352\0025Assetmantle::Modules::Ord" +
-      "ers::Transactions::Immediateb\006proto3"
+      "te/transaction_response.proto2\266\001\n\003Msg\022\256\001" +
+      "\n\006Handle\022:.assetmantle.modules.orders.tr" +
+      "ansactions.immediate.Message\032F.assetmant" +
+      "le.modules.orders.transactions.immediate" +
+      ".TransactionResponse\" \202\323\344\223\002\032\"\030/mantle/or" +
+      "ders/immediateB\357\002\n5com.assetmantle.modul" +
+      "es.orders.transactions.immediateB\014Servic" +
+      "eProtoP\001Z>github.com/AssetMantle/modules" +
+      "/x/orders/transactions/immediate\242\002\005AMOTI" +
+      "\252\0021Assetmantle.Modules.Orders.Transactio" +
+      "ns.Immediate\312\0021Assetmantle\\Modules\\Order" +
+      "s\\Transactions\\Immediate\342\002=Assetmantle\\M" +
+      "odules\\Orders\\Transactions\\Immediate\\GPB" +
+      "Metadata\352\0025Assetmantle::Modules::Orders:" +
+      ":Transactions::Immediateb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

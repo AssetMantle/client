@@ -29,22 +29,22 @@ public final class ServiceProto {
       "/annotations.proto\0321identities/transacti" +
       "ons/unprovision/message.proto\032>identitie" +
       "s/transactions/unprovision/transaction_r" +
-      "esponse.proto2\314\001\n\007Service\022\300\001\n\006Handle\022@.a" +
-      "ssetmantle.modules.identities.transactio" +
-      "ns.unprovision.Message\032L.assetmantle.mod" +
+      "esponse.proto2\310\001\n\003Msg\022\300\001\n\006Handle\022@.asset" +
+      "mantle.modules.identities.transactions.u" +
+      "nprovision.Message\032L.assetmantle.modules" +
+      ".identities.transactions.unprovision.Tra" +
+      "nsactionResponse\"&\202\323\344\223\002 \"\036/mantle/identi" +
+      "ties/unprovisionB\223\003\n;com.assetmantle.mod" +
       "ules.identities.transactions.unprovision" +
-      ".TransactionResponse\"&\202\323\344\223\002 \"\036/mantle/id" +
-      "entities/unprovisionB\223\003\n;com.assetmantle" +
-      ".modules.identities.transactions.unprovi" +
-      "sionB\014ServiceProtoP\001ZDgithub.com/AssetMa" +
-      "ntle/modules/x/identities/transactions/u" +
-      "nprovision\242\002\005AMITU\252\0027Assetmantle.Modules" +
-      ".Identities.Transactions.Unprovision\312\0027A" +
-      "ssetmantle\\Modules\\Identities\\Transactio" +
-      "ns\\Unprovision\342\002CAssetmantle\\Modules\\Ide" +
-      "ntities\\Transactions\\Unprovision\\GPBMeta" +
-      "data\352\002;Assetmantle::Modules::Identities:" +
-      ":Transactions::Unprovisionb\006proto3"
+      "B\014ServiceProtoP\001ZDgithub.com/AssetMantle" +
+      "/modules/x/identities/transactions/unpro" +
+      "vision\242\002\005AMITU\252\0027Assetmantle.Modules.Ide" +
+      "ntities.Transactions.Unprovision\312\0027Asset" +
+      "mantle\\Modules\\Identities\\Transactions\\U" +
+      "nprovision\342\002CAssetmantle\\Modules\\Identit" +
+      "ies\\Transactions\\Unprovision\\GPBMetadata" +
+      "\352\002;Assetmantle::Modules::Identities::Tra" +
+      "nsactions::Unprovisionb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

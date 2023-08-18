@@ -58,12 +58,12 @@ public final class GenesisProto {
       "rt_id\030\001 \001(\tB\022\362\336\037\016yaml:\"port_id\"R\006portId\022" +
       "4\n\nchannel_id\030\002 \001(\tB\025\362\336\037\021yaml:\"channel_i" +
       "d\"R\tchannelId\022\032\n\010sequence\030\003 \001(\004R\010sequenc" +
-      "eB\324\001\n\027com.ibc.core.channel.v1B\014GenesisPr" +
-      "otoP\001Z<github.com/AssetMantle/modules/ib" +
-      "c/core/channel/v1;channelv1\242\002\003ICC\252\002\023Ibc." +
-      "Core.Channel.V1\312\002\023Ibc\\Core\\Channel\\V1\342\002\037" +
-      "Ibc\\Core\\Channel\\V1\\GPBMetadata\352\002\026Ibc::C" +
-      "ore::Channel::V1b\006proto3"
+      "eB\321\001\n\027com.ibc.core.channel.v1B\014GenesisPr" +
+      "otoP\001Z9github.com/cosmos/ibc-go/v4/modul" +
+      "es/core/04-channel/types\242\002\003ICC\252\002\023Ibc.Cor" +
+      "e.Channel.V1\312\002\023Ibc\\Core\\Channel\\V1\342\002\037Ibc" +
+      "\\Core\\Channel\\V1\\GPBMetadata\352\002\026Ibc::Core" +
+      "::Channel::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

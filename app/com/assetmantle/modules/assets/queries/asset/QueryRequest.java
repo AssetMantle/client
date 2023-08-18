@@ -38,30 +38,30 @@ private static final long serialVersionUID = 0L;
             com.assetmantle.modules.assets.queries.asset.QueryRequest.class, com.assetmantle.modules.assets.queries.asset.QueryRequest.Builder.class);
   }
 
-  public static final int ASSET_I_D_FIELD_NUMBER = 1;
-  private com.assetmantle.schema.ids.base.AssetID assetID_;
+  public static final int KEY_FIELD_NUMBER = 1;
+  private com.assetmantle.modules.assets.key.Key key_;
   /**
-   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
-   * @return Whether the assetID field is set.
+   * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
+   * @return Whether the key field is set.
    */
   @java.lang.Override
-  public boolean hasAssetID() {
-    return assetID_ != null;
+  public boolean hasKey() {
+    return key_ != null;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
-   * @return The assetID.
+   * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.AssetID getAssetID() {
-    return assetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
+  public com.assetmantle.modules.assets.key.Key getKey() {
+    return key_ == null ? com.assetmantle.modules.assets.key.Key.getDefaultInstance() : key_;
   }
   /**
-   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+   * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.schema.ids.base.AssetIDOrBuilder getAssetIDOrBuilder() {
-    return assetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
+  public com.assetmantle.modules.assets.key.KeyOrBuilder getKeyOrBuilder() {
+    return key_ == null ? com.assetmantle.modules.assets.key.Key.getDefaultInstance() : key_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -78,8 +78,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (assetID_ != null) {
-      output.writeMessage(1, getAssetID());
+    if (key_ != null) {
+      output.writeMessage(1, getKey());
     }
     getUnknownFields().writeTo(output);
   }
@@ -90,9 +90,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (assetID_ != null) {
+    if (key_ != null) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, getAssetID());
+        .computeMessageSize(1, getKey());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -109,10 +109,10 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.modules.assets.queries.asset.QueryRequest other = (com.assetmantle.modules.assets.queries.asset.QueryRequest) obj;
 
-    if (hasAssetID() != other.hasAssetID()) return false;
-    if (hasAssetID()) {
-      if (!getAssetID()
-          .equals(other.getAssetID())) return false;
+    if (hasKey() != other.hasKey()) return false;
+    if (hasKey()) {
+      if (!getKey()
+          .equals(other.getKey())) return false;
     }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
@@ -125,9 +125,9 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (hasAssetID()) {
-      hash = (37 * hash) + ASSET_I_D_FIELD_NUMBER;
-      hash = (53 * hash) + getAssetID().hashCode();
+    if (hasKey()) {
+      hash = (37 * hash) + KEY_FIELD_NUMBER;
+      hash = (53 * hash) + getKey().hashCode();
     }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
@@ -258,10 +258,10 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      assetID_ = null;
-      if (assetIDBuilder_ != null) {
-        assetIDBuilder_.dispose();
-        assetIDBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
       return this;
     }
@@ -297,9 +297,9 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(com.assetmantle.modules.assets.queries.asset.QueryRequest result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.assetID_ = assetIDBuilder_ == null
-            ? assetID_
-            : assetIDBuilder_.build();
+        result.key_ = keyBuilder_ == null
+            ? key_
+            : keyBuilder_.build();
       }
     }
 
@@ -347,8 +347,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.modules.assets.queries.asset.QueryRequest other) {
       if (other == com.assetmantle.modules.assets.queries.asset.QueryRequest.getDefaultInstance()) return this;
-      if (other.hasAssetID()) {
-        mergeAssetID(other.getAssetID());
+      if (other.hasKey()) {
+        mergeKey(other.getKey());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -378,7 +378,7 @@ private static final long serialVersionUID = 0L;
               break;
             case 10: {
               input.readMessage(
-                  getAssetIDFieldBuilder().getBuilder(),
+                  getKeyFieldBuilder().getBuilder(),
                   extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
@@ -400,123 +400,123 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private com.assetmantle.schema.ids.base.AssetID assetID_;
+    private com.assetmantle.modules.assets.key.Key key_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder> assetIDBuilder_;
+        com.assetmantle.modules.assets.key.Key, com.assetmantle.modules.assets.key.Key.Builder, com.assetmantle.modules.assets.key.KeyOrBuilder> keyBuilder_;
     /**
-     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
-     * @return Whether the assetID field is set.
+     * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
+     * @return Whether the key field is set.
      */
-    public boolean hasAssetID() {
+    public boolean hasKey() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
-     * @return The assetID.
+     * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
+     * @return The key.
      */
-    public com.assetmantle.schema.ids.base.AssetID getAssetID() {
-      if (assetIDBuilder_ == null) {
-        return assetID_ == null ? com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
+    public com.assetmantle.modules.assets.key.Key getKey() {
+      if (keyBuilder_ == null) {
+        return key_ == null ? com.assetmantle.modules.assets.key.Key.getDefaultInstance() : key_;
       } else {
-        return assetIDBuilder_.getMessage();
+        return keyBuilder_.getMessage();
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setAssetID(com.assetmantle.schema.ids.base.AssetID value) {
-      if (assetIDBuilder_ == null) {
+    public Builder setKey(com.assetmantle.modules.assets.key.Key value) {
+      if (keyBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        assetID_ = value;
+        key_ = value;
       } else {
-        assetIDBuilder_.setMessage(value);
+        keyBuilder_.setMessage(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder setAssetID(
-        com.assetmantle.schema.ids.base.AssetID.Builder builderForValue) {
-      if (assetIDBuilder_ == null) {
-        assetID_ = builderForValue.build();
+    public Builder setKey(
+        com.assetmantle.modules.assets.key.Key.Builder builderForValue) {
+      if (keyBuilder_ == null) {
+        key_ = builderForValue.build();
       } else {
-        assetIDBuilder_.setMessage(builderForValue.build());
+        keyBuilder_.setMessage(builderForValue.build());
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder mergeAssetID(com.assetmantle.schema.ids.base.AssetID value) {
-      if (assetIDBuilder_ == null) {
+    public Builder mergeKey(com.assetmantle.modules.assets.key.Key value) {
+      if (keyBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0) &&
-          assetID_ != null &&
-          assetID_ != com.assetmantle.schema.ids.base.AssetID.getDefaultInstance()) {
-          getAssetIDBuilder().mergeFrom(value);
+          key_ != null &&
+          key_ != com.assetmantle.modules.assets.key.Key.getDefaultInstance()) {
+          getKeyBuilder().mergeFrom(value);
         } else {
-          assetID_ = value;
+          key_ = value;
         }
       } else {
-        assetIDBuilder_.mergeFrom(value);
+        keyBuilder_.mergeFrom(value);
       }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
      */
-    public Builder clearAssetID() {
+    public Builder clearKey() {
       bitField0_ = (bitField0_ & ~0x00000001);
-      assetID_ = null;
-      if (assetIDBuilder_ != null) {
-        assetIDBuilder_.dispose();
-        assetIDBuilder_ = null;
+      key_ = null;
+      if (keyBuilder_ != null) {
+        keyBuilder_.dispose();
+        keyBuilder_ = null;
       }
       onChanged();
       return this;
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.assetmantle.schema.ids.base.AssetID.Builder getAssetIDBuilder() {
+    public com.assetmantle.modules.assets.key.Key.Builder getKeyBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return getAssetIDFieldBuilder().getBuilder();
+      return getKeyFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
      */
-    public com.assetmantle.schema.ids.base.AssetIDOrBuilder getAssetIDOrBuilder() {
-      if (assetIDBuilder_ != null) {
-        return assetIDBuilder_.getMessageOrBuilder();
+    public com.assetmantle.modules.assets.key.KeyOrBuilder getKeyOrBuilder() {
+      if (keyBuilder_ != null) {
+        return keyBuilder_.getMessageOrBuilder();
       } else {
-        return assetID_ == null ?
-            com.assetmantle.schema.ids.base.AssetID.getDefaultInstance() : assetID_;
+        return key_ == null ?
+            com.assetmantle.modules.assets.key.Key.getDefaultInstance() : key_;
       }
     }
     /**
-     * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+     * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder> 
-        getAssetIDFieldBuilder() {
-      if (assetIDBuilder_ == null) {
-        assetIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.assetmantle.schema.ids.base.AssetID, com.assetmantle.schema.ids.base.AssetID.Builder, com.assetmantle.schema.ids.base.AssetIDOrBuilder>(
-                getAssetID(),
+        com.assetmantle.modules.assets.key.Key, com.assetmantle.modules.assets.key.Key.Builder, com.assetmantle.modules.assets.key.KeyOrBuilder> 
+        getKeyFieldBuilder() {
+      if (keyBuilder_ == null) {
+        keyBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.modules.assets.key.Key, com.assetmantle.modules.assets.key.Key.Builder, com.assetmantle.modules.assets.key.KeyOrBuilder>(
+                getKey(),
                 getParentForChildren(),
                 isClean());
-        assetID_ = null;
+        key_ = null;
       }
-      return assetIDBuilder_;
+      return keyBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

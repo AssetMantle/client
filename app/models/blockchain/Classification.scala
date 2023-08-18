@@ -104,15 +104,15 @@ class Classifications @Inject()(
 
   object Utility {
 
-    def defineAuxiliary(definer: String, mutables: Mutables, immutables: Immutables): Future[ClassificationID] = {
-      val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(definer)
+    def defineAuxiliary(address: String, mutables: Mutables, immutables: Immutables): Future[ClassificationID] = {
+      val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(address)
       val classificationParameter = blockchainParameters.Service.tryGetClassificationParameter
       val totalWeight = mutables.getTotalBondWeight + immutables.getTotalBondWeight
 
       def add(classificationParameter: ClassificationParameter) = {
-        val updatedImmutables = Immutables(immutables.propertyList.add(Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(totalWeight * classificationParameter.bondRate)))))
-        val classificationID = schema.utilities.ID.getClassificationID(immutables = updatedImmutables, mutables = mutables)
-        val classification = Classification(classificationID.getBytes, idString = classificationID.asString, immutables = updatedImmutables.asProtoImmutables.toByteString.toByteArray, mutables = mutables.asProtoMutables.toByteString.toByteArray)
+        val updatedMutables = Mutables(mutables.propertyList.add(Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(totalWeight * classificationParameter.bondRate)))))
+        val classificationID = schema.utilities.ID.getClassificationID(immutables = immutables, mutables = updatedMutables)
+        val classification = Classification(classificationID.getBytes, idString = classificationID.asString, immutables = immutables.asProtoImmutables.toByteString.toByteArray, mutables = updatedMutables.asProtoMutables.toByteString.toByteArray)
         Service.add(classification)
       }
 
@@ -123,42 +123,51 @@ class Classifications @Inject()(
       } yield ClassificationID(HashID(classificationIDBytes))
     }
 
-    def bondAuxiliary(address: String, classificationID: ClassificationID): Future[Unit] = {
+    def bondAuxiliary(address: String, classificationID: ClassificationID, bondAmount: NumberData): Future[Unit] = {
       val addressBalance = blockchainBalances.Utility.insertOrUpdateBalance(address)
-      val classification = tryGetById(classificationID.getBytes)
+      //      val classification = tryGetById(classificationID.getBytes)
 
-      def locked(classification: Classification) = blockchainTokens.Service.addTotalLocked(denom = constants.Blockchain.StakingDenom, locked = classification.getBondAmount)
+      val locked = blockchainTokens.Service.addTotalLocked(denom = constants.Blockchain.StakingDenom, locked = MicroNumber(bondAmount.value))
 
       for {
         _ <- addressBalance
-        classification <- classification
-        _ <- locked(classification)
+        //        classification <- classification
+        _ <- locked
       } yield ()
     }
 
-    def unbondAuxiliary(address: String, classificationID: ClassificationID): Future[Unit] = {
+    def unbondAuxiliary(address: String, classificationID: ClassificationID, bondAmount: NumberData): Future[Unit] = {
       val addressBalance = blockchainBalances.Utility.insertOrUpdateBalance(address)
-      val classification = tryGetById(classificationID.getBytes)
+      //      val classification = tryGetById(classificationID.getBytes)
 
-      def unlocked(classification: Classification) = blockchainTokens.Service.subtractTotalLocked(denom = constants.Blockchain.StakingDenom, locked = classification.getBondAmount)
+      val unlocked = blockchainTokens.Service.subtractTotalLocked(denom = constants.Blockchain.StakingDenom, locked = MicroNumber(bondAmount.value))
 
       for {
         _ <- addressBalance
-        classification <- classification
-        _ <- unlocked(classification)
+        //        classification <- classification
+        _ <- unlocked
       } yield ()
     }
 
-    def burnAuxiliary(classificationID: ClassificationID): Future[Unit] = {
-      val classification = tryGetById(classificationID.getBytes)
+    def burnAuxiliary(classificationID: ClassificationID, bondAmount: NumberData): Future[Unit] = {
+      //      val classification = tryGetById(classificationID.getBytes)
 
-      def burn(classification: Classification) = blockchainTokens.Service.addTotalBurnt(denom = constants.Blockchain.StakingDenom, burnt = classification.getBondAmount)
+      val burn = blockchainTokens.Service.addTotalBurnt(denom = constants.Blockchain.StakingDenom, burnt = MicroNumber(bondAmount.value))
 
       for {
-        classification <- classification
-        _ <- burn(classification)
+        //        classification <- classification
+        _ <- burn
       } yield ()
+    }
 
+    def beforeRun: Future[Int] = {
+      Service.insertOrUpdate(Seq(
+        Classification(schema.document.NameIdentity.DocumentClassificationID.getBytes, idString = schema.document.NameIdentity.DocumentClassificationID.asString, immutables = schema.document.NameIdentity.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.NameIdentity.DocumentMutables.asProtoMutables.toByteString.toByteArray),
+        Classification(schema.document.CoinAsset.DocumentClassificationID.getBytes, idString = schema.document.CoinAsset.DocumentClassificationID.asString, immutables = schema.document.CoinAsset.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.CoinAsset.DocumentMutables.asProtoMutables.toByteString.toByteArray),
+        Classification(schema.document.Maintainer.DocumentClassificationID.getBytes, idString = schema.document.Maintainer.DocumentClassificationID.asString, immutables = schema.document.Maintainer.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.Maintainer.DocumentMutables.asProtoMutables.toByteString.toByteArray),
+        Classification(schema.document.ModuleIdentity.DocumentClassificationID.getBytes, idString = schema.document.ModuleIdentity.DocumentClassificationID.asString, immutables = schema.document.ModuleIdentity.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.ModuleIdentity.DocumentMutables.asProtoMutables.toByteString.toByteArray),
+        Classification(schema.document.PutOrder.DocumentClassificationID.getBytes, idString = schema.document.PutOrder.DocumentClassificationID.asString, immutables = schema.document.PutOrder.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.PutOrder.DocumentMutables.asProtoMutables.toByteString.toByteArray),
+      ))
     }
   }
 }

@@ -5,7 +5,7 @@ package com.tendermint.types;
 
 /**
  * <pre>
- * Header defines the structure of a Tendermint block header.
+ * Header defines the structure of a block header.
  * </pre>
  *
  * Protobuf type {@code tendermint.types.Header}
@@ -654,7 +654,7 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * Header defines the structure of a Tendermint block header.
+   * Header defines the structure of a block header.
    * </pre>
    *
    * Protobuf type {@code tendermint.types.Header}

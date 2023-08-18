@@ -28,20 +28,20 @@ public final class ServiceProto {
       "s.reveal\032\034google/api/annotations.proto\032\'" +
       "metas/transactions/reveal/message.proto\032" +
       "4metas/transactions/reveal/transaction_r" +
-      "esponse.proto2\256\001\n\007Service\022\242\001\n\006Handle\0226.a" +
-      "ssetmantle.modules.metas.transactions.re" +
-      "veal.Message\032B.assetmantle.modules.metas" +
-      ".transactions.reveal.TransactionResponse" +
-      "\"\034\202\323\344\223\002\026\"\024/mantle/metas/revealB\327\002\n1com.a" +
-      "ssetmantle.modules.metas.transactions.re" +
-      "vealB\014ServiceProtoP\001Z:github.com/AssetMa" +
-      "ntle/modules/x/metas/transactions/reveal" +
-      "\242\002\005AMMTR\252\002-Assetmantle.Modules.Metas.Tra" +
-      "nsactions.Reveal\312\002-Assetmantle\\Modules\\M" +
-      "etas\\Transactions\\Reveal\342\0029Assetmantle\\M" +
-      "odules\\Metas\\Transactions\\Reveal\\GPBMeta" +
-      "data\352\0021Assetmantle::Modules::Metas::Tran" +
-      "sactions::Revealb\006proto3"
+      "esponse.proto2\252\001\n\003Msg\022\242\001\n\006Handle\0226.asset" +
+      "mantle.modules.metas.transactions.reveal" +
+      ".Message\032B.assetmantle.modules.metas.tra" +
+      "nsactions.reveal.TransactionResponse\"\034\202\323" +
+      "\344\223\002\026\"\024/mantle/metas/revealB\327\002\n1com.asset" +
+      "mantle.modules.metas.transactions.reveal" +
+      "B\014ServiceProtoP\001Z:github.com/AssetMantle" +
+      "/modules/x/metas/transactions/reveal\242\002\005A" +
+      "MMTR\252\002-Assetmantle.Modules.Metas.Transac" +
+      "tions.Reveal\312\002-Assetmantle\\Modules\\Metas" +
+      "\\Transactions\\Reveal\342\0029Assetmantle\\Modul" +
+      "es\\Metas\\Transactions\\Reveal\\GPBMetadata" +
+      "\352\0021Assetmantle::Modules::Metas::Transact" +
+      "ions::Revealb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

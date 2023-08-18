@@ -29,24 +29,24 @@ public final class ServiceProto {
       "ogle/api/annotations.proto\032;classificati" +
       "ons/queries/classifications/query_reques" +
       "t.proto\032<classifications/queries/classif" +
-      "ications/query_response.proto2\344\001\n\007Servic" +
-      "e\022\330\001\n\006Handle\022I.assetmantle.modules.class" +
-      "ifications.queries.classifications.Query" +
-      "Request\032J.assetmantle.modules.classifica" +
-      "tions.queries.classifications.QueryRespo" +
-      "nse\"7\202\323\344\223\0021\022//mantle/classifications/v1b" +
-      "eta1/classificationsB\253\003\n?com.assetmantle" +
-      ".modules.classifications.queries.classif" +
-      "icationsB\014ServiceProtoP\001ZHgithub.com/Ass" +
-      "etMantle/modules/x/classifications/queri" +
-      "es/classifications\242\002\005AMCQC\252\002;Assetmantle" +
-      ".Modules.Classifications.Queries.Classif" +
-      "ications\312\002;Assetmantle\\Modules\\Classific" +
-      "ations\\Queries\\Classifications\342\002GAssetma" +
-      "ntle\\Modules\\Classifications\\Queries\\Cla" +
-      "ssifications\\GPBMetadata\352\002?Assetmantle::" +
-      "Modules::Classifications::Queries::Class" +
-      "ificationsb\006proto3"
+      "ications/query_response.proto2\342\001\n\005Query\022" +
+      "\330\001\n\006Handle\022I.assetmantle.modules.classif" +
+      "ications.queries.classifications.QueryRe" +
+      "quest\032J.assetmantle.modules.classificati" +
+      "ons.queries.classifications.QueryRespons" +
+      "e\"7\202\323\344\223\0021\022//mantle/classifications/v1bet" +
+      "a1/classificationsB\253\003\n?com.assetmantle.m" +
+      "odules.classifications.queries.classific" +
+      "ationsB\014ServiceProtoP\001ZHgithub.com/Asset" +
+      "Mantle/modules/x/classifications/queries" +
+      "/classifications\242\002\005AMCQC\252\002;Assetmantle.M" +
+      "odules.Classifications.Queries.Classific" +
+      "ations\312\002;Assetmantle\\Modules\\Classificat" +
+      "ions\\Queries\\Classifications\342\002GAssetmant" +
+      "le\\Modules\\Classifications\\Queries\\Class" +
+      "ifications\\GPBMetadata\352\002?Assetmantle::Mo" +
+      "dules::Classifications::Queries::Classif" +
+      "icationsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

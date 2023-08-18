@@ -120,14 +120,14 @@ public final class QueryProto {
       "est\0328.ibc.applications.transfer.v1.Query" +
       "EscrowAddressResponse\"R\202\323\344\223\002L\022J/ibc/apps" +
       "/transfer/v1/channels/{channel_id}/ports" +
-      "/{port_id}/escrow_addressB\211\002\n com.ibc.ap" +
-      "plications.transfer.v1B\nQueryProtoP\001ZFgi" +
-      "thub.com/AssetMantle/modules/ibc/applica" +
-      "tions/transfer/v1;transferv1\242\002\003IAT\252\002\034Ibc" +
-      ".Applications.Transfer.V1\312\002\034Ibc\\Applicat" +
-      "ions\\Transfer\\V1\342\002(Ibc\\Applications\\Tran" +
-      "sfer\\V1\\GPBMetadata\352\002\037Ibc::Applications:" +
-      ":Transfer::V1b\006proto3"
+      "/{port_id}/escrow_addressB\372\001\n com.ibc.ap" +
+      "plications.transfer.v1B\nQueryProtoP\001Z7gi" +
+      "thub.com/cosmos/ibc-go/v4/modules/apps/t" +
+      "ransfer/types\242\002\003IAT\252\002\034Ibc.Applications.T" +
+      "ransfer.V1\312\002\034Ibc\\Applications\\Transfer\\V" +
+      "1\342\002(Ibc\\Applications\\Transfer\\V1\\GPBMeta" +
+      "data\352\002\037Ibc::Applications::Transfer::V1b\006" +
+      "proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -30,30 +30,30 @@ public final class QueryRequestProto {
     java.lang.String[] descriptorData = {
       "\n(orders/queries/order/query_request.pro" +
       "to\022(assetmantle.modules.orders.queries.o" +
-      "rder\032\027ids/base/order_id.proto\"P\n\014QueryRe" +
-      "quest\022@\n\torder_i_d\030\001 \001(\0132$.assetmantle.s" +
-      "chema.ids.base.OrderIDR\007orderIDB\276\002\n,com." +
-      "assetmantle.modules.orders.queries.order" +
-      "B\021QueryRequestProtoP\001Z5github.com/AssetM" +
-      "antle/modules/x/orders/queries/order\242\002\005A" +
-      "MOQO\252\002(Assetmantle.Modules.Orders.Querie" +
-      "s.Order\312\002(Assetmantle\\Modules\\Orders\\Que" +
-      "ries\\Order\342\0024Assetmantle\\Modules\\Orders\\" +
-      "Queries\\Order\\GPBMetadata\352\002,Assetmantle:" +
-      ":Modules::Orders::Queries::Orderb\006proto3"
+      "rder\032\024orders/key/key.proto\"E\n\014QueryReque" +
+      "st\0225\n\003key\030\001 \001(\0132#.assetmantle.modules.or" +
+      "ders.key.KeyR\003keyB\276\002\n,com.assetmantle.mo" +
+      "dules.orders.queries.orderB\021QueryRequest" +
+      "ProtoP\001Z5github.com/AssetMantle/modules/" +
+      "x/orders/queries/order\242\002\005AMOQO\252\002(Assetma" +
+      "ntle.Modules.Orders.Queries.Order\312\002(Asse" +
+      "tmantle\\Modules\\Orders\\Queries\\Order\342\0024A" +
+      "ssetmantle\\Modules\\Orders\\Queries\\Order\\" +
+      "GPBMetadata\352\002,Assetmantle::Modules::Orde" +
+      "rs::Queries::Orderb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.assetmantle.schema.ids.base.OrderIdProto.getDescriptor(),
+          com.assetmantle.modules.orders.key.KeyProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_orders_queries_order_QueryRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_orders_queries_order_QueryRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_orders_queries_order_QueryRequest_descriptor,
-        new java.lang.String[] { "OrderID", });
-    com.assetmantle.schema.ids.base.OrderIdProto.getDescriptor();
+        new java.lang.String[] { "Key", });
+    com.assetmantle.modules.orders.key.KeyProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

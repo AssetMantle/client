@@ -28,20 +28,20 @@ public final class ServiceProto {
       "ons.revoke\032\034google/api/annotations.proto" +
       "\032(assets/transactions/revoke/message.pro" +
       "to\0325assets/transactions/revoke/transacti" +
-      "on_response.proto2\261\001\n\007Service\022\245\001\n\006Handle" +
-      "\0227.assetmantle.modules.assets.transactio" +
-      "ns.revoke.Message\032C.assetmantle.modules." +
-      "assets.transactions.revoke.TransactionRe" +
-      "sponse\"\035\202\323\344\223\002\027\"\025/mantle/assets/revokeB\335\002" +
-      "\n2com.assetmantle.modules.assets.transac" +
-      "tions.revokeB\014ServiceProtoP\001Z;github.com" +
-      "/AssetMantle/modules/x/assets/transactio" +
-      "ns/revoke\242\002\005AMATR\252\002.Assetmantle.Modules." +
-      "Assets.Transactions.Revoke\312\002.Assetmantle" +
-      "\\Modules\\Assets\\Transactions\\Revoke\342\002:As" +
-      "setmantle\\Modules\\Assets\\Transactions\\Re" +
-      "voke\\GPBMetadata\352\0022Assetmantle::Modules:" +
-      ":Assets::Transactions::Revokeb\006proto3"
+      "on_response.proto2\255\001\n\003Msg\022\245\001\n\006Handle\0227.a" +
+      "ssetmantle.modules.assets.transactions.r" +
+      "evoke.Message\032C.assetmantle.modules.asse" +
+      "ts.transactions.revoke.TransactionRespon" +
+      "se\"\035\202\323\344\223\002\027\"\025/mantle/assets/revokeB\335\002\n2co" +
+      "m.assetmantle.modules.assets.transaction" +
+      "s.revokeB\014ServiceProtoP\001Z;github.com/Ass" +
+      "etMantle/modules/x/assets/transactions/r" +
+      "evoke\242\002\005AMATR\252\002.Assetmantle.Modules.Asse" +
+      "ts.Transactions.Revoke\312\002.Assetmantle\\Mod" +
+      "ules\\Assets\\Transactions\\Revoke\342\002:Assetm" +
+      "antle\\Modules\\Assets\\Transactions\\Revoke" +
+      "\\GPBMetadata\352\0022Assetmantle::Modules::Ass" +
+      "ets::Transactions::Revokeb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

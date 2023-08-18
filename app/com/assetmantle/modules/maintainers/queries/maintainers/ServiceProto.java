@@ -28,22 +28,22 @@ public final class ServiceProto {
       ".queries.maintainers\032\034google/api/annotat" +
       "ions.proto\0323maintainers/queries/maintain" +
       "ers/query_request.proto\0324maintainers/que" +
-      "ries/maintainers/query_response.proto2\314\001" +
-      "\n\007Service\022\300\001\n\006Handle\022A.assetmantle.modul" +
-      "es.maintainers.queries.maintainers.Query" +
-      "Request\032B.assetmantle.modules.maintainer" +
-      "s.queries.maintainers.QueryResponse\"/\202\323\344" +
-      "\223\002)\022\'/mantle/maintainers/v1beta1/maintai" +
-      "nersB\373\002\n7com.assetmantle.modules.maintai" +
-      "ners.queries.maintainersB\014ServiceProtoP\001" +
-      "Z@github.com/AssetMantle/modules/x/maint" +
-      "ainers/queries/maintainers\242\002\005AMMQM\252\0023Ass" +
-      "etmantle.Modules.Maintainers.Queries.Mai" +
-      "ntainers\312\0023Assetmantle\\Modules\\Maintaine" +
-      "rs\\Queries\\Maintainers\342\002?Assetmantle\\Mod" +
-      "ules\\Maintainers\\Queries\\Maintainers\\GPB" +
-      "Metadata\352\0027Assetmantle::Modules::Maintai" +
-      "ners::Queries::Maintainersb\006proto3"
+      "ries/maintainers/query_response.proto2\312\001" +
+      "\n\005Query\022\300\001\n\006Handle\022A.assetmantle.modules" +
+      ".maintainers.queries.maintainers.QueryRe" +
+      "quest\032B.assetmantle.modules.maintainers." +
+      "queries.maintainers.QueryResponse\"/\202\323\344\223\002" +
+      ")\022\'/mantle/maintainers/v1beta1/maintaine" +
+      "rsB\373\002\n7com.assetmantle.modules.maintaine" +
+      "rs.queries.maintainersB\014ServiceProtoP\001Z@" +
+      "github.com/AssetMantle/modules/x/maintai" +
+      "ners/queries/maintainers\242\002\005AMMQM\252\0023Asset" +
+      "mantle.Modules.Maintainers.Queries.Maint" +
+      "ainers\312\0023Assetmantle\\Modules\\Maintainers" +
+      "\\Queries\\Maintainers\342\002?Assetmantle\\Modul" +
+      "es\\Maintainers\\Queries\\Maintainers\\GPBMe" +
+      "tadata\352\0027Assetmantle::Modules::Maintaine" +
+      "rs::Queries::Maintainersb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

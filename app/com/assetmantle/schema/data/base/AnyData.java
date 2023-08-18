@@ -50,8 +50,9 @@ private static final long serialVersionUID = 0L;
     HEIGHT_DATA(4),
     I_D_DATA(5),
     LIST_DATA(6),
-    NUMBER_DATA(7),
-    STRING_DATA(8),
+    LINKED_DATA(7),
+    NUMBER_DATA(8),
+    STRING_DATA(9),
     IMPL_NOT_SET(0);
     private final int value;
     private ImplCase(int value) {
@@ -75,8 +76,9 @@ private static final long serialVersionUID = 0L;
         case 4: return HEIGHT_DATA;
         case 5: return I_D_DATA;
         case 6: return LIST_DATA;
-        case 7: return NUMBER_DATA;
-        case 8: return STRING_DATA;
+        case 7: return LINKED_DATA;
+        case 8: return NUMBER_DATA;
+        case 9: return STRING_DATA;
         case 0: return IMPL_NOT_SET;
         default: return null;
       }
@@ -278,63 +280,94 @@ private static final long serialVersionUID = 0L;
     return com.assetmantle.schema.data.base.ListData.getDefaultInstance();
   }
 
-  public static final int NUMBER_DATA_FIELD_NUMBER = 7;
+  public static final int LINKED_DATA_FIELD_NUMBER = 7;
   /**
-   * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+   * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+   * @return Whether the linkedData field is set.
+   */
+  @java.lang.Override
+  public boolean hasLinkedData() {
+    return implCase_ == 7;
+  }
+  /**
+   * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+   * @return The linkedData.
+   */
+  @java.lang.Override
+  public com.assetmantle.schema.data.base.LinkedData getLinkedData() {
+    if (implCase_ == 7) {
+       return (com.assetmantle.schema.data.base.LinkedData) impl_;
+    }
+    return com.assetmantle.schema.data.base.LinkedData.getDefaultInstance();
+  }
+  /**
+   * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+   */
+  @java.lang.Override
+  public com.assetmantle.schema.data.base.LinkedDataOrBuilder getLinkedDataOrBuilder() {
+    if (implCase_ == 7) {
+       return (com.assetmantle.schema.data.base.LinkedData) impl_;
+    }
+    return com.assetmantle.schema.data.base.LinkedData.getDefaultInstance();
+  }
+
+  public static final int NUMBER_DATA_FIELD_NUMBER = 8;
+  /**
+   * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
    * @return Whether the numberData field is set.
    */
   @java.lang.Override
   public boolean hasNumberData() {
-    return implCase_ == 7;
+    return implCase_ == 8;
   }
   /**
-   * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+   * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
    * @return The numberData.
    */
   @java.lang.Override
   public com.assetmantle.schema.data.base.NumberData getNumberData() {
-    if (implCase_ == 7) {
+    if (implCase_ == 8) {
        return (com.assetmantle.schema.data.base.NumberData) impl_;
     }
     return com.assetmantle.schema.data.base.NumberData.getDefaultInstance();
   }
   /**
-   * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+   * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.data.base.NumberDataOrBuilder getNumberDataOrBuilder() {
-    if (implCase_ == 7) {
+    if (implCase_ == 8) {
        return (com.assetmantle.schema.data.base.NumberData) impl_;
     }
     return com.assetmantle.schema.data.base.NumberData.getDefaultInstance();
   }
 
-  public static final int STRING_DATA_FIELD_NUMBER = 8;
+  public static final int STRING_DATA_FIELD_NUMBER = 9;
   /**
-   * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+   * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
    * @return Whether the stringData field is set.
    */
   @java.lang.Override
   public boolean hasStringData() {
-    return implCase_ == 8;
+    return implCase_ == 9;
   }
   /**
-   * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+   * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
    * @return The stringData.
    */
   @java.lang.Override
   public com.assetmantle.schema.data.base.StringData getStringData() {
-    if (implCase_ == 8) {
+    if (implCase_ == 9) {
        return (com.assetmantle.schema.data.base.StringData) impl_;
     }
     return com.assetmantle.schema.data.base.StringData.getDefaultInstance();
   }
   /**
-   * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+   * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
    */
   @java.lang.Override
   public com.assetmantle.schema.data.base.StringDataOrBuilder getStringDataOrBuilder() {
-    if (implCase_ == 8) {
+    if (implCase_ == 9) {
        return (com.assetmantle.schema.data.base.StringData) impl_;
     }
     return com.assetmantle.schema.data.base.StringData.getDefaultInstance();
@@ -373,10 +406,13 @@ private static final long serialVersionUID = 0L;
       output.writeMessage(6, (com.assetmantle.schema.data.base.ListData) impl_);
     }
     if (implCase_ == 7) {
-      output.writeMessage(7, (com.assetmantle.schema.data.base.NumberData) impl_);
+      output.writeMessage(7, (com.assetmantle.schema.data.base.LinkedData) impl_);
     }
     if (implCase_ == 8) {
-      output.writeMessage(8, (com.assetmantle.schema.data.base.StringData) impl_);
+      output.writeMessage(8, (com.assetmantle.schema.data.base.NumberData) impl_);
+    }
+    if (implCase_ == 9) {
+      output.writeMessage(9, (com.assetmantle.schema.data.base.StringData) impl_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -413,11 +449,15 @@ private static final long serialVersionUID = 0L;
     }
     if (implCase_ == 7) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(7, (com.assetmantle.schema.data.base.NumberData) impl_);
+        .computeMessageSize(7, (com.assetmantle.schema.data.base.LinkedData) impl_);
     }
     if (implCase_ == 8) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(8, (com.assetmantle.schema.data.base.StringData) impl_);
+        .computeMessageSize(8, (com.assetmantle.schema.data.base.NumberData) impl_);
+    }
+    if (implCase_ == 9) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(9, (com.assetmantle.schema.data.base.StringData) impl_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -461,10 +501,14 @@ private static final long serialVersionUID = 0L;
             .equals(other.getListData())) return false;
         break;
       case 7:
+        if (!getLinkedData()
+            .equals(other.getLinkedData())) return false;
+        break;
+      case 8:
         if (!getNumberData()
             .equals(other.getNumberData())) return false;
         break;
-      case 8:
+      case 9:
         if (!getStringData()
             .equals(other.getStringData())) return false;
         break;
@@ -508,10 +552,14 @@ private static final long serialVersionUID = 0L;
         hash = (53 * hash) + getListData().hashCode();
         break;
       case 7:
+        hash = (37 * hash) + LINKED_DATA_FIELD_NUMBER;
+        hash = (53 * hash) + getLinkedData().hashCode();
+        break;
+      case 8:
         hash = (37 * hash) + NUMBER_DATA_FIELD_NUMBER;
         hash = (53 * hash) + getNumberData().hashCode();
         break;
-      case 8:
+      case 9:
         hash = (37 * hash) + STRING_DATA_FIELD_NUMBER;
         hash = (53 * hash) + getStringData().hashCode();
         break;
@@ -665,6 +713,9 @@ private static final long serialVersionUID = 0L;
       if (listDataBuilder_ != null) {
         listDataBuilder_.clear();
       }
+      if (linkedDataBuilder_ != null) {
+        linkedDataBuilder_.clear();
+      }
       if (numberDataBuilder_ != null) {
         numberDataBuilder_.clear();
       }
@@ -737,10 +788,14 @@ private static final long serialVersionUID = 0L;
         result.impl_ = listDataBuilder_.build();
       }
       if (implCase_ == 7 &&
+          linkedDataBuilder_ != null) {
+        result.impl_ = linkedDataBuilder_.build();
+      }
+      if (implCase_ == 8 &&
           numberDataBuilder_ != null) {
         result.impl_ = numberDataBuilder_.build();
       }
-      if (implCase_ == 8 &&
+      if (implCase_ == 9 &&
           stringDataBuilder_ != null) {
         result.impl_ = stringDataBuilder_.build();
       }
@@ -813,6 +868,10 @@ private static final long serialVersionUID = 0L;
         }
         case LIST_DATA: {
           mergeListData(other.getListData());
+          break;
+        }
+        case LINKED_DATA: {
+          mergeLinkedData(other.getLinkedData());
           break;
         }
         case NUMBER_DATA: {
@@ -897,18 +956,25 @@ private static final long serialVersionUID = 0L;
             } // case 50
             case 58: {
               input.readMessage(
-                  getNumberDataFieldBuilder().getBuilder(),
+                  getLinkedDataFieldBuilder().getBuilder(),
                   extensionRegistry);
               implCase_ = 7;
               break;
             } // case 58
             case 66: {
               input.readMessage(
-                  getStringDataFieldBuilder().getBuilder(),
+                  getNumberDataFieldBuilder().getBuilder(),
                   extensionRegistry);
               implCase_ = 8;
               break;
             } // case 66
+            case 74: {
+              input.readMessage(
+                  getStringDataFieldBuilder().getBuilder(),
+                  extensionRegistry);
+              implCase_ = 9;
+              break;
+            } // case 74
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1794,35 +1860,177 @@ private static final long serialVersionUID = 0L;
     }
 
     private com.google.protobuf.SingleFieldBuilderV3<
+        com.assetmantle.schema.data.base.LinkedData, com.assetmantle.schema.data.base.LinkedData.Builder, com.assetmantle.schema.data.base.LinkedDataOrBuilder> linkedDataBuilder_;
+    /**
+     * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+     * @return Whether the linkedData field is set.
+     */
+    @java.lang.Override
+    public boolean hasLinkedData() {
+      return implCase_ == 7;
+    }
+    /**
+     * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+     * @return The linkedData.
+     */
+    @java.lang.Override
+    public com.assetmantle.schema.data.base.LinkedData getLinkedData() {
+      if (linkedDataBuilder_ == null) {
+        if (implCase_ == 7) {
+          return (com.assetmantle.schema.data.base.LinkedData) impl_;
+        }
+        return com.assetmantle.schema.data.base.LinkedData.getDefaultInstance();
+      } else {
+        if (implCase_ == 7) {
+          return linkedDataBuilder_.getMessage();
+        }
+        return com.assetmantle.schema.data.base.LinkedData.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+     */
+    public Builder setLinkedData(com.assetmantle.schema.data.base.LinkedData value) {
+      if (linkedDataBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        impl_ = value;
+        onChanged();
+      } else {
+        linkedDataBuilder_.setMessage(value);
+      }
+      implCase_ = 7;
+      return this;
+    }
+    /**
+     * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+     */
+    public Builder setLinkedData(
+        com.assetmantle.schema.data.base.LinkedData.Builder builderForValue) {
+      if (linkedDataBuilder_ == null) {
+        impl_ = builderForValue.build();
+        onChanged();
+      } else {
+        linkedDataBuilder_.setMessage(builderForValue.build());
+      }
+      implCase_ = 7;
+      return this;
+    }
+    /**
+     * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+     */
+    public Builder mergeLinkedData(com.assetmantle.schema.data.base.LinkedData value) {
+      if (linkedDataBuilder_ == null) {
+        if (implCase_ == 7 &&
+            impl_ != com.assetmantle.schema.data.base.LinkedData.getDefaultInstance()) {
+          impl_ = com.assetmantle.schema.data.base.LinkedData.newBuilder((com.assetmantle.schema.data.base.LinkedData) impl_)
+              .mergeFrom(value).buildPartial();
+        } else {
+          impl_ = value;
+        }
+        onChanged();
+      } else {
+        if (implCase_ == 7) {
+          linkedDataBuilder_.mergeFrom(value);
+        } else {
+          linkedDataBuilder_.setMessage(value);
+        }
+      }
+      implCase_ = 7;
+      return this;
+    }
+    /**
+     * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+     */
+    public Builder clearLinkedData() {
+      if (linkedDataBuilder_ == null) {
+        if (implCase_ == 7) {
+          implCase_ = 0;
+          impl_ = null;
+          onChanged();
+        }
+      } else {
+        if (implCase_ == 7) {
+          implCase_ = 0;
+          impl_ = null;
+        }
+        linkedDataBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+     */
+    public com.assetmantle.schema.data.base.LinkedData.Builder getLinkedDataBuilder() {
+      return getLinkedDataFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+     */
+    @java.lang.Override
+    public com.assetmantle.schema.data.base.LinkedDataOrBuilder getLinkedDataOrBuilder() {
+      if ((implCase_ == 7) && (linkedDataBuilder_ != null)) {
+        return linkedDataBuilder_.getMessageOrBuilder();
+      } else {
+        if (implCase_ == 7) {
+          return (com.assetmantle.schema.data.base.LinkedData) impl_;
+        }
+        return com.assetmantle.schema.data.base.LinkedData.getDefaultInstance();
+      }
+    }
+    /**
+     * <code>.assetmantle.schema.data.base.LinkedData linked_data = 7 [json_name = "linkedData"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.assetmantle.schema.data.base.LinkedData, com.assetmantle.schema.data.base.LinkedData.Builder, com.assetmantle.schema.data.base.LinkedDataOrBuilder> 
+        getLinkedDataFieldBuilder() {
+      if (linkedDataBuilder_ == null) {
+        if (!(implCase_ == 7)) {
+          impl_ = com.assetmantle.schema.data.base.LinkedData.getDefaultInstance();
+        }
+        linkedDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.schema.data.base.LinkedData, com.assetmantle.schema.data.base.LinkedData.Builder, com.assetmantle.schema.data.base.LinkedDataOrBuilder>(
+                (com.assetmantle.schema.data.base.LinkedData) impl_,
+                getParentForChildren(),
+                isClean());
+        impl_ = null;
+      }
+      implCase_ = 7;
+      onChanged();
+      return linkedDataBuilder_;
+    }
+
+    private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.data.base.NumberData, com.assetmantle.schema.data.base.NumberData.Builder, com.assetmantle.schema.data.base.NumberDataOrBuilder> numberDataBuilder_;
     /**
-     * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+     * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
      * @return Whether the numberData field is set.
      */
     @java.lang.Override
     public boolean hasNumberData() {
-      return implCase_ == 7;
+      return implCase_ == 8;
     }
     /**
-     * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+     * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
      * @return The numberData.
      */
     @java.lang.Override
     public com.assetmantle.schema.data.base.NumberData getNumberData() {
       if (numberDataBuilder_ == null) {
-        if (implCase_ == 7) {
+        if (implCase_ == 8) {
           return (com.assetmantle.schema.data.base.NumberData) impl_;
         }
         return com.assetmantle.schema.data.base.NumberData.getDefaultInstance();
       } else {
-        if (implCase_ == 7) {
+        if (implCase_ == 8) {
           return numberDataBuilder_.getMessage();
         }
         return com.assetmantle.schema.data.base.NumberData.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+     * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
      */
     public Builder setNumberData(com.assetmantle.schema.data.base.NumberData value) {
       if (numberDataBuilder_ == null) {
@@ -1834,11 +2042,11 @@ private static final long serialVersionUID = 0L;
       } else {
         numberDataBuilder_.setMessage(value);
       }
-      implCase_ = 7;
+      implCase_ = 8;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+     * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
      */
     public Builder setNumberData(
         com.assetmantle.schema.data.base.NumberData.Builder builderForValue) {
@@ -1848,15 +2056,15 @@ private static final long serialVersionUID = 0L;
       } else {
         numberDataBuilder_.setMessage(builderForValue.build());
       }
-      implCase_ = 7;
+      implCase_ = 8;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+     * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
      */
     public Builder mergeNumberData(com.assetmantle.schema.data.base.NumberData value) {
       if (numberDataBuilder_ == null) {
-        if (implCase_ == 7 &&
+        if (implCase_ == 8 &&
             impl_ != com.assetmantle.schema.data.base.NumberData.getDefaultInstance()) {
           impl_ = com.assetmantle.schema.data.base.NumberData.newBuilder((com.assetmantle.schema.data.base.NumberData) impl_)
               .mergeFrom(value).buildPartial();
@@ -1865,27 +2073,27 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       } else {
-        if (implCase_ == 7) {
+        if (implCase_ == 8) {
           numberDataBuilder_.mergeFrom(value);
         } else {
           numberDataBuilder_.setMessage(value);
         }
       }
-      implCase_ = 7;
+      implCase_ = 8;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+     * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
      */
     public Builder clearNumberData() {
       if (numberDataBuilder_ == null) {
-        if (implCase_ == 7) {
+        if (implCase_ == 8) {
           implCase_ = 0;
           impl_ = null;
           onChanged();
         }
       } else {
-        if (implCase_ == 7) {
+        if (implCase_ == 8) {
           implCase_ = 0;
           impl_ = null;
         }
@@ -1894,33 +2102,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+     * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
      */
     public com.assetmantle.schema.data.base.NumberData.Builder getNumberDataBuilder() {
       return getNumberDataFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+     * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
      */
     @java.lang.Override
     public com.assetmantle.schema.data.base.NumberDataOrBuilder getNumberDataOrBuilder() {
-      if ((implCase_ == 7) && (numberDataBuilder_ != null)) {
+      if ((implCase_ == 8) && (numberDataBuilder_ != null)) {
         return numberDataBuilder_.getMessageOrBuilder();
       } else {
-        if (implCase_ == 7) {
+        if (implCase_ == 8) {
           return (com.assetmantle.schema.data.base.NumberData) impl_;
         }
         return com.assetmantle.schema.data.base.NumberData.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.data.base.NumberData number_data = 7 [json_name = "numberData"];</code>
+     * <code>.assetmantle.schema.data.base.NumberData number_data = 8 [json_name = "numberData"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.data.base.NumberData, com.assetmantle.schema.data.base.NumberData.Builder, com.assetmantle.schema.data.base.NumberDataOrBuilder> 
         getNumberDataFieldBuilder() {
       if (numberDataBuilder_ == null) {
-        if (!(implCase_ == 7)) {
+        if (!(implCase_ == 8)) {
           impl_ = com.assetmantle.schema.data.base.NumberData.getDefaultInstance();
         }
         numberDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1930,7 +2138,7 @@ private static final long serialVersionUID = 0L;
                 isClean());
         impl_ = null;
       }
-      implCase_ = 7;
+      implCase_ = 8;
       onChanged();
       return numberDataBuilder_;
     }
@@ -1938,33 +2146,33 @@ private static final long serialVersionUID = 0L;
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.data.base.StringData, com.assetmantle.schema.data.base.StringData.Builder, com.assetmantle.schema.data.base.StringDataOrBuilder> stringDataBuilder_;
     /**
-     * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+     * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
      * @return Whether the stringData field is set.
      */
     @java.lang.Override
     public boolean hasStringData() {
-      return implCase_ == 8;
+      return implCase_ == 9;
     }
     /**
-     * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+     * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
      * @return The stringData.
      */
     @java.lang.Override
     public com.assetmantle.schema.data.base.StringData getStringData() {
       if (stringDataBuilder_ == null) {
-        if (implCase_ == 8) {
+        if (implCase_ == 9) {
           return (com.assetmantle.schema.data.base.StringData) impl_;
         }
         return com.assetmantle.schema.data.base.StringData.getDefaultInstance();
       } else {
-        if (implCase_ == 8) {
+        if (implCase_ == 9) {
           return stringDataBuilder_.getMessage();
         }
         return com.assetmantle.schema.data.base.StringData.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+     * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
      */
     public Builder setStringData(com.assetmantle.schema.data.base.StringData value) {
       if (stringDataBuilder_ == null) {
@@ -1976,11 +2184,11 @@ private static final long serialVersionUID = 0L;
       } else {
         stringDataBuilder_.setMessage(value);
       }
-      implCase_ = 8;
+      implCase_ = 9;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+     * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
      */
     public Builder setStringData(
         com.assetmantle.schema.data.base.StringData.Builder builderForValue) {
@@ -1990,15 +2198,15 @@ private static final long serialVersionUID = 0L;
       } else {
         stringDataBuilder_.setMessage(builderForValue.build());
       }
-      implCase_ = 8;
+      implCase_ = 9;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+     * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
      */
     public Builder mergeStringData(com.assetmantle.schema.data.base.StringData value) {
       if (stringDataBuilder_ == null) {
-        if (implCase_ == 8 &&
+        if (implCase_ == 9 &&
             impl_ != com.assetmantle.schema.data.base.StringData.getDefaultInstance()) {
           impl_ = com.assetmantle.schema.data.base.StringData.newBuilder((com.assetmantle.schema.data.base.StringData) impl_)
               .mergeFrom(value).buildPartial();
@@ -2007,27 +2215,27 @@ private static final long serialVersionUID = 0L;
         }
         onChanged();
       } else {
-        if (implCase_ == 8) {
+        if (implCase_ == 9) {
           stringDataBuilder_.mergeFrom(value);
         } else {
           stringDataBuilder_.setMessage(value);
         }
       }
-      implCase_ = 8;
+      implCase_ = 9;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+     * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
      */
     public Builder clearStringData() {
       if (stringDataBuilder_ == null) {
-        if (implCase_ == 8) {
+        if (implCase_ == 9) {
           implCase_ = 0;
           impl_ = null;
           onChanged();
         }
       } else {
-        if (implCase_ == 8) {
+        if (implCase_ == 9) {
           implCase_ = 0;
           impl_ = null;
         }
@@ -2036,33 +2244,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+     * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
      */
     public com.assetmantle.schema.data.base.StringData.Builder getStringDataBuilder() {
       return getStringDataFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+     * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
      */
     @java.lang.Override
     public com.assetmantle.schema.data.base.StringDataOrBuilder getStringDataOrBuilder() {
-      if ((implCase_ == 8) && (stringDataBuilder_ != null)) {
+      if ((implCase_ == 9) && (stringDataBuilder_ != null)) {
         return stringDataBuilder_.getMessageOrBuilder();
       } else {
-        if (implCase_ == 8) {
+        if (implCase_ == 9) {
           return (com.assetmantle.schema.data.base.StringData) impl_;
         }
         return com.assetmantle.schema.data.base.StringData.getDefaultInstance();
       }
     }
     /**
-     * <code>.assetmantle.schema.data.base.StringData string_data = 8 [json_name = "stringData"];</code>
+     * <code>.assetmantle.schema.data.base.StringData string_data = 9 [json_name = "stringData"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
         com.assetmantle.schema.data.base.StringData, com.assetmantle.schema.data.base.StringData.Builder, com.assetmantle.schema.data.base.StringDataOrBuilder> 
         getStringDataFieldBuilder() {
       if (stringDataBuilder_ == null) {
-        if (!(implCase_ == 8)) {
+        if (!(implCase_ == 9)) {
           impl_ = com.assetmantle.schema.data.base.StringData.getDefaultInstance();
         }
         stringDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -2072,7 +2280,7 @@ private static final long serialVersionUID = 0L;
                 isClean());
         impl_ = null;
       }
-      implCase_ = 8;
+      implCase_ = 9;
       onChanged();
       return stringDataBuilder_;
     }

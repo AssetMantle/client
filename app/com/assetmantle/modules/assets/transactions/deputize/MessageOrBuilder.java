@@ -86,16 +86,16 @@ public interface MessageOrBuilder extends
   boolean getCanMintAsset();
 
   /**
-   * <code>bool can_burn_asset = 7 [json_name = "canBurnAsset"];</code>
-   * @return The canBurnAsset.
-   */
-  boolean getCanBurnAsset();
-
-  /**
-   * <code>bool can_renumerate_asset = 8 [json_name = "canRenumerateAsset"];</code>
+   * <code>bool can_renumerate_asset = 7 [json_name = "canRenumerateAsset"];</code>
    * @return The canRenumerateAsset.
    */
   boolean getCanRenumerateAsset();
+
+  /**
+   * <code>bool can_burn_asset = 8 [json_name = "canBurnAsset"];</code>
+   * @return The canBurnAsset.
+   */
+  boolean getCanBurnAsset();
 
   /**
    * <code>bool can_add_maintainer = 9 [json_name = "canAddMaintainer"];</code>

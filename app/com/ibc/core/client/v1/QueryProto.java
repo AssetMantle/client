@@ -211,12 +211,12 @@ public final class QueryProto {
       "onsensusStateRequest\0327.ibc.core.client.v" +
       "1.QueryUpgradedConsensusStateResponse\"5\202" +
       "\323\344\223\002/\022-/ibc/core/client/v1/upgraded_cons" +
-      "ensus_statesB\313\001\n\026com.ibc.core.client.v1B" +
-      "\nQueryProtoP\001Z:github.com/AssetMantle/mo" +
-      "dules/ibc/core/client/v1;clientv1\242\002\003ICC\252" +
-      "\002\022Ibc.Core.Client.V1\312\002\022Ibc\\Core\\Client\\V" +
-      "1\342\002\036Ibc\\Core\\Client\\V1\\GPBMetadata\352\002\025Ibc" +
-      "::Core::Client::V1b\006proto3"
+      "ensus_statesB\311\001\n\026com.ibc.core.client.v1B" +
+      "\nQueryProtoP\001Z8github.com/cosmos/ibc-go/" +
+      "v4/modules/core/02-client/types\242\002\003ICC\252\002\022" +
+      "Ibc.Core.Client.V1\312\002\022Ibc\\Core\\Client\\V1\342" +
+      "\002\036Ibc\\Core\\Client\\V1\\GPBMetadata\352\002\025Ibc::" +
+      "Core::Client::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

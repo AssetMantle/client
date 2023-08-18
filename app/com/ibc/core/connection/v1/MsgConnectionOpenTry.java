@@ -94,15 +94,16 @@ private static final long serialVersionUID = 0L;
   private volatile java.lang.Object previousConnectionId_ = "";
   /**
    * <pre>
-   * in the case of crossing hello's, when both chains call OpenInit, we need
-   * the connection identifier of the previous connection in state INIT
+   * Deprecated: this field is unused. Crossing hellos are no longer supported in core IBC.
    * </pre>
    *
-   * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+   * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+   * @deprecated ibc.core.connection.v1.MsgConnectionOpenTry.previous_connection_id is deprecated.
+   *     See ibc/core/connection/v1/tx.proto;l=52
    * @return The previousConnectionId.
    */
   @java.lang.Override
-  public java.lang.String getPreviousConnectionId() {
+  @java.lang.Deprecated public java.lang.String getPreviousConnectionId() {
     java.lang.Object ref = previousConnectionId_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
@@ -116,15 +117,16 @@ private static final long serialVersionUID = 0L;
   }
   /**
    * <pre>
-   * in the case of crossing hello's, when both chains call OpenInit, we need
-   * the connection identifier of the previous connection in state INIT
+   * Deprecated: this field is unused. Crossing hellos are no longer supported in core IBC.
    * </pre>
    *
-   * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+   * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+   * @deprecated ibc.core.connection.v1.MsgConnectionOpenTry.previous_connection_id is deprecated.
+   *     See ibc/core/connection/v1/tx.proto;l=52
    * @return The bytes for previousConnectionId.
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
+  @java.lang.Deprecated public com.google.protobuf.ByteString
       getPreviousConnectionIdBytes() {
     java.lang.Object ref = previousConnectionId_;
     if (ref instanceof java.lang.String) {
@@ -1140,14 +1142,15 @@ private static final long serialVersionUID = 0L;
     private java.lang.Object previousConnectionId_ = "";
     /**
      * <pre>
-     * in the case of crossing hello's, when both chains call OpenInit, we need
-     * the connection identifier of the previous connection in state INIT
+     * Deprecated: this field is unused. Crossing hellos are no longer supported in core IBC.
      * </pre>
      *
-     * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+     * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+     * @deprecated ibc.core.connection.v1.MsgConnectionOpenTry.previous_connection_id is deprecated.
+     *     See ibc/core/connection/v1/tx.proto;l=52
      * @return The previousConnectionId.
      */
-    public java.lang.String getPreviousConnectionId() {
+    @java.lang.Deprecated public java.lang.String getPreviousConnectionId() {
       java.lang.Object ref = previousConnectionId_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
@@ -1161,14 +1164,15 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * in the case of crossing hello's, when both chains call OpenInit, we need
-     * the connection identifier of the previous connection in state INIT
+     * Deprecated: this field is unused. Crossing hellos are no longer supported in core IBC.
      * </pre>
      *
-     * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+     * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+     * @deprecated ibc.core.connection.v1.MsgConnectionOpenTry.previous_connection_id is deprecated.
+     *     See ibc/core/connection/v1/tx.proto;l=52
      * @return The bytes for previousConnectionId.
      */
-    public com.google.protobuf.ByteString
+    @java.lang.Deprecated public com.google.protobuf.ByteString
         getPreviousConnectionIdBytes() {
       java.lang.Object ref = previousConnectionId_;
       if (ref instanceof String) {
@@ -1183,15 +1187,16 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * in the case of crossing hello's, when both chains call OpenInit, we need
-     * the connection identifier of the previous connection in state INIT
+     * Deprecated: this field is unused. Crossing hellos are no longer supported in core IBC.
      * </pre>
      *
-     * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+     * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+     * @deprecated ibc.core.connection.v1.MsgConnectionOpenTry.previous_connection_id is deprecated.
+     *     See ibc/core/connection/v1/tx.proto;l=52
      * @param value The previousConnectionId to set.
      * @return This builder for chaining.
      */
-    public Builder setPreviousConnectionId(
+    @java.lang.Deprecated public Builder setPreviousConnectionId(
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
       previousConnectionId_ = value;
@@ -1201,14 +1206,15 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * in the case of crossing hello's, when both chains call OpenInit, we need
-     * the connection identifier of the previous connection in state INIT
+     * Deprecated: this field is unused. Crossing hellos are no longer supported in core IBC.
      * </pre>
      *
-     * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+     * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+     * @deprecated ibc.core.connection.v1.MsgConnectionOpenTry.previous_connection_id is deprecated.
+     *     See ibc/core/connection/v1/tx.proto;l=52
      * @return This builder for chaining.
      */
-    public Builder clearPreviousConnectionId() {
+    @java.lang.Deprecated public Builder clearPreviousConnectionId() {
       previousConnectionId_ = getDefaultInstance().getPreviousConnectionId();
       bitField0_ = (bitField0_ & ~0x00000002);
       onChanged();
@@ -1216,15 +1222,16 @@ private static final long serialVersionUID = 0L;
     }
     /**
      * <pre>
-     * in the case of crossing hello's, when both chains call OpenInit, we need
-     * the connection identifier of the previous connection in state INIT
+     * Deprecated: this field is unused. Crossing hellos are no longer supported in core IBC.
      * </pre>
      *
-     * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+     * <code>string previous_connection_id = 2 [json_name = "previousConnectionId", deprecated = true, (.gogoproto.moretags) = "yaml:&#92;"previous_connection_id&#92;""];</code>
+     * @deprecated ibc.core.connection.v1.MsgConnectionOpenTry.previous_connection_id is deprecated.
+     *     See ibc/core/connection/v1/tx.proto;l=52
      * @param value The bytes for previousConnectionId to set.
      * @return This builder for chaining.
      */
-    public Builder setPreviousConnectionIdBytes(
+    @java.lang.Deprecated public Builder setPreviousConnectionIdBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);

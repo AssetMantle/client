@@ -44,12 +44,12 @@ public final class TxProto {
       "v\n\003Msg\022o\n\017VerifyInvariant\022).cosmos.crisi" +
       "s.v1beta1.MsgVerifyInvariant\0321.cosmos.cr" +
       "isis.v1beta1.MsgVerifyInvariantResponseB" +
-      "\336\001\n\031com.cosmos.crisis.v1beta1B\007TxProtoP\001" +
-      "ZBgithub.com/AssetMantle/modules/cosmos/" +
-      "crisis/v1beta1;crisisv1beta1\242\002\003CCX\252\002\025Cos" +
-      "mos.Crisis.V1beta1\312\002\025Cosmos\\Crisis\\V1bet" +
-      "a1\342\002!Cosmos\\Crisis\\V1beta1\\GPBMetadata\352\002" +
-      "\027Cosmos::Crisis::V1beta1b\006proto3"
+      "\307\001\n\031com.cosmos.crisis.v1beta1B\007TxProtoP\001" +
+      "Z+github.com/cosmos/cosmos-sdk/x/crisis/" +
+      "types\242\002\003CCX\252\002\025Cosmos.Crisis.V1beta1\312\002\025Co" +
+      "smos\\Crisis\\V1beta1\342\002!Cosmos\\Crisis\\V1be" +
+      "ta1\\GPBMetadata\352\002\027Cosmos::Crisis::V1beta" +
+      "1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

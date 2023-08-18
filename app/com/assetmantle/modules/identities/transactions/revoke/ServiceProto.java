@@ -28,22 +28,22 @@ public final class ServiceProto {
       "ransactions.revoke\032\034google/api/annotatio" +
       "ns.proto\032,identities/transactions/revoke" +
       "/message.proto\0329identities/transactions/" +
-      "revoke/transaction_response.proto2\275\001\n\007Se" +
-      "rvice\022\261\001\n\006Handle\022;.assetmantle.modules.i" +
-      "dentities.transactions.revoke.Message\032G." +
-      "assetmantle.modules.identities.transacti" +
-      "ons.revoke.TransactionResponse\"!\202\323\344\223\002\033\"\031" +
-      "/mantle/identities/revokeB\365\002\n6com.assetm" +
-      "antle.modules.identities.transactions.re" +
-      "vokeB\014ServiceProtoP\001Z?github.com/AssetMa" +
-      "ntle/modules/x/identities/transactions/r" +
-      "evoke\242\002\005AMITR\252\0022Assetmantle.Modules.Iden" +
-      "tities.Transactions.Revoke\312\0022Assetmantle" +
-      "\\Modules\\Identities\\Transactions\\Revoke\342" +
-      "\002>Assetmantle\\Modules\\Identities\\Transac" +
-      "tions\\Revoke\\GPBMetadata\352\0026Assetmantle::" +
-      "Modules::Identities::Transactions::Revok" +
-      "eb\006proto3"
+      "revoke/transaction_response.proto2\271\001\n\003Ms" +
+      "g\022\261\001\n\006Handle\022;.assetmantle.modules.ident" +
+      "ities.transactions.revoke.Message\032G.asse" +
+      "tmantle.modules.identities.transactions." +
+      "revoke.TransactionResponse\"!\202\323\344\223\002\033\"\031/man" +
+      "tle/identities/revokeB\365\002\n6com.assetmantl" +
+      "e.modules.identities.transactions.revoke" +
+      "B\014ServiceProtoP\001Z?github.com/AssetMantle" +
+      "/modules/x/identities/transactions/revok" +
+      "e\242\002\005AMITR\252\0022Assetmantle.Modules.Identiti" +
+      "es.Transactions.Revoke\312\0022Assetmantle\\Mod" +
+      "ules\\Identities\\Transactions\\Revoke\342\002>As" +
+      "setmantle\\Modules\\Identities\\Transaction" +
+      "s\\Revoke\\GPBMetadata\352\0026Assetmantle::Modu" +
+      "les::Identities::Transactions::Revokeb\006p" +
+      "roto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -16,7 +16,7 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private Genesis() {
-    mappables_ = java.util.Collections.emptyList();
+    records_ = java.util.Collections.emptyList();
   }
 
   @java.lang.Override
@@ -39,51 +39,51 @@ private static final long serialVersionUID = 0L;
             com.assetmantle.modules.splits.genesis.Genesis.class, com.assetmantle.modules.splits.genesis.Genesis.Builder.class);
   }
 
-  public static final int MAPPABLES_FIELD_NUMBER = 1;
+  public static final int RECORDS_FIELD_NUMBER = 1;
   @SuppressWarnings("serial")
-  private java.util.List<com.assetmantle.modules.splits.mappable.Mappable> mappables_;
+  private java.util.List<com.assetmantle.modules.splits.record.Record> records_;
   /**
-   * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+   * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
    */
   @java.lang.Override
-  public java.util.List<com.assetmantle.modules.splits.mappable.Mappable> getMappablesList() {
-    return mappables_;
+  public java.util.List<com.assetmantle.modules.splits.record.Record> getRecordsList() {
+    return records_;
   }
   /**
-   * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+   * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
    */
   @java.lang.Override
-  public java.util.List<? extends com.assetmantle.modules.splits.mappable.MappableOrBuilder> 
-      getMappablesOrBuilderList() {
-    return mappables_;
+  public java.util.List<? extends com.assetmantle.modules.splits.record.RecordOrBuilder> 
+      getRecordsOrBuilderList() {
+    return records_;
   }
   /**
-   * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+   * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
    */
   @java.lang.Override
-  public int getMappablesCount() {
-    return mappables_.size();
+  public int getRecordsCount() {
+    return records_.size();
   }
   /**
-   * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+   * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.modules.splits.mappable.Mappable getMappables(int index) {
-    return mappables_.get(index);
+  public com.assetmantle.modules.splits.record.Record getRecords(int index) {
+    return records_.get(index);
   }
   /**
-   * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+   * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.modules.splits.mappable.MappableOrBuilder getMappablesOrBuilder(
+  public com.assetmantle.modules.splits.record.RecordOrBuilder getRecordsOrBuilder(
       int index) {
-    return mappables_.get(index);
+    return records_.get(index);
   }
 
   public static final int PARAMETER_LIST_FIELD_NUMBER = 2;
-  private com.assetmantle.schema.parameters.base.ParameterList parameterList_;
+  private com.assetmantle.schema.lists.base.ParameterList parameterList_;
   /**
-   * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+   * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
    * @return Whether the parameterList field is set.
    */
   @java.lang.Override
@@ -91,19 +91,19 @@ private static final long serialVersionUID = 0L;
     return parameterList_ != null;
   }
   /**
-   * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+   * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
    * @return The parameterList.
    */
   @java.lang.Override
-  public com.assetmantle.schema.parameters.base.ParameterList getParameterList() {
-    return parameterList_ == null ? com.assetmantle.schema.parameters.base.ParameterList.getDefaultInstance() : parameterList_;
+  public com.assetmantle.schema.lists.base.ParameterList getParameterList() {
+    return parameterList_ == null ? com.assetmantle.schema.lists.base.ParameterList.getDefaultInstance() : parameterList_;
   }
   /**
-   * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+   * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
    */
   @java.lang.Override
-  public com.assetmantle.schema.parameters.base.ParameterListOrBuilder getParameterListOrBuilder() {
-    return parameterList_ == null ? com.assetmantle.schema.parameters.base.ParameterList.getDefaultInstance() : parameterList_;
+  public com.assetmantle.schema.lists.base.ParameterListOrBuilder getParameterListOrBuilder() {
+    return parameterList_ == null ? com.assetmantle.schema.lists.base.ParameterList.getDefaultInstance() : parameterList_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -120,8 +120,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    for (int i = 0; i < mappables_.size(); i++) {
-      output.writeMessage(1, mappables_.get(i));
+    for (int i = 0; i < records_.size(); i++) {
+      output.writeMessage(1, records_.get(i));
     }
     if (parameterList_ != null) {
       output.writeMessage(2, getParameterList());
@@ -135,9 +135,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    for (int i = 0; i < mappables_.size(); i++) {
+    for (int i = 0; i < records_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(1, mappables_.get(i));
+        .computeMessageSize(1, records_.get(i));
     }
     if (parameterList_ != null) {
       size += com.google.protobuf.CodedOutputStream
@@ -158,8 +158,8 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.modules.splits.genesis.Genesis other = (com.assetmantle.modules.splits.genesis.Genesis) obj;
 
-    if (!getMappablesList()
-        .equals(other.getMappablesList())) return false;
+    if (!getRecordsList()
+        .equals(other.getRecordsList())) return false;
     if (hasParameterList() != other.hasParameterList()) return false;
     if (hasParameterList()) {
       if (!getParameterList()
@@ -176,9 +176,9 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    if (getMappablesCount() > 0) {
-      hash = (37 * hash) + MAPPABLES_FIELD_NUMBER;
-      hash = (53 * hash) + getMappablesList().hashCode();
+    if (getRecordsCount() > 0) {
+      hash = (37 * hash) + RECORDS_FIELD_NUMBER;
+      hash = (53 * hash) + getRecordsList().hashCode();
     }
     if (hasParameterList()) {
       hash = (37 * hash) + PARAMETER_LIST_FIELD_NUMBER;
@@ -313,11 +313,11 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      if (mappablesBuilder_ == null) {
-        mappables_ = java.util.Collections.emptyList();
+      if (recordsBuilder_ == null) {
+        records_ = java.util.Collections.emptyList();
       } else {
-        mappables_ = null;
-        mappablesBuilder_.clear();
+        records_ = null;
+        recordsBuilder_.clear();
       }
       bitField0_ = (bitField0_ & ~0x00000001);
       parameterList_ = null;
@@ -358,14 +358,14 @@ private static final long serialVersionUID = 0L;
     }
 
     private void buildPartialRepeatedFields(com.assetmantle.modules.splits.genesis.Genesis result) {
-      if (mappablesBuilder_ == null) {
+      if (recordsBuilder_ == null) {
         if (((bitField0_ & 0x00000001) != 0)) {
-          mappables_ = java.util.Collections.unmodifiableList(mappables_);
+          records_ = java.util.Collections.unmodifiableList(records_);
           bitField0_ = (bitField0_ & ~0x00000001);
         }
-        result.mappables_ = mappables_;
+        result.records_ = records_;
       } else {
-        result.mappables_ = mappablesBuilder_.build();
+        result.records_ = recordsBuilder_.build();
       }
     }
 
@@ -422,29 +422,29 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.modules.splits.genesis.Genesis other) {
       if (other == com.assetmantle.modules.splits.genesis.Genesis.getDefaultInstance()) return this;
-      if (mappablesBuilder_ == null) {
-        if (!other.mappables_.isEmpty()) {
-          if (mappables_.isEmpty()) {
-            mappables_ = other.mappables_;
+      if (recordsBuilder_ == null) {
+        if (!other.records_.isEmpty()) {
+          if (records_.isEmpty()) {
+            records_ = other.records_;
             bitField0_ = (bitField0_ & ~0x00000001);
           } else {
-            ensureMappablesIsMutable();
-            mappables_.addAll(other.mappables_);
+            ensureRecordsIsMutable();
+            records_.addAll(other.records_);
           }
           onChanged();
         }
       } else {
-        if (!other.mappables_.isEmpty()) {
-          if (mappablesBuilder_.isEmpty()) {
-            mappablesBuilder_.dispose();
-            mappablesBuilder_ = null;
-            mappables_ = other.mappables_;
+        if (!other.records_.isEmpty()) {
+          if (recordsBuilder_.isEmpty()) {
+            recordsBuilder_.dispose();
+            recordsBuilder_ = null;
+            records_ = other.records_;
             bitField0_ = (bitField0_ & ~0x00000001);
-            mappablesBuilder_ = 
+            recordsBuilder_ = 
               com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                 getMappablesFieldBuilder() : null;
+                 getRecordsFieldBuilder() : null;
           } else {
-            mappablesBuilder_.addAllMessages(other.mappables_);
+            recordsBuilder_.addAllMessages(other.records_);
           }
         }
       }
@@ -478,15 +478,15 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 10: {
-              com.assetmantle.modules.splits.mappable.Mappable m =
+              com.assetmantle.modules.splits.record.Record m =
                   input.readMessage(
-                      com.assetmantle.modules.splits.mappable.Mappable.parser(),
+                      com.assetmantle.modules.splits.record.Record.parser(),
                       extensionRegistry);
-              if (mappablesBuilder_ == null) {
-                ensureMappablesIsMutable();
-                mappables_.add(m);
+              if (recordsBuilder_ == null) {
+                ensureRecordsIsMutable();
+                records_.add(m);
               } else {
-                mappablesBuilder_.addMessage(m);
+                recordsBuilder_.addMessage(m);
               }
               break;
             } // case 10
@@ -514,271 +514,271 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.util.List<com.assetmantle.modules.splits.mappable.Mappable> mappables_ =
+    private java.util.List<com.assetmantle.modules.splits.record.Record> records_ =
       java.util.Collections.emptyList();
-    private void ensureMappablesIsMutable() {
+    private void ensureRecordsIsMutable() {
       if (!((bitField0_ & 0x00000001) != 0)) {
-        mappables_ = new java.util.ArrayList<com.assetmantle.modules.splits.mappable.Mappable>(mappables_);
+        records_ = new java.util.ArrayList<com.assetmantle.modules.splits.record.Record>(records_);
         bitField0_ |= 0x00000001;
        }
     }
 
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.assetmantle.modules.splits.mappable.Mappable, com.assetmantle.modules.splits.mappable.Mappable.Builder, com.assetmantle.modules.splits.mappable.MappableOrBuilder> mappablesBuilder_;
+        com.assetmantle.modules.splits.record.Record, com.assetmantle.modules.splits.record.Record.Builder, com.assetmantle.modules.splits.record.RecordOrBuilder> recordsBuilder_;
 
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public java.util.List<com.assetmantle.modules.splits.mappable.Mappable> getMappablesList() {
-      if (mappablesBuilder_ == null) {
-        return java.util.Collections.unmodifiableList(mappables_);
+    public java.util.List<com.assetmantle.modules.splits.record.Record> getRecordsList() {
+      if (recordsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(records_);
       } else {
-        return mappablesBuilder_.getMessageList();
+        return recordsBuilder_.getMessageList();
       }
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public int getMappablesCount() {
-      if (mappablesBuilder_ == null) {
-        return mappables_.size();
+    public int getRecordsCount() {
+      if (recordsBuilder_ == null) {
+        return records_.size();
       } else {
-        return mappablesBuilder_.getCount();
+        return recordsBuilder_.getCount();
       }
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public com.assetmantle.modules.splits.mappable.Mappable getMappables(int index) {
-      if (mappablesBuilder_ == null) {
-        return mappables_.get(index);
+    public com.assetmantle.modules.splits.record.Record getRecords(int index) {
+      if (recordsBuilder_ == null) {
+        return records_.get(index);
       } else {
-        return mappablesBuilder_.getMessage(index);
+        return recordsBuilder_.getMessage(index);
       }
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public Builder setMappables(
-        int index, com.assetmantle.modules.splits.mappable.Mappable value) {
-      if (mappablesBuilder_ == null) {
+    public Builder setRecords(
+        int index, com.assetmantle.modules.splits.record.Record value) {
+      if (recordsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureMappablesIsMutable();
-        mappables_.set(index, value);
+        ensureRecordsIsMutable();
+        records_.set(index, value);
         onChanged();
       } else {
-        mappablesBuilder_.setMessage(index, value);
+        recordsBuilder_.setMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public Builder setMappables(
-        int index, com.assetmantle.modules.splits.mappable.Mappable.Builder builderForValue) {
-      if (mappablesBuilder_ == null) {
-        ensureMappablesIsMutable();
-        mappables_.set(index, builderForValue.build());
+    public Builder setRecords(
+        int index, com.assetmantle.modules.splits.record.Record.Builder builderForValue) {
+      if (recordsBuilder_ == null) {
+        ensureRecordsIsMutable();
+        records_.set(index, builderForValue.build());
         onChanged();
       } else {
-        mappablesBuilder_.setMessage(index, builderForValue.build());
+        recordsBuilder_.setMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public Builder addMappables(com.assetmantle.modules.splits.mappable.Mappable value) {
-      if (mappablesBuilder_ == null) {
+    public Builder addRecords(com.assetmantle.modules.splits.record.Record value) {
+      if (recordsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureMappablesIsMutable();
-        mappables_.add(value);
+        ensureRecordsIsMutable();
+        records_.add(value);
         onChanged();
       } else {
-        mappablesBuilder_.addMessage(value);
+        recordsBuilder_.addMessage(value);
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public Builder addMappables(
-        int index, com.assetmantle.modules.splits.mappable.Mappable value) {
-      if (mappablesBuilder_ == null) {
+    public Builder addRecords(
+        int index, com.assetmantle.modules.splits.record.Record value) {
+      if (recordsBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
         }
-        ensureMappablesIsMutable();
-        mappables_.add(index, value);
+        ensureRecordsIsMutable();
+        records_.add(index, value);
         onChanged();
       } else {
-        mappablesBuilder_.addMessage(index, value);
+        recordsBuilder_.addMessage(index, value);
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public Builder addMappables(
-        com.assetmantle.modules.splits.mappable.Mappable.Builder builderForValue) {
-      if (mappablesBuilder_ == null) {
-        ensureMappablesIsMutable();
-        mappables_.add(builderForValue.build());
+    public Builder addRecords(
+        com.assetmantle.modules.splits.record.Record.Builder builderForValue) {
+      if (recordsBuilder_ == null) {
+        ensureRecordsIsMutable();
+        records_.add(builderForValue.build());
         onChanged();
       } else {
-        mappablesBuilder_.addMessage(builderForValue.build());
+        recordsBuilder_.addMessage(builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public Builder addMappables(
-        int index, com.assetmantle.modules.splits.mappable.Mappable.Builder builderForValue) {
-      if (mappablesBuilder_ == null) {
-        ensureMappablesIsMutable();
-        mappables_.add(index, builderForValue.build());
+    public Builder addRecords(
+        int index, com.assetmantle.modules.splits.record.Record.Builder builderForValue) {
+      if (recordsBuilder_ == null) {
+        ensureRecordsIsMutable();
+        records_.add(index, builderForValue.build());
         onChanged();
       } else {
-        mappablesBuilder_.addMessage(index, builderForValue.build());
+        recordsBuilder_.addMessage(index, builderForValue.build());
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public Builder addAllMappables(
-        java.lang.Iterable<? extends com.assetmantle.modules.splits.mappable.Mappable> values) {
-      if (mappablesBuilder_ == null) {
-        ensureMappablesIsMutable();
+    public Builder addAllRecords(
+        java.lang.Iterable<? extends com.assetmantle.modules.splits.record.Record> values) {
+      if (recordsBuilder_ == null) {
+        ensureRecordsIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, mappables_);
+            values, records_);
         onChanged();
       } else {
-        mappablesBuilder_.addAllMessages(values);
+        recordsBuilder_.addAllMessages(values);
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public Builder clearMappables() {
-      if (mappablesBuilder_ == null) {
-        mappables_ = java.util.Collections.emptyList();
+    public Builder clearRecords() {
+      if (recordsBuilder_ == null) {
+        records_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
         onChanged();
       } else {
-        mappablesBuilder_.clear();
+        recordsBuilder_.clear();
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public Builder removeMappables(int index) {
-      if (mappablesBuilder_ == null) {
-        ensureMappablesIsMutable();
-        mappables_.remove(index);
+    public Builder removeRecords(int index) {
+      if (recordsBuilder_ == null) {
+        ensureRecordsIsMutable();
+        records_.remove(index);
         onChanged();
       } else {
-        mappablesBuilder_.remove(index);
+        recordsBuilder_.remove(index);
       }
       return this;
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public com.assetmantle.modules.splits.mappable.Mappable.Builder getMappablesBuilder(
+    public com.assetmantle.modules.splits.record.Record.Builder getRecordsBuilder(
         int index) {
-      return getMappablesFieldBuilder().getBuilder(index);
+      return getRecordsFieldBuilder().getBuilder(index);
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public com.assetmantle.modules.splits.mappable.MappableOrBuilder getMappablesOrBuilder(
+    public com.assetmantle.modules.splits.record.RecordOrBuilder getRecordsOrBuilder(
         int index) {
-      if (mappablesBuilder_ == null) {
-        return mappables_.get(index);  } else {
-        return mappablesBuilder_.getMessageOrBuilder(index);
+      if (recordsBuilder_ == null) {
+        return records_.get(index);  } else {
+        return recordsBuilder_.getMessageOrBuilder(index);
       }
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public java.util.List<? extends com.assetmantle.modules.splits.mappable.MappableOrBuilder> 
-         getMappablesOrBuilderList() {
-      if (mappablesBuilder_ != null) {
-        return mappablesBuilder_.getMessageOrBuilderList();
+    public java.util.List<? extends com.assetmantle.modules.splits.record.RecordOrBuilder> 
+         getRecordsOrBuilderList() {
+      if (recordsBuilder_ != null) {
+        return recordsBuilder_.getMessageOrBuilderList();
       } else {
-        return java.util.Collections.unmodifiableList(mappables_);
+        return java.util.Collections.unmodifiableList(records_);
       }
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public com.assetmantle.modules.splits.mappable.Mappable.Builder addMappablesBuilder() {
-      return getMappablesFieldBuilder().addBuilder(
-          com.assetmantle.modules.splits.mappable.Mappable.getDefaultInstance());
+    public com.assetmantle.modules.splits.record.Record.Builder addRecordsBuilder() {
+      return getRecordsFieldBuilder().addBuilder(
+          com.assetmantle.modules.splits.record.Record.getDefaultInstance());
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public com.assetmantle.modules.splits.mappable.Mappable.Builder addMappablesBuilder(
+    public com.assetmantle.modules.splits.record.Record.Builder addRecordsBuilder(
         int index) {
-      return getMappablesFieldBuilder().addBuilder(
-          index, com.assetmantle.modules.splits.mappable.Mappable.getDefaultInstance());
+      return getRecordsFieldBuilder().addBuilder(
+          index, com.assetmantle.modules.splits.record.Record.getDefaultInstance());
     }
     /**
-     * <code>repeated .assetmantle.modules.splits.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+     * <code>repeated .assetmantle.modules.splits.record.Record records = 1 [json_name = "records"];</code>
      */
-    public java.util.List<com.assetmantle.modules.splits.mappable.Mappable.Builder> 
-         getMappablesBuilderList() {
-      return getMappablesFieldBuilder().getBuilderList();
+    public java.util.List<com.assetmantle.modules.splits.record.Record.Builder> 
+         getRecordsBuilderList() {
+      return getRecordsFieldBuilder().getBuilderList();
     }
     private com.google.protobuf.RepeatedFieldBuilderV3<
-        com.assetmantle.modules.splits.mappable.Mappable, com.assetmantle.modules.splits.mappable.Mappable.Builder, com.assetmantle.modules.splits.mappable.MappableOrBuilder> 
-        getMappablesFieldBuilder() {
-      if (mappablesBuilder_ == null) {
-        mappablesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-            com.assetmantle.modules.splits.mappable.Mappable, com.assetmantle.modules.splits.mappable.Mappable.Builder, com.assetmantle.modules.splits.mappable.MappableOrBuilder>(
-                mappables_,
+        com.assetmantle.modules.splits.record.Record, com.assetmantle.modules.splits.record.Record.Builder, com.assetmantle.modules.splits.record.RecordOrBuilder> 
+        getRecordsFieldBuilder() {
+      if (recordsBuilder_ == null) {
+        recordsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+            com.assetmantle.modules.splits.record.Record, com.assetmantle.modules.splits.record.Record.Builder, com.assetmantle.modules.splits.record.RecordOrBuilder>(
+                records_,
                 ((bitField0_ & 0x00000001) != 0),
                 getParentForChildren(),
                 isClean());
-        mappables_ = null;
+        records_ = null;
       }
-      return mappablesBuilder_;
+      return recordsBuilder_;
     }
 
-    private com.assetmantle.schema.parameters.base.ParameterList parameterList_;
+    private com.assetmantle.schema.lists.base.ParameterList parameterList_;
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.parameters.base.ParameterList, com.assetmantle.schema.parameters.base.ParameterList.Builder, com.assetmantle.schema.parameters.base.ParameterListOrBuilder> parameterListBuilder_;
+        com.assetmantle.schema.lists.base.ParameterList, com.assetmantle.schema.lists.base.ParameterList.Builder, com.assetmantle.schema.lists.base.ParameterListOrBuilder> parameterListBuilder_;
     /**
-     * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+     * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
      * @return Whether the parameterList field is set.
      */
     public boolean hasParameterList() {
       return ((bitField0_ & 0x00000002) != 0);
     }
     /**
-     * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+     * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
      * @return The parameterList.
      */
-    public com.assetmantle.schema.parameters.base.ParameterList getParameterList() {
+    public com.assetmantle.schema.lists.base.ParameterList getParameterList() {
       if (parameterListBuilder_ == null) {
-        return parameterList_ == null ? com.assetmantle.schema.parameters.base.ParameterList.getDefaultInstance() : parameterList_;
+        return parameterList_ == null ? com.assetmantle.schema.lists.base.ParameterList.getDefaultInstance() : parameterList_;
       } else {
         return parameterListBuilder_.getMessage();
       }
     }
     /**
-     * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+     * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
      */
-    public Builder setParameterList(com.assetmantle.schema.parameters.base.ParameterList value) {
+    public Builder setParameterList(com.assetmantle.schema.lists.base.ParameterList value) {
       if (parameterListBuilder_ == null) {
         if (value == null) {
           throw new NullPointerException();
@@ -792,10 +792,10 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+     * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
      */
     public Builder setParameterList(
-        com.assetmantle.schema.parameters.base.ParameterList.Builder builderForValue) {
+        com.assetmantle.schema.lists.base.ParameterList.Builder builderForValue) {
       if (parameterListBuilder_ == null) {
         parameterList_ = builderForValue.build();
       } else {
@@ -806,13 +806,13 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+     * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
      */
-    public Builder mergeParameterList(com.assetmantle.schema.parameters.base.ParameterList value) {
+    public Builder mergeParameterList(com.assetmantle.schema.lists.base.ParameterList value) {
       if (parameterListBuilder_ == null) {
         if (((bitField0_ & 0x00000002) != 0) &&
           parameterList_ != null &&
-          parameterList_ != com.assetmantle.schema.parameters.base.ParameterList.getDefaultInstance()) {
+          parameterList_ != com.assetmantle.schema.lists.base.ParameterList.getDefaultInstance()) {
           getParameterListBuilder().mergeFrom(value);
         } else {
           parameterList_ = value;
@@ -825,7 +825,7 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+     * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
      */
     public Builder clearParameterList() {
       bitField0_ = (bitField0_ & ~0x00000002);
@@ -838,33 +838,33 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     /**
-     * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+     * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
      */
-    public com.assetmantle.schema.parameters.base.ParameterList.Builder getParameterListBuilder() {
+    public com.assetmantle.schema.lists.base.ParameterList.Builder getParameterListBuilder() {
       bitField0_ |= 0x00000002;
       onChanged();
       return getParameterListFieldBuilder().getBuilder();
     }
     /**
-     * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+     * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
      */
-    public com.assetmantle.schema.parameters.base.ParameterListOrBuilder getParameterListOrBuilder() {
+    public com.assetmantle.schema.lists.base.ParameterListOrBuilder getParameterListOrBuilder() {
       if (parameterListBuilder_ != null) {
         return parameterListBuilder_.getMessageOrBuilder();
       } else {
         return parameterList_ == null ?
-            com.assetmantle.schema.parameters.base.ParameterList.getDefaultInstance() : parameterList_;
+            com.assetmantle.schema.lists.base.ParameterList.getDefaultInstance() : parameterList_;
       }
     }
     /**
-     * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+     * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
      */
     private com.google.protobuf.SingleFieldBuilderV3<
-        com.assetmantle.schema.parameters.base.ParameterList, com.assetmantle.schema.parameters.base.ParameterList.Builder, com.assetmantle.schema.parameters.base.ParameterListOrBuilder> 
+        com.assetmantle.schema.lists.base.ParameterList, com.assetmantle.schema.lists.base.ParameterList.Builder, com.assetmantle.schema.lists.base.ParameterListOrBuilder> 
         getParameterListFieldBuilder() {
       if (parameterListBuilder_ == null) {
         parameterListBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            com.assetmantle.schema.parameters.base.ParameterList, com.assetmantle.schema.parameters.base.ParameterList.Builder, com.assetmantle.schema.parameters.base.ParameterListOrBuilder>(
+            com.assetmantle.schema.lists.base.ParameterList, com.assetmantle.schema.lists.base.ParameterList.Builder, com.assetmantle.schema.lists.base.ParameterListOrBuilder>(
                 getParameterList(),
                 getParentForChildren(),
                 isClean());

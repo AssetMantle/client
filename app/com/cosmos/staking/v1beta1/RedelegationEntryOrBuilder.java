@@ -83,4 +83,24 @@ public interface RedelegationEntryOrBuilder extends
    */
   com.google.protobuf.ByteString
       getSharesDstBytes();
+
+  /**
+   * <pre>
+   * Incrementing id that uniquely identifies this entry
+   * </pre>
+   *
+   * <code>uint64 unbonding_id = 5 [json_name = "unbondingId"];</code>
+   * @return The unbondingId.
+   */
+  long getUnbondingId();
+
+  /**
+   * <pre>
+   * Strictly positive if this entry's unbonding has been stopped by external modules
+   * </pre>
+   *
+   * <code>int64 unbonding_on_hold_ref_count = 6 [json_name = "unbondingOnHoldRefCount"];</code>
+   * @return The unbondingOnHoldRefCount.
+   */
+  long getUnbondingOnHoldRefCount();
 }

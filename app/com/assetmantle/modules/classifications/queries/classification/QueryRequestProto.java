@@ -31,34 +31,33 @@ public final class QueryRequestProto {
       "\n:classifications/queries/classification" +
       "/query_request.proto\022:assetmantle.module" +
       "s.classifications.queries.classification" +
-      "\032 ids/base/classification_id.proto\"k\n\014Qu" +
-      "eryRequest\022[\n\022classification_i_d\030\001 \001(\0132-" +
-      ".assetmantle.schema.ids.base.Classificat" +
-      "ionIDR\020classificationIDB\252\003\n>com.assetman" +
-      "tle.modules.classifications.queries.clas" +
-      "sificationB\021QueryRequestProtoP\001ZGgithub." +
-      "com/AssetMantle/modules/x/classification" +
-      "s/queries/classification\242\002\005AMCQC\252\002:Asset" +
-      "mantle.Modules.Classifications.Queries.C" +
-      "lassification\312\002:Assetmantle\\Modules\\Clas" +
-      "sifications\\Queries\\Classification\342\002FAss" +
-      "etmantle\\Modules\\Classifications\\Queries" +
-      "\\Classification\\GPBMetadata\352\002>Assetmantl" +
-      "e::Modules::Classifications::Queries::Cl" +
-      "assificationb\006proto3"
+      "\032\035classifications/key/key.proto\"N\n\014Query" +
+      "Request\022>\n\003key\030\001 \001(\0132,.assetmantle.modul" +
+      "es.classifications.key.KeyR\003keyB\252\003\n>com." +
+      "assetmantle.modules.classifications.quer" +
+      "ies.classificationB\021QueryRequestProtoP\001Z" +
+      "Ggithub.com/AssetMantle/modules/x/classi" +
+      "fications/queries/classification\242\002\005AMCQC" +
+      "\252\002:Assetmantle.Modules.Classifications.Q" +
+      "ueries.Classification\312\002:Assetmantle\\Modu" +
+      "les\\Classifications\\Queries\\Classificati" +
+      "on\342\002FAssetmantle\\Modules\\Classifications" +
+      "\\Queries\\Classification\\GPBMetadata\352\002>As" +
+      "setmantle::Modules::Classifications::Que" +
+      "ries::Classificationb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.assetmantle.schema.ids.base.ClassificationIdProto.getDescriptor(),
+          com.assetmantle.modules.classifications.key.KeyProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_classifications_queries_classification_QueryRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_classifications_queries_classification_QueryRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_classifications_queries_classification_QueryRequest_descriptor,
-        new java.lang.String[] { "ClassificationID", });
-    com.assetmantle.schema.ids.base.ClassificationIdProto.getDescriptor();
+        new java.lang.String[] { "Key", });
+    com.assetmantle.modules.classifications.key.KeyProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

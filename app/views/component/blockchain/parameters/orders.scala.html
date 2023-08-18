@@ -1,5 +1,6 @@
 @import views.html.base.cards._
 @import models.common.Parameters.OrderParameter
+@import views.html.base.commonIcon
 
 @(orderParameter: OrderParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
@@ -11,7 +12,21 @@
             <td>
                 <div class="tableField">
                     <div class="tableFieldTitle">@Messages(constants.View.MAX_ORDER_LIFE):</div>
-                    <div class="tableFieldValue">@orderParameter.maxOrderLife Blocks<div>
+                    <div class="tableFieldValue">
+                        @orderParameter.maxOrderLife Blocks
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.PUT_ENABLED):</div>
+                    <div class="tableFieldValue">
+                    @if(orderParameter.putEnabled) {
+                        <span class="statusCheck">@commonIcon("check")</span>
+                    } else {
+                        <span class="statusClose">@commonIcon("close")</span>
+                    }
+                    </div>
                 </div>
             </td>
         </tr>

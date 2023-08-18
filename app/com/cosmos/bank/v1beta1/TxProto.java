@@ -61,12 +61,12 @@ public final class TxProto {
       "gSend\032$.cosmos.bank.v1beta1.MsgSendRespo" +
       "nse\022Y\n\tMultiSend\022!.cosmos.bank.v1beta1.M" +
       "sgMultiSend\032).cosmos.bank.v1beta1.MsgMul" +
-      "tiSendResponseB\320\001\n\027com.cosmos.bank.v1bet" +
-      "a1B\007TxProtoP\001Z>github.com/AssetMantle/mo" +
-      "dules/cosmos/bank/v1beta1;bankv1beta1\242\002\003" +
-      "CBX\252\002\023Cosmos.Bank.V1beta1\312\002\023Cosmos\\Bank\\" +
-      "V1beta1\342\002\037Cosmos\\Bank\\V1beta1\\GPBMetadat" +
-      "a\352\002\025Cosmos::Bank::V1beta1b\006proto3"
+      "tiSendResponseB\273\001\n\027com.cosmos.bank.v1bet" +
+      "a1B\007TxProtoP\001Z)github.com/cosmos/cosmos-" +
+      "sdk/x/bank/types\242\002\003CBX\252\002\023Cosmos.Bank.V1b" +
+      "eta1\312\002\023Cosmos\\Bank\\V1beta1\342\002\037Cosmos\\Bank" +
+      "\\V1beta1\\GPBMetadata\352\002\025Cosmos::Bank::V1b" +
+      "eta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

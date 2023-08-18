@@ -16,7 +16,6 @@ private static final long serialVersionUID = 0L;
     super(builder);
   }
   private TransactionResponse() {
-    identityID_ = "";
   }
 
   @java.lang.Override
@@ -40,42 +39,29 @@ private static final long serialVersionUID = 0L;
   }
 
   public static final int IDENTITY_I_D_FIELD_NUMBER = 1;
-  @SuppressWarnings("serial")
-  private volatile java.lang.Object identityID_ = "";
+  private com.assetmantle.schema.ids.base.IdentityID identityID_;
   /**
-   * <code>string identity_i_d = 1 [json_name = "identityID"];</code>
+   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
+   * @return Whether the identityID field is set.
+   */
+  @java.lang.Override
+  public boolean hasIdentityID() {
+    return identityID_ != null;
+  }
+  /**
+   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
    * @return The identityID.
    */
   @java.lang.Override
-  public java.lang.String getIdentityID() {
-    java.lang.Object ref = identityID_;
-    if (ref instanceof java.lang.String) {
-      return (java.lang.String) ref;
-    } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
-      java.lang.String s = bs.toStringUtf8();
-      identityID_ = s;
-      return s;
-    }
+  public com.assetmantle.schema.ids.base.IdentityID getIdentityID() {
+    return identityID_ == null ? com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance() : identityID_;
   }
   /**
-   * <code>string identity_i_d = 1 [json_name = "identityID"];</code>
-   * @return The bytes for identityID.
+   * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString
-      getIdentityIDBytes() {
-    java.lang.Object ref = identityID_;
-    if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (java.lang.String) ref);
-      identityID_ = b;
-      return b;
-    } else {
-      return (com.google.protobuf.ByteString) ref;
-    }
+  public com.assetmantle.schema.ids.base.IdentityIDOrBuilder getIdentityIDOrBuilder() {
+    return identityID_ == null ? com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance() : identityID_;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -92,8 +78,8 @@ private static final long serialVersionUID = 0L;
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(identityID_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 1, identityID_);
+    if (identityID_ != null) {
+      output.writeMessage(1, getIdentityID());
     }
     getUnknownFields().writeTo(output);
   }
@@ -104,8 +90,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(identityID_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, identityID_);
+    if (identityID_ != null) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeMessageSize(1, getIdentityID());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -122,8 +109,11 @@ private static final long serialVersionUID = 0L;
     }
     com.assetmantle.modules.identities.transactions.issue.TransactionResponse other = (com.assetmantle.modules.identities.transactions.issue.TransactionResponse) obj;
 
-    if (!getIdentityID()
-        .equals(other.getIdentityID())) return false;
+    if (hasIdentityID() != other.hasIdentityID()) return false;
+    if (hasIdentityID()) {
+      if (!getIdentityID()
+          .equals(other.getIdentityID())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -135,8 +125,10 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + IDENTITY_I_D_FIELD_NUMBER;
-    hash = (53 * hash) + getIdentityID().hashCode();
+    if (hasIdentityID()) {
+      hash = (37 * hash) + IDENTITY_I_D_FIELD_NUMBER;
+      hash = (53 * hash) + getIdentityID().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -266,7 +258,11 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      identityID_ = "";
+      identityID_ = null;
+      if (identityIDBuilder_ != null) {
+        identityIDBuilder_.dispose();
+        identityIDBuilder_ = null;
+      }
       return this;
     }
 
@@ -301,7 +297,9 @@ private static final long serialVersionUID = 0L;
     private void buildPartial0(com.assetmantle.modules.identities.transactions.issue.TransactionResponse result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.identityID_ = identityID_;
+        result.identityID_ = identityIDBuilder_ == null
+            ? identityID_
+            : identityIDBuilder_.build();
       }
     }
 
@@ -349,10 +347,8 @@ private static final long serialVersionUID = 0L;
 
     public Builder mergeFrom(com.assetmantle.modules.identities.transactions.issue.TransactionResponse other) {
       if (other == com.assetmantle.modules.identities.transactions.issue.TransactionResponse.getDefaultInstance()) return this;
-      if (!other.getIdentityID().isEmpty()) {
-        identityID_ = other.identityID_;
-        bitField0_ |= 0x00000001;
-        onChanged();
+      if (other.hasIdentityID()) {
+        mergeIdentityID(other.getIdentityID());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -381,7 +377,9 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 10: {
-              identityID_ = input.readStringRequireUtf8();
+              input.readMessage(
+                  getIdentityIDFieldBuilder().getBuilder(),
+                  extensionRegistry);
               bitField0_ |= 0x00000001;
               break;
             } // case 10
@@ -402,76 +400,123 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private java.lang.Object identityID_ = "";
+    private com.assetmantle.schema.ids.base.IdentityID identityID_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.assetmantle.schema.ids.base.IdentityID, com.assetmantle.schema.ids.base.IdentityID.Builder, com.assetmantle.schema.ids.base.IdentityIDOrBuilder> identityIDBuilder_;
     /**
-     * <code>string identity_i_d = 1 [json_name = "identityID"];</code>
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
+     * @return Whether the identityID field is set.
+     */
+    public boolean hasIdentityID() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
      * @return The identityID.
      */
-    public java.lang.String getIdentityID() {
-      java.lang.Object ref = identityID_;
-      if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        identityID_ = s;
-        return s;
+    public com.assetmantle.schema.ids.base.IdentityID getIdentityID() {
+      if (identityIDBuilder_ == null) {
+        return identityID_ == null ? com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance() : identityID_;
       } else {
-        return (java.lang.String) ref;
+        return identityIDBuilder_.getMessage();
       }
     }
     /**
-     * <code>string identity_i_d = 1 [json_name = "identityID"];</code>
-     * @return The bytes for identityID.
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
      */
-    public com.google.protobuf.ByteString
-        getIdentityIDBytes() {
-      java.lang.Object ref = identityID_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        identityID_ = b;
-        return b;
+    public Builder setIdentityID(com.assetmantle.schema.ids.base.IdentityID value) {
+      if (identityIDBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        identityID_ = value;
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        identityIDBuilder_.setMessage(value);
       }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
     }
     /**
-     * <code>string identity_i_d = 1 [json_name = "identityID"];</code>
-     * @param value The identityID to set.
-     * @return This builder for chaining.
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
      */
     public Builder setIdentityID(
-        java.lang.String value) {
-      if (value == null) { throw new NullPointerException(); }
-      identityID_ = value;
+        com.assetmantle.schema.ids.base.IdentityID.Builder builderForValue) {
+      if (identityIDBuilder_ == null) {
+        identityID_ = builderForValue.build();
+      } else {
+        identityIDBuilder_.setMessage(builderForValue.build());
+      }
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>string identity_i_d = 1 [json_name = "identityID"];</code>
-     * @return This builder for chaining.
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
+     */
+    public Builder mergeIdentityID(com.assetmantle.schema.ids.base.IdentityID value) {
+      if (identityIDBuilder_ == null) {
+        if (((bitField0_ & 0x00000001) != 0) &&
+          identityID_ != null &&
+          identityID_ != com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance()) {
+          getIdentityIDBuilder().mergeFrom(value);
+        } else {
+          identityID_ = value;
+        }
+      } else {
+        identityIDBuilder_.mergeFrom(value);
+      }
+      bitField0_ |= 0x00000001;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
      */
     public Builder clearIdentityID() {
-      identityID_ = getDefaultInstance().getIdentityID();
       bitField0_ = (bitField0_ & ~0x00000001);
+      identityID_ = null;
+      if (identityIDBuilder_ != null) {
+        identityIDBuilder_.dispose();
+        identityIDBuilder_ = null;
+      }
       onChanged();
       return this;
     }
     /**
-     * <code>string identity_i_d = 1 [json_name = "identityID"];</code>
-     * @param value The bytes for identityID to set.
-     * @return This builder for chaining.
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
      */
-    public Builder setIdentityIDBytes(
-        com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
-      checkByteStringIsUtf8(value);
-      identityID_ = value;
+    public com.assetmantle.schema.ids.base.IdentityID.Builder getIdentityIDBuilder() {
       bitField0_ |= 0x00000001;
       onChanged();
-      return this;
+      return getIdentityIDFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
+     */
+    public com.assetmantle.schema.ids.base.IdentityIDOrBuilder getIdentityIDOrBuilder() {
+      if (identityIDBuilder_ != null) {
+        return identityIDBuilder_.getMessageOrBuilder();
+      } else {
+        return identityID_ == null ?
+            com.assetmantle.schema.ids.base.IdentityID.getDefaultInstance() : identityID_;
+      }
+    }
+    /**
+     * <code>.assetmantle.schema.ids.base.IdentityID identity_i_d = 1 [json_name = "identityID"];</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+        com.assetmantle.schema.ids.base.IdentityID, com.assetmantle.schema.ids.base.IdentityID.Builder, com.assetmantle.schema.ids.base.IdentityIDOrBuilder> 
+        getIdentityIDFieldBuilder() {
+      if (identityIDBuilder_ == null) {
+        identityIDBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+            com.assetmantle.schema.ids.base.IdentityID, com.assetmantle.schema.ids.base.IdentityID.Builder, com.assetmantle.schema.ids.base.IdentityIDOrBuilder>(
+                getIdentityID(),
+                getParentForChildren(),
+                isClean());
+        identityID_ = null;
+      }
+      return identityIDBuilder_;
     }
     @java.lang.Override
     public final Builder setUnknownFields(

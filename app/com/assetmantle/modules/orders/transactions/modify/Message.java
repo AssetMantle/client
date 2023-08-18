@@ -17,8 +17,8 @@ private static final long serialVersionUID = 0L;
   }
   private Message() {
     from_ = "";
-    makerOwnableSplit_ = "";
-    takerOwnableSplit_ = "";
+    makerSplit_ = "";
+    takerSplit_ = "";
   }
 
   @java.lang.Override
@@ -132,78 +132,78 @@ private static final long serialVersionUID = 0L;
     return orderID_ == null ? com.assetmantle.schema.ids.base.OrderID.getDefaultInstance() : orderID_;
   }
 
-  public static final int MAKER_OWNABLE_SPLIT_FIELD_NUMBER = 4;
+  public static final int MAKER_SPLIT_FIELD_NUMBER = 4;
   @SuppressWarnings("serial")
-  private volatile java.lang.Object makerOwnableSplit_ = "";
+  private volatile java.lang.Object makerSplit_ = "";
   /**
-   * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
-   * @return The makerOwnableSplit.
+   * <code>string maker_split = 4 [json_name = "makerSplit"];</code>
+   * @return The makerSplit.
    */
   @java.lang.Override
-  public java.lang.String getMakerOwnableSplit() {
-    java.lang.Object ref = makerOwnableSplit_;
+  public java.lang.String getMakerSplit() {
+    java.lang.Object ref = makerSplit_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      makerOwnableSplit_ = s;
+      makerSplit_ = s;
       return s;
     }
   }
   /**
-   * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
-   * @return The bytes for makerOwnableSplit.
+   * <code>string maker_split = 4 [json_name = "makerSplit"];</code>
+   * @return The bytes for makerSplit.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getMakerOwnableSplitBytes() {
-    java.lang.Object ref = makerOwnableSplit_;
+      getMakerSplitBytes() {
+    java.lang.Object ref = makerSplit_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      makerOwnableSplit_ = b;
+      makerSplit_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
     }
   }
 
-  public static final int TAKER_OWNABLE_SPLIT_FIELD_NUMBER = 5;
+  public static final int TAKER_SPLIT_FIELD_NUMBER = 5;
   @SuppressWarnings("serial")
-  private volatile java.lang.Object takerOwnableSplit_ = "";
+  private volatile java.lang.Object takerSplit_ = "";
   /**
-   * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
-   * @return The takerOwnableSplit.
+   * <code>string taker_split = 5 [json_name = "takerSplit"];</code>
+   * @return The takerSplit.
    */
   @java.lang.Override
-  public java.lang.String getTakerOwnableSplit() {
-    java.lang.Object ref = takerOwnableSplit_;
+  public java.lang.String getTakerSplit() {
+    java.lang.Object ref = takerSplit_;
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
       com.google.protobuf.ByteString bs = 
           (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
-      takerOwnableSplit_ = s;
+      takerSplit_ = s;
       return s;
     }
   }
   /**
-   * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
-   * @return The bytes for takerOwnableSplit.
+   * <code>string taker_split = 5 [json_name = "takerSplit"];</code>
+   * @return The bytes for takerSplit.
    */
   @java.lang.Override
   public com.google.protobuf.ByteString
-      getTakerOwnableSplitBytes() {
-    java.lang.Object ref = takerOwnableSplit_;
+      getTakerSplitBytes() {
+    java.lang.Object ref = takerSplit_;
     if (ref instanceof java.lang.String) {
       com.google.protobuf.ByteString b = 
           com.google.protobuf.ByteString.copyFromUtf8(
               (java.lang.String) ref);
-      takerOwnableSplit_ = b;
+      takerSplit_ = b;
       return b;
     } else {
       return (com.google.protobuf.ByteString) ref;
@@ -311,11 +311,11 @@ private static final long serialVersionUID = 0L;
     if (orderID_ != null) {
       output.writeMessage(3, getOrderID());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(makerOwnableSplit_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, makerOwnableSplit_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(makerSplit_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 4, makerSplit_);
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(takerOwnableSplit_)) {
-      com.google.protobuf.GeneratedMessageV3.writeString(output, 5, takerOwnableSplit_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(takerSplit_)) {
+      com.google.protobuf.GeneratedMessageV3.writeString(output, 5, takerSplit_);
     }
     if (expiresIn_ != null) {
       output.writeMessage(6, getExpiresIn());
@@ -346,11 +346,11 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeMessageSize(3, getOrderID());
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(makerOwnableSplit_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, makerOwnableSplit_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(makerSplit_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, makerSplit_);
     }
-    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(takerOwnableSplit_)) {
-      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, takerOwnableSplit_);
+    if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(takerSplit_)) {
+      size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, takerSplit_);
     }
     if (expiresIn_ != null) {
       size += com.google.protobuf.CodedOutputStream
@@ -391,10 +391,10 @@ private static final long serialVersionUID = 0L;
       if (!getOrderID()
           .equals(other.getOrderID())) return false;
     }
-    if (!getMakerOwnableSplit()
-        .equals(other.getMakerOwnableSplit())) return false;
-    if (!getTakerOwnableSplit()
-        .equals(other.getTakerOwnableSplit())) return false;
+    if (!getMakerSplit()
+        .equals(other.getMakerSplit())) return false;
+    if (!getTakerSplit()
+        .equals(other.getTakerSplit())) return false;
     if (hasExpiresIn() != other.hasExpiresIn()) return false;
     if (hasExpiresIn()) {
       if (!getExpiresIn()
@@ -431,10 +431,10 @@ private static final long serialVersionUID = 0L;
       hash = (37 * hash) + ORDER_I_D_FIELD_NUMBER;
       hash = (53 * hash) + getOrderID().hashCode();
     }
-    hash = (37 * hash) + MAKER_OWNABLE_SPLIT_FIELD_NUMBER;
-    hash = (53 * hash) + getMakerOwnableSplit().hashCode();
-    hash = (37 * hash) + TAKER_OWNABLE_SPLIT_FIELD_NUMBER;
-    hash = (53 * hash) + getTakerOwnableSplit().hashCode();
+    hash = (37 * hash) + MAKER_SPLIT_FIELD_NUMBER;
+    hash = (53 * hash) + getMakerSplit().hashCode();
+    hash = (37 * hash) + TAKER_SPLIT_FIELD_NUMBER;
+    hash = (53 * hash) + getTakerSplit().hashCode();
     if (hasExpiresIn()) {
       hash = (37 * hash) + EXPIRES_IN_FIELD_NUMBER;
       hash = (53 * hash) + getExpiresIn().hashCode();
@@ -587,8 +587,8 @@ private static final long serialVersionUID = 0L;
         orderIDBuilder_.dispose();
         orderIDBuilder_ = null;
       }
-      makerOwnableSplit_ = "";
-      takerOwnableSplit_ = "";
+      makerSplit_ = "";
+      takerSplit_ = "";
       expiresIn_ = null;
       if (expiresInBuilder_ != null) {
         expiresInBuilder_.dispose();
@@ -651,10 +651,10 @@ private static final long serialVersionUID = 0L;
             : orderIDBuilder_.build();
       }
       if (((from_bitField0_ & 0x00000008) != 0)) {
-        result.makerOwnableSplit_ = makerOwnableSplit_;
+        result.makerSplit_ = makerSplit_;
       }
       if (((from_bitField0_ & 0x00000010) != 0)) {
-        result.takerOwnableSplit_ = takerOwnableSplit_;
+        result.takerSplit_ = takerSplit_;
       }
       if (((from_bitField0_ & 0x00000020) != 0)) {
         result.expiresIn_ = expiresInBuilder_ == null
@@ -728,13 +728,13 @@ private static final long serialVersionUID = 0L;
       if (other.hasOrderID()) {
         mergeOrderID(other.getOrderID());
       }
-      if (!other.getMakerOwnableSplit().isEmpty()) {
-        makerOwnableSplit_ = other.makerOwnableSplit_;
+      if (!other.getMakerSplit().isEmpty()) {
+        makerSplit_ = other.makerSplit_;
         bitField0_ |= 0x00000008;
         onChanged();
       }
-      if (!other.getTakerOwnableSplit().isEmpty()) {
-        takerOwnableSplit_ = other.takerOwnableSplit_;
+      if (!other.getTakerSplit().isEmpty()) {
+        takerSplit_ = other.takerSplit_;
         bitField0_ |= 0x00000010;
         onChanged();
       }
@@ -793,12 +793,12 @@ private static final long serialVersionUID = 0L;
               break;
             } // case 26
             case 34: {
-              makerOwnableSplit_ = input.readStringRequireUtf8();
+              makerSplit_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000008;
               break;
             } // case 34
             case 42: {
-              takerOwnableSplit_ = input.readStringRequireUtf8();
+              takerSplit_ = input.readStringRequireUtf8();
               bitField0_ |= 0x00000010;
               break;
             } // case 42
@@ -1150,145 +1150,145 @@ private static final long serialVersionUID = 0L;
       return orderIDBuilder_;
     }
 
-    private java.lang.Object makerOwnableSplit_ = "";
+    private java.lang.Object makerSplit_ = "";
     /**
-     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
-     * @return The makerOwnableSplit.
+     * <code>string maker_split = 4 [json_name = "makerSplit"];</code>
+     * @return The makerSplit.
      */
-    public java.lang.String getMakerOwnableSplit() {
-      java.lang.Object ref = makerOwnableSplit_;
+    public java.lang.String getMakerSplit() {
+      java.lang.Object ref = makerSplit_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        makerOwnableSplit_ = s;
+        makerSplit_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
-     * @return The bytes for makerOwnableSplit.
+     * <code>string maker_split = 4 [json_name = "makerSplit"];</code>
+     * @return The bytes for makerSplit.
      */
     public com.google.protobuf.ByteString
-        getMakerOwnableSplitBytes() {
-      java.lang.Object ref = makerOwnableSplit_;
+        getMakerSplitBytes() {
+      java.lang.Object ref = makerSplit_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        makerOwnableSplit_ = b;
+        makerSplit_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
-     * @param value The makerOwnableSplit to set.
+     * <code>string maker_split = 4 [json_name = "makerSplit"];</code>
+     * @param value The makerSplit to set.
      * @return This builder for chaining.
      */
-    public Builder setMakerOwnableSplit(
+    public Builder setMakerSplit(
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
-      makerOwnableSplit_ = value;
+      makerSplit_ = value;
       bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
     /**
-     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
+     * <code>string maker_split = 4 [json_name = "makerSplit"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearMakerOwnableSplit() {
-      makerOwnableSplit_ = getDefaultInstance().getMakerOwnableSplit();
+    public Builder clearMakerSplit() {
+      makerSplit_ = getDefaultInstance().getMakerSplit();
       bitField0_ = (bitField0_ & ~0x00000008);
       onChanged();
       return this;
     }
     /**
-     * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
-     * @param value The bytes for makerOwnableSplit to set.
+     * <code>string maker_split = 4 [json_name = "makerSplit"];</code>
+     * @param value The bytes for makerSplit to set.
      * @return This builder for chaining.
      */
-    public Builder setMakerOwnableSplitBytes(
+    public Builder setMakerSplitBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
-      makerOwnableSplit_ = value;
+      makerSplit_ = value;
       bitField0_ |= 0x00000008;
       onChanged();
       return this;
     }
 
-    private java.lang.Object takerOwnableSplit_ = "";
+    private java.lang.Object takerSplit_ = "";
     /**
-     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
-     * @return The takerOwnableSplit.
+     * <code>string taker_split = 5 [json_name = "takerSplit"];</code>
+     * @return The takerSplit.
      */
-    public java.lang.String getTakerOwnableSplit() {
-      java.lang.Object ref = takerOwnableSplit_;
+    public java.lang.String getTakerSplit() {
+      java.lang.Object ref = takerSplit_;
       if (!(ref instanceof java.lang.String)) {
         com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        takerOwnableSplit_ = s;
+        takerSplit_ = s;
         return s;
       } else {
         return (java.lang.String) ref;
       }
     }
     /**
-     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
-     * @return The bytes for takerOwnableSplit.
+     * <code>string taker_split = 5 [json_name = "takerSplit"];</code>
+     * @return The bytes for takerSplit.
      */
     public com.google.protobuf.ByteString
-        getTakerOwnableSplitBytes() {
-      java.lang.Object ref = takerOwnableSplit_;
+        getTakerSplitBytes() {
+      java.lang.Object ref = takerSplit_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        takerOwnableSplit_ = b;
+        takerSplit_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     /**
-     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
-     * @param value The takerOwnableSplit to set.
+     * <code>string taker_split = 5 [json_name = "takerSplit"];</code>
+     * @param value The takerSplit to set.
      * @return This builder for chaining.
      */
-    public Builder setTakerOwnableSplit(
+    public Builder setTakerSplit(
         java.lang.String value) {
       if (value == null) { throw new NullPointerException(); }
-      takerOwnableSplit_ = value;
+      takerSplit_ = value;
       bitField0_ |= 0x00000010;
       onChanged();
       return this;
     }
     /**
-     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
+     * <code>string taker_split = 5 [json_name = "takerSplit"];</code>
      * @return This builder for chaining.
      */
-    public Builder clearTakerOwnableSplit() {
-      takerOwnableSplit_ = getDefaultInstance().getTakerOwnableSplit();
+    public Builder clearTakerSplit() {
+      takerSplit_ = getDefaultInstance().getTakerSplit();
       bitField0_ = (bitField0_ & ~0x00000010);
       onChanged();
       return this;
     }
     /**
-     * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
-     * @param value The bytes for takerOwnableSplit to set.
+     * <code>string taker_split = 5 [json_name = "takerSplit"];</code>
+     * @param value The bytes for takerSplit to set.
      * @return This builder for chaining.
      */
-    public Builder setTakerOwnableSplitBytes(
+    public Builder setTakerSplitBytes(
         com.google.protobuf.ByteString value) {
       if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
-      takerOwnableSplit_ = value;
+      takerSplit_ = value;
       bitField0_ |= 0x00000010;
       onChanged();
       return this;

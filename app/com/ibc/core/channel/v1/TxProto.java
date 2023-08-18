@@ -133,134 +133,134 @@ public final class TxProto {
       "r\030\003 \001(\tR\006signer:\010\210\240\037\000\350\240\037\000\"l\n\032MsgChannelO" +
       "penInitResponse\0224\n\nchannel_id\030\001 \001(\tB\025\362\336\037" +
       "\021yaml:\"channel_id\"R\tchannelId\022\030\n\007version" +
-      "\030\002 \001(\tR\007version\"\326\003\n\021MsgChannelOpenTry\022+\n" +
+      "\030\002 \001(\tR\007version\"\330\003\n\021MsgChannelOpenTry\022+\n" +
       "\007port_id\030\001 \001(\tB\022\362\336\037\016yaml:\"port_id\"R\006port" +
-      "Id\022N\n\023previous_channel_id\030\002 \001(\tB\036\362\336\037\032yam" +
-      "l:\"previous_channel_id\"R\021previousChannel" +
-      "Id\022<\n\007channel\030\003 \001(\0132\034.ibc.core.channel.v" +
-      "1.ChannelB\004\310\336\037\000R\007channel\022R\n\024counterparty" +
-      "_version\030\004 \001(\tB\037\362\336\037\033yaml:\"counterparty_v" +
-      "ersion\"R\023counterpartyVersion\0224\n\nproof_in" +
-      "it\030\005 \001(\014B\025\362\336\037\021yaml:\"proof_init\"R\tproofIn" +
-      "it\022Z\n\014proof_height\030\006 \001(\0132\032.ibc.core.clie" +
-      "nt.v1.HeightB\033\310\336\037\000\362\336\037\023yaml:\"proof_height" +
-      "\"R\013proofHeight\022\026\n\006signer\030\007 \001(\tR\006signer:\010" +
-      "\210\240\037\000\350\240\037\000\"5\n\031MsgChannelOpenTryResponse\022\030\n" +
-      "\007version\030\001 \001(\tR\007version\"\327\003\n\021MsgChannelOp" +
-      "enAck\022+\n\007port_id\030\001 \001(\tB\022\362\336\037\016yaml:\"port_i" +
-      "d\"R\006portId\0224\n\nchannel_id\030\002 \001(\tB\025\362\336\037\021yaml" +
-      ":\"channel_id\"R\tchannelId\022Z\n\027counterparty" +
-      "_channel_id\030\003 \001(\tB\"\362\336\037\036yaml:\"counterpart" +
-      "y_channel_id\"R\025counterpartyChannelId\022R\n\024" +
-      "counterparty_version\030\004 \001(\tB\037\362\336\037\033yaml:\"co" +
-      "unterparty_version\"R\023counterpartyVersion" +
-      "\0221\n\tproof_try\030\005 \001(\014B\024\362\336\037\020yaml:\"proof_try" +
-      "\"R\010proofTry\022Z\n\014proof_height\030\006 \001(\0132\032.ibc." +
-      "core.client.v1.HeightB\033\310\336\037\000\362\336\037\023yaml:\"pro" +
-      "of_height\"R\013proofHeight\022\026\n\006signer\030\007 \001(\tR" +
-      "\006signer:\010\210\240\037\000\350\240\037\000\"\033\n\031MsgChannelOpenAckRe" +
-      "sponse\"\253\002\n\025MsgChannelOpenConfirm\022+\n\007port" +
-      "_id\030\001 \001(\tB\022\362\336\037\016yaml:\"port_id\"R\006portId\0224\n" +
-      "\nchannel_id\030\002 \001(\tB\025\362\336\037\021yaml:\"channel_id\"" +
-      "R\tchannelId\0221\n\tproof_ack\030\003 \001(\014B\024\362\336\037\020yaml" +
-      ":\"proof_ack\"R\010proofAck\022Z\n\014proof_height\030\004" +
-      " \001(\0132\032.ibc.core.client.v1.HeightB\033\310\336\037\000\362\336" +
-      "\037\023yaml:\"proof_height\"R\013proofHeight\022\026\n\006si" +
-      "gner\030\005 \001(\tR\006signer:\010\210\240\037\000\350\240\037\000\"\037\n\035MsgChann" +
-      "elOpenConfirmResponse\"\232\001\n\023MsgChannelClos" +
-      "eInit\022+\n\007port_id\030\001 \001(\tB\022\362\336\037\016yaml:\"port_i" +
-      "d\"R\006portId\0224\n\nchannel_id\030\002 \001(\tB\025\362\336\037\021yaml" +
-      ":\"channel_id\"R\tchannelId\022\026\n\006signer\030\003 \001(\t" +
-      "R\006signer:\010\210\240\037\000\350\240\037\000\"\035\n\033MsgChannelCloseIni" +
-      "tResponse\"\257\002\n\026MsgChannelCloseConfirm\022+\n\007" +
-      "port_id\030\001 \001(\tB\022\362\336\037\016yaml:\"port_id\"R\006portI" +
-      "d\0224\n\nchannel_id\030\002 \001(\tB\025\362\336\037\021yaml:\"channel" +
-      "_id\"R\tchannelId\0224\n\nproof_init\030\003 \001(\014B\025\362\336\037" +
-      "\021yaml:\"proof_init\"R\tproofInit\022Z\n\014proof_h" +
-      "eight\030\004 \001(\0132\032.ibc.core.client.v1.HeightB" +
-      "\033\310\336\037\000\362\336\037\023yaml:\"proof_height\"R\013proofHeigh" +
-      "t\022\026\n\006signer\030\005 \001(\tR\006signer:\010\210\240\037\000\350\240\037\000\" \n\036M" +
-      "sgChannelCloseConfirmResponse\"\220\002\n\rMsgRec" +
-      "vPacket\0229\n\006packet\030\001 \001(\0132\033.ibc.core.chann" +
-      "el.v1.PacketB\004\310\336\037\000R\006packet\022F\n\020proof_comm" +
-      "itment\030\002 \001(\014B\033\362\336\037\027yaml:\"proof_commitment" +
-      "\"R\017proofCommitment\022Z\n\014proof_height\030\003 \001(\013" +
+      "Id\022P\n\023previous_channel_id\030\002 \001(\tB \030\001\362\336\037\032y" +
+      "aml:\"previous_channel_id\"R\021previousChann" +
+      "elId\022<\n\007channel\030\003 \001(\0132\034.ibc.core.channel" +
+      ".v1.ChannelB\004\310\336\037\000R\007channel\022R\n\024counterpar" +
+      "ty_version\030\004 \001(\tB\037\362\336\037\033yaml:\"counterparty" +
+      "_version\"R\023counterpartyVersion\0224\n\nproof_" +
+      "init\030\005 \001(\014B\025\362\336\037\021yaml:\"proof_init\"R\tproof" +
+      "Init\022Z\n\014proof_height\030\006 \001(\0132\032.ibc.core.cl" +
+      "ient.v1.HeightB\033\310\336\037\000\362\336\037\023yaml:\"proof_heig" +
+      "ht\"R\013proofHeight\022\026\n\006signer\030\007 \001(\tR\006signer" +
+      ":\010\210\240\037\000\350\240\037\000\"5\n\031MsgChannelOpenTryResponse\022" +
+      "\030\n\007version\030\001 \001(\tR\007version\"\327\003\n\021MsgChannel" +
+      "OpenAck\022+\n\007port_id\030\001 \001(\tB\022\362\336\037\016yaml:\"port" +
+      "_id\"R\006portId\0224\n\nchannel_id\030\002 \001(\tB\025\362\336\037\021ya" +
+      "ml:\"channel_id\"R\tchannelId\022Z\n\027counterpar" +
+      "ty_channel_id\030\003 \001(\tB\"\362\336\037\036yaml:\"counterpa" +
+      "rty_channel_id\"R\025counterpartyChannelId\022R" +
+      "\n\024counterparty_version\030\004 \001(\tB\037\362\336\037\033yaml:\"" +
+      "counterparty_version\"R\023counterpartyVersi" +
+      "on\0221\n\tproof_try\030\005 \001(\014B\024\362\336\037\020yaml:\"proof_t" +
+      "ry\"R\010proofTry\022Z\n\014proof_height\030\006 \001(\0132\032.ib" +
+      "c.core.client.v1.HeightB\033\310\336\037\000\362\336\037\023yaml:\"p" +
+      "roof_height\"R\013proofHeight\022\026\n\006signer\030\007 \001(" +
+      "\tR\006signer:\010\210\240\037\000\350\240\037\000\"\033\n\031MsgChannelOpenAck" +
+      "Response\"\253\002\n\025MsgChannelOpenConfirm\022+\n\007po" +
+      "rt_id\030\001 \001(\tB\022\362\336\037\016yaml:\"port_id\"R\006portId\022" +
+      "4\n\nchannel_id\030\002 \001(\tB\025\362\336\037\021yaml:\"channel_i" +
+      "d\"R\tchannelId\0221\n\tproof_ack\030\003 \001(\014B\024\362\336\037\020ya" +
+      "ml:\"proof_ack\"R\010proofAck\022Z\n\014proof_height" +
+      "\030\004 \001(\0132\032.ibc.core.client.v1.HeightB\033\310\336\037\000" +
+      "\362\336\037\023yaml:\"proof_height\"R\013proofHeight\022\026\n\006" +
+      "signer\030\005 \001(\tR\006signer:\010\210\240\037\000\350\240\037\000\"\037\n\035MsgCha" +
+      "nnelOpenConfirmResponse\"\232\001\n\023MsgChannelCl" +
+      "oseInit\022+\n\007port_id\030\001 \001(\tB\022\362\336\037\016yaml:\"port" +
+      "_id\"R\006portId\0224\n\nchannel_id\030\002 \001(\tB\025\362\336\037\021ya" +
+      "ml:\"channel_id\"R\tchannelId\022\026\n\006signer\030\003 \001" +
+      "(\tR\006signer:\010\210\240\037\000\350\240\037\000\"\035\n\033MsgChannelCloseI" +
+      "nitResponse\"\257\002\n\026MsgChannelCloseConfirm\022+" +
+      "\n\007port_id\030\001 \001(\tB\022\362\336\037\016yaml:\"port_id\"R\006por" +
+      "tId\0224\n\nchannel_id\030\002 \001(\tB\025\362\336\037\021yaml:\"chann" +
+      "el_id\"R\tchannelId\0224\n\nproof_init\030\003 \001(\014B\025\362" +
+      "\336\037\021yaml:\"proof_init\"R\tproofInit\022Z\n\014proof" +
+      "_height\030\004 \001(\0132\032.ibc.core.client.v1.Heigh" +
+      "tB\033\310\336\037\000\362\336\037\023yaml:\"proof_height\"R\013proofHei" +
+      "ght\022\026\n\006signer\030\005 \001(\tR\006signer:\010\210\240\037\000\350\240\037\000\" \n" +
+      "\036MsgChannelCloseConfirmResponse\"\220\002\n\rMsgR" +
+      "ecvPacket\0229\n\006packet\030\001 \001(\0132\033.ibc.core.cha" +
+      "nnel.v1.PacketB\004\310\336\037\000R\006packet\022F\n\020proof_co" +
+      "mmitment\030\002 \001(\014B\033\362\336\037\027yaml:\"proof_commitme" +
+      "nt\"R\017proofCommitment\022Z\n\014proof_height\030\003 \001" +
+      "(\0132\032.ibc.core.client.v1.HeightB\033\310\336\037\000\362\336\037\023" +
+      "yaml:\"proof_height\"R\013proofHeight\022\026\n\006sign" +
+      "er\030\004 \001(\tR\006signer:\010\210\240\037\000\350\240\037\000\"^\n\025MsgRecvPac" +
+      "ketResponse\022?\n\006result\030\001 \001(\0162\'.ibc.core.c" +
+      "hannel.v1.ResponseResultTypeR\006result:\004\210\240" +
+      "\037\000\"\332\002\n\nMsgTimeout\0229\n\006packet\030\001 \001(\0132\033.ibc." +
+      "core.channel.v1.PacketB\004\310\336\037\000R\006packet\022F\n\020" +
+      "proof_unreceived\030\002 \001(\014B\033\362\336\037\027yaml:\"proof_" +
+      "unreceived\"R\017proofUnreceived\022Z\n\014proof_he" +
+      "ight\030\003 \001(\0132\032.ibc.core.client.v1.HeightB\033" +
+      "\310\336\037\000\362\336\037\023yaml:\"proof_height\"R\013proofHeight" +
+      "\022K\n\022next_sequence_recv\030\004 \001(\004B\035\362\336\037\031yaml:\"" +
+      "next_sequence_recv\"R\020nextSequenceRecv\022\026\n" +
+      "\006signer\030\005 \001(\tR\006signer:\010\210\240\037\000\350\240\037\000\"[\n\022MsgTi" +
+      "meoutResponse\022?\n\006result\030\001 \001(\0162\'.ibc.core" +
+      ".channel.v1.ResponseResultTypeR\006result:\004" +
+      "\210\240\037\000\"\232\003\n\021MsgTimeoutOnClose\0229\n\006packet\030\001 \001" +
+      "(\0132\033.ibc.core.channel.v1.PacketB\004\310\336\037\000R\006p" +
+      "acket\022F\n\020proof_unreceived\030\002 \001(\014B\033\362\336\037\027yam" +
+      "l:\"proof_unreceived\"R\017proofUnreceived\0227\n" +
+      "\013proof_close\030\003 \001(\014B\026\362\336\037\022yaml:\"proof_clos" +
+      "e\"R\nproofClose\022Z\n\014proof_height\030\004 \001(\0132\032.i" +
+      "bc.core.client.v1.HeightB\033\310\336\037\000\362\336\037\023yaml:\"" +
+      "proof_height\"R\013proofHeight\022K\n\022next_seque" +
+      "nce_recv\030\005 \001(\004B\035\362\336\037\031yaml:\"next_sequence_" +
+      "recv\"R\020nextSequenceRecv\022\026\n\006signer\030\006 \001(\tR" +
+      "\006signer:\010\210\240\037\000\350\240\037\000\"b\n\031MsgTimeoutOnCloseRe" +
+      "sponse\022?\n\006result\030\001 \001(\0162\'.ibc.core.channe" +
+      "l.v1.ResponseResultTypeR\006result:\004\210\240\037\000\"\260\002" +
+      "\n\022MsgAcknowledgement\0229\n\006packet\030\001 \001(\0132\033.i" +
+      "bc.core.channel.v1.PacketB\004\310\336\037\000R\006packet\022" +
+      "(\n\017acknowledgement\030\002 \001(\014R\017acknowledgemen" +
+      "t\0227\n\013proof_acked\030\003 \001(\014B\026\362\336\037\022yaml:\"proof_" +
+      "acked\"R\nproofAcked\022Z\n\014proof_height\030\004 \001(\013" +
       "2\032.ibc.core.client.v1.HeightB\033\310\336\037\000\362\336\037\023ya" +
       "ml:\"proof_height\"R\013proofHeight\022\026\n\006signer" +
-      "\030\004 \001(\tR\006signer:\010\210\240\037\000\350\240\037\000\"^\n\025MsgRecvPacke" +
-      "tResponse\022?\n\006result\030\001 \001(\0162\'.ibc.core.cha" +
-      "nnel.v1.ResponseResultTypeR\006result:\004\210\240\037\000" +
-      "\"\332\002\n\nMsgTimeout\0229\n\006packet\030\001 \001(\0132\033.ibc.co" +
-      "re.channel.v1.PacketB\004\310\336\037\000R\006packet\022F\n\020pr" +
-      "oof_unreceived\030\002 \001(\014B\033\362\336\037\027yaml:\"proof_un" +
-      "received\"R\017proofUnreceived\022Z\n\014proof_heig" +
-      "ht\030\003 \001(\0132\032.ibc.core.client.v1.HeightB\033\310\336" +
-      "\037\000\362\336\037\023yaml:\"proof_height\"R\013proofHeight\022K" +
-      "\n\022next_sequence_recv\030\004 \001(\004B\035\362\336\037\031yaml:\"ne" +
-      "xt_sequence_recv\"R\020nextSequenceRecv\022\026\n\006s" +
-      "igner\030\005 \001(\tR\006signer:\010\210\240\037\000\350\240\037\000\"[\n\022MsgTime" +
-      "outResponse\022?\n\006result\030\001 \001(\0162\'.ibc.core.c" +
-      "hannel.v1.ResponseResultTypeR\006result:\004\210\240" +
-      "\037\000\"\232\003\n\021MsgTimeoutOnClose\0229\n\006packet\030\001 \001(\013" +
-      "2\033.ibc.core.channel.v1.PacketB\004\310\336\037\000R\006pac" +
-      "ket\022F\n\020proof_unreceived\030\002 \001(\014B\033\362\336\037\027yaml:" +
-      "\"proof_unreceived\"R\017proofUnreceived\0227\n\013p" +
-      "roof_close\030\003 \001(\014B\026\362\336\037\022yaml:\"proof_close\"" +
-      "R\nproofClose\022Z\n\014proof_height\030\004 \001(\0132\032.ibc" +
-      ".core.client.v1.HeightB\033\310\336\037\000\362\336\037\023yaml:\"pr" +
-      "oof_height\"R\013proofHeight\022K\n\022next_sequenc" +
-      "e_recv\030\005 \001(\004B\035\362\336\037\031yaml:\"next_sequence_re" +
-      "cv\"R\020nextSequenceRecv\022\026\n\006signer\030\006 \001(\tR\006s" +
-      "igner:\010\210\240\037\000\350\240\037\000\"b\n\031MsgTimeoutOnCloseResp" +
-      "onse\022?\n\006result\030\001 \001(\0162\'.ibc.core.channel." +
-      "v1.ResponseResultTypeR\006result:\004\210\240\037\000\"\260\002\n\022" +
-      "MsgAcknowledgement\0229\n\006packet\030\001 \001(\0132\033.ibc" +
-      ".core.channel.v1.PacketB\004\310\336\037\000R\006packet\022(\n" +
-      "\017acknowledgement\030\002 \001(\014R\017acknowledgement\022" +
-      "7\n\013proof_acked\030\003 \001(\014B\026\362\336\037\022yaml:\"proof_ac" +
-      "ked\"R\nproofAcked\022Z\n\014proof_height\030\004 \001(\0132\032" +
-      ".ibc.core.client.v1.HeightB\033\310\336\037\000\362\336\037\023yaml" +
-      ":\"proof_height\"R\013proofHeight\022\026\n\006signer\030\005" +
-      " \001(\tR\006signer:\010\210\240\037\000\350\240\037\000\"c\n\032MsgAcknowledge" +
-      "mentResponse\022?\n\006result\030\001 \001(\0162\'.ibc.core." +
-      "channel.v1.ResponseResultTypeR\006result:\004\210" +
-      "\240\037\000*\251\001\n\022ResponseResultType\0225\n RESPONSE_R" +
-      "ESULT_TYPE_UNSPECIFIED\020\000\032\017\212\235 \013UNSPECIFIE" +
-      "D\022\'\n\031RESPONSE_RESULT_TYPE_NOOP\020\001\032\010\212\235 \004NO" +
-      "OP\022-\n\034RESPONSE_RESULT_TYPE_SUCCESS\020\002\032\013\212\235" +
-      " \007SUCCESS\032\004\210\243\036\0002\257\010\n\003Msg\022k\n\017ChannelOpenIn" +
-      "it\022\'.ibc.core.channel.v1.MsgChannelOpenI" +
-      "nit\032/.ibc.core.channel.v1.MsgChannelOpen" +
-      "InitResponse\022h\n\016ChannelOpenTry\022&.ibc.cor" +
-      "e.channel.v1.MsgChannelOpenTry\032..ibc.cor" +
-      "e.channel.v1.MsgChannelOpenTryResponse\022h" +
-      "\n\016ChannelOpenAck\022&.ibc.core.channel.v1.M" +
-      "sgChannelOpenAck\032..ibc.core.channel.v1.M" +
-      "sgChannelOpenAckResponse\022t\n\022ChannelOpenC" +
-      "onfirm\022*.ibc.core.channel.v1.MsgChannelO" +
-      "penConfirm\0322.ibc.core.channel.v1.MsgChan" +
-      "nelOpenConfirmResponse\022n\n\020ChannelCloseIn" +
-      "it\022(.ibc.core.channel.v1.MsgChannelClose" +
-      "Init\0320.ibc.core.channel.v1.MsgChannelClo" +
-      "seInitResponse\022w\n\023ChannelCloseConfirm\022+." +
-      "ibc.core.channel.v1.MsgChannelCloseConfi" +
-      "rm\0323.ibc.core.channel.v1.MsgChannelClose" +
-      "ConfirmResponse\022\\\n\nRecvPacket\022\".ibc.core" +
-      ".channel.v1.MsgRecvPacket\032*.ibc.core.cha" +
-      "nnel.v1.MsgRecvPacketResponse\022S\n\007Timeout" +
-      "\022\037.ibc.core.channel.v1.MsgTimeout\032\'.ibc." +
-      "core.channel.v1.MsgTimeoutResponse\022h\n\016Ti" +
-      "meoutOnClose\022&.ibc.core.channel.v1.MsgTi" +
-      "meoutOnClose\032..ibc.core.channel.v1.MsgTi" +
-      "meoutOnCloseResponse\022k\n\017Acknowledgement\022" +
-      "\'.ibc.core.channel.v1.MsgAcknowledgement" +
-      "\032/.ibc.core.channel.v1.MsgAcknowledgemen" +
-      "tResponseB\317\001\n\027com.ibc.core.channel.v1B\007T" +
-      "xProtoP\001Z<github.com/AssetMantle/modules" +
-      "/ibc/core/channel/v1;channelv1\242\002\003ICC\252\002\023I" +
-      "bc.Core.Channel.V1\312\002\023Ibc\\Core\\Channel\\V1" +
-      "\342\002\037Ibc\\Core\\Channel\\V1\\GPBMetadata\352\002\026Ibc" +
-      "::Core::Channel::V1b\006proto3"
+      "\030\005 \001(\tR\006signer:\010\210\240\037\000\350\240\037\000\"c\n\032MsgAcknowled" +
+      "gementResponse\022?\n\006result\030\001 \001(\0162\'.ibc.cor" +
+      "e.channel.v1.ResponseResultTypeR\006result:" +
+      "\004\210\240\037\000*\251\001\n\022ResponseResultType\0225\n RESPONSE" +
+      "_RESULT_TYPE_UNSPECIFIED\020\000\032\017\212\235 \013UNSPECIF" +
+      "IED\022\'\n\031RESPONSE_RESULT_TYPE_NOOP\020\001\032\010\212\235 \004" +
+      "NOOP\022-\n\034RESPONSE_RESULT_TYPE_SUCCESS\020\002\032\013" +
+      "\212\235 \007SUCCESS\032\004\210\243\036\0002\257\010\n\003Msg\022k\n\017ChannelOpen" +
+      "Init\022\'.ibc.core.channel.v1.MsgChannelOpe" +
+      "nInit\032/.ibc.core.channel.v1.MsgChannelOp" +
+      "enInitResponse\022h\n\016ChannelOpenTry\022&.ibc.c" +
+      "ore.channel.v1.MsgChannelOpenTry\032..ibc.c" +
+      "ore.channel.v1.MsgChannelOpenTryResponse" +
+      "\022h\n\016ChannelOpenAck\022&.ibc.core.channel.v1" +
+      ".MsgChannelOpenAck\032..ibc.core.channel.v1" +
+      ".MsgChannelOpenAckResponse\022t\n\022ChannelOpe" +
+      "nConfirm\022*.ibc.core.channel.v1.MsgChanne" +
+      "lOpenConfirm\0322.ibc.core.channel.v1.MsgCh" +
+      "annelOpenConfirmResponse\022n\n\020ChannelClose" +
+      "Init\022(.ibc.core.channel.v1.MsgChannelClo" +
+      "seInit\0320.ibc.core.channel.v1.MsgChannelC" +
+      "loseInitResponse\022w\n\023ChannelCloseConfirm\022" +
+      "+.ibc.core.channel.v1.MsgChannelCloseCon" +
+      "firm\0323.ibc.core.channel.v1.MsgChannelClo" +
+      "seConfirmResponse\022\\\n\nRecvPacket\022\".ibc.co" +
+      "re.channel.v1.MsgRecvPacket\032*.ibc.core.c" +
+      "hannel.v1.MsgRecvPacketResponse\022S\n\007Timeo" +
+      "ut\022\037.ibc.core.channel.v1.MsgTimeout\032\'.ib" +
+      "c.core.channel.v1.MsgTimeoutResponse\022h\n\016" +
+      "TimeoutOnClose\022&.ibc.core.channel.v1.Msg" +
+      "TimeoutOnClose\032..ibc.core.channel.v1.Msg" +
+      "TimeoutOnCloseResponse\022k\n\017Acknowledgemen" +
+      "t\022\'.ibc.core.channel.v1.MsgAcknowledgeme" +
+      "nt\032/.ibc.core.channel.v1.MsgAcknowledgem" +
+      "entResponseB\314\001\n\027com.ibc.core.channel.v1B" +
+      "\007TxProtoP\001Z9github.com/cosmos/ibc-go/v4/" +
+      "modules/core/04-channel/types\242\002\003ICC\252\002\023Ib" +
+      "c.Core.Channel.V1\312\002\023Ibc\\Core\\Channel\\V1\342" +
+      "\002\037Ibc\\Core\\Channel\\V1\\GPBMetadata\352\002\026Ibc:" +
+      ":Core::Channel::V1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

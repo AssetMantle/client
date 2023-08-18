@@ -42,9 +42,9 @@ public final class MessageProto {
       "nID\022`\n\025maintained_properties\030\005 \001(\0132+.ass" +
       "etmantle.schema.lists.base.PropertyListR" +
       "\024maintainedProperties\022$\n\016can_mint_asset\030" +
-      "\006 \001(\010R\014canMintAsset\022$\n\016can_burn_asset\030\007 " +
-      "\001(\010R\014canBurnAsset\0220\n\024can_renumerate_asse" +
-      "t\030\010 \001(\010R\022canRenumerateAsset\022,\n\022can_add_m" +
+      "\006 \001(\010R\014canMintAsset\0220\n\024can_renumerate_as" +
+      "set\030\007 \001(\010R\022canRenumerateAsset\022$\n\016can_bur" +
+      "n_asset\030\010 \001(\010R\014canBurnAsset\022,\n\022can_add_m" +
       "aintainer\030\t \001(\010R\020canAddMaintainer\0222\n\025can" +
       "_remove_maintainer\030\n \001(\010R\023canRemoveMaint" +
       "ainer\0222\n\025can_mutate_maintainer\030\013 \001(\010R\023ca" +
@@ -71,7 +71,7 @@ public final class MessageProto {
     internal_static_assetmantle_modules_assets_transactions_deputize_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_assets_transactions_deputize_Message_descriptor,
-        new java.lang.String[] { "From", "FromID", "ToID", "ClassificationID", "MaintainedProperties", "CanMintAsset", "CanBurnAsset", "CanRenumerateAsset", "CanAddMaintainer", "CanRemoveMaintainer", "CanMutateMaintainer", });
+        new java.lang.String[] { "From", "FromID", "ToID", "ClassificationID", "MaintainedProperties", "CanMintAsset", "CanRenumerateAsset", "CanBurnAsset", "CanAddMaintainer", "CanRemoveMaintainer", "CanMutateMaintainer", });
     com.assetmantle.schema.ids.base.ClassificationIdProto.getDescriptor();
     com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor();
     com.assetmantle.schema.lists.base.PropertyListProto.getDescriptor();

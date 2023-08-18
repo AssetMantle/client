@@ -30,44 +30,44 @@ public final class GenesisProto {
     java.lang.String[] descriptorData = {
       "\n%classifications/genesis/genesis.proto\022" +
       "+assetmantle.modules.classifications.gen" +
-      "esis\032\024gogoproto/gogo.proto\032\'classificati" +
-      "ons/mappable/mappable.proto\032$parameters/" +
-      "base/parameter_list.proto\"\277\001\n\007Genesis\022T\n" +
-      "\tmappables\030\001 \003(\01326.assetmantle.modules.c" +
-      "lassifications.mappable.MappableR\tmappab" +
-      "les\022X\n\016parameter_list\030\002 \001(\01321.assetmantl" +
-      "e.schema.parameters.base.ParameterListR\r" +
-      "parameterList:\004\210\240\037\000B\311\002\n/com.assetmantle." +
-      "modules.classifications.genesisB\014Genesis" +
-      "ProtoP\001Z8github.com/AssetMantle/modules/" +
-      "x/classifications/genesis\242\002\004AMCG\252\002+Asset" +
-      "mantle.Modules.Classifications.Genesis\312\002" +
-      "+Assetmantle\\Modules\\Classifications\\Gen" +
-      "esis\342\0027Assetmantle\\Modules\\Classificatio" +
-      "ns\\Genesis\\GPBMetadata\352\002.Assetmantle::Mo" +
-      "dules::Classifications::Genesisb\006proto3"
+      "esis\032\024gogoproto/gogo.proto\032#classificati" +
+      "ons/record/record.proto\032\037lists/base/para" +
+      "meter_list.proto\"\262\001\n\007Genesis\022L\n\007records\030" +
+      "\001 \003(\01322.assetmantle.modules.classificati" +
+      "ons.record.RecordR\007records\022S\n\016parameter_" +
+      "list\030\002 \001(\0132,.assetmantle.schema.lists.ba" +
+      "se.ParameterListR\rparameterList:\004\210\240\037\000B\311\002" +
+      "\n/com.assetmantle.modules.classification" +
+      "s.genesisB\014GenesisProtoP\001Z8github.com/As" +
+      "setMantle/modules/x/classifications/gene" +
+      "sis\242\002\004AMCG\252\002+Assetmantle.Modules.Classif" +
+      "ications.Genesis\312\002+Assetmantle\\Modules\\C" +
+      "lassifications\\Genesis\342\0027Assetmantle\\Mod" +
+      "ules\\Classifications\\Genesis\\GPBMetadata" +
+      "\352\002.Assetmantle::Modules::Classifications" +
+      "::Genesisb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.gogoproto.GogoProto.getDescriptor(),
-          com.assetmantle.modules.classifications.mappable.MappableProto.getDescriptor(),
-          com.assetmantle.schema.parameters.base.ParameterListProto.getDescriptor(),
+          com.assetmantle.modules.classifications.record.RecordProto.getDescriptor(),
+          com.assetmantle.schema.lists.base.ParameterListProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_classifications_genesis_Genesis_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_assetmantle_modules_classifications_genesis_Genesis_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_classifications_genesis_Genesis_descriptor,
-        new java.lang.String[] { "Mappables", "ParameterList", });
+        new java.lang.String[] { "Records", "ParameterList", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.gogoproto.GogoProto.getDescriptor();
-    com.assetmantle.modules.classifications.mappable.MappableProto.getDescriptor();
-    com.assetmantle.schema.parameters.base.ParameterListProto.getDescriptor();
+    com.assetmantle.modules.classifications.record.RecordProto.getDescriptor();
+    com.assetmantle.schema.lists.base.ParameterListProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

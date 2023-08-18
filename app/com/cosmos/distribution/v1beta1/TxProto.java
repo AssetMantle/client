@@ -100,14 +100,14 @@ public final class TxProto {
       "orCommissionResponse\022\201\001\n\021FundCommunityPo" +
       "ol\0221.cosmos.distribution.v1beta1.MsgFund" +
       "CommunityPool\0329.cosmos.distribution.v1be" +
-      "ta1.MsgFundCommunityPoolResponseB\214\002\n\037com" +
+      "ta1.MsgFundCommunityPoolResponseB\357\001\n\037com" +
       ".cosmos.distribution.v1beta1B\007TxProtoP\001Z" +
-      "Ngithub.com/AssetMantle/modules/cosmos/d" +
-      "istribution/v1beta1;distributionv1beta1\242" +
-      "\002\003CDX\252\002\033Cosmos.Distribution.V1beta1\312\002\033Co" +
-      "smos\\Distribution\\V1beta1\342\002\'Cosmos\\Distr" +
-      "ibution\\V1beta1\\GPBMetadata\352\002\035Cosmos::Di" +
-      "stribution::V1beta1\250\342\036\001b\006proto3"
+      "1github.com/cosmos/cosmos-sdk/x/distribu" +
+      "tion/types\242\002\003CDX\252\002\033Cosmos.Distribution.V" +
+      "1beta1\312\002\033Cosmos\\Distribution\\V1beta1\342\002\'C" +
+      "osmos\\Distribution\\V1beta1\\GPBMetadata\352\002" +
+      "\035Cosmos::Distribution::V1beta1\250\342\036\001b\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

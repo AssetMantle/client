@@ -28,20 +28,20 @@ public final class ServiceProto {
       "ons.cancel\032\034google/api/annotations.proto" +
       "\032(orders/transactions/cancel/message.pro" +
       "to\0325orders/transactions/cancel/transacti" +
-      "on_response.proto2\261\001\n\007Service\022\245\001\n\006Handle" +
-      "\0227.assetmantle.modules.orders.transactio" +
-      "ns.cancel.Message\032C.assetmantle.modules." +
-      "orders.transactions.cancel.TransactionRe" +
-      "sponse\"\035\202\323\344\223\002\027\"\025/mantle/orders/cancelB\335\002" +
-      "\n2com.assetmantle.modules.orders.transac" +
-      "tions.cancelB\014ServiceProtoP\001Z;github.com" +
-      "/AssetMantle/modules/x/orders/transactio" +
-      "ns/cancel\242\002\005AMOTC\252\002.Assetmantle.Modules." +
-      "Orders.Transactions.Cancel\312\002.Assetmantle" +
-      "\\Modules\\Orders\\Transactions\\Cancel\342\002:As" +
-      "setmantle\\Modules\\Orders\\Transactions\\Ca" +
-      "ncel\\GPBMetadata\352\0022Assetmantle::Modules:" +
-      ":Orders::Transactions::Cancelb\006proto3"
+      "on_response.proto2\255\001\n\003Msg\022\245\001\n\006Handle\0227.a" +
+      "ssetmantle.modules.orders.transactions.c" +
+      "ancel.Message\032C.assetmantle.modules.orde" +
+      "rs.transactions.cancel.TransactionRespon" +
+      "se\"\035\202\323\344\223\002\027\"\025/mantle/orders/cancelB\335\002\n2co" +
+      "m.assetmantle.modules.orders.transaction" +
+      "s.cancelB\014ServiceProtoP\001Z;github.com/Ass" +
+      "etMantle/modules/x/orders/transactions/c" +
+      "ancel\242\002\005AMOTC\252\002.Assetmantle.Modules.Orde" +
+      "rs.Transactions.Cancel\312\002.Assetmantle\\Mod" +
+      "ules\\Orders\\Transactions\\Cancel\342\002:Assetm" +
+      "antle\\Modules\\Orders\\Transactions\\Cancel" +
+      "\\GPBMetadata\352\0022Assetmantle::Modules::Ord" +
+      "ers::Transactions::Cancelb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

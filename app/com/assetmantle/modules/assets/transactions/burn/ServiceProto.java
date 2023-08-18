@@ -28,20 +28,20 @@ public final class ServiceProto {
       "s.burn\032\034google/api/annotations.proto\032&as" +
       "sets/transactions/burn/message.proto\0323as" +
       "sets/transactions/burn/transaction_respo" +
-      "nse.proto2\253\001\n\007Service\022\237\001\n\006Handle\0225.asset" +
-      "mantle.modules.assets.transactions.burn." +
-      "Message\032A.assetmantle.modules.assets.tra" +
-      "nsactions.burn.TransactionResponse\"\033\202\323\344\223" +
-      "\002\025\"\023/mantle/assets/burnB\321\002\n0com.assetman" +
-      "tle.modules.assets.transactions.burnB\014Se" +
-      "rviceProtoP\001Z9github.com/AssetMantle/mod" +
-      "ules/x/assets/transactions/burn\242\002\005AMATB\252" +
-      "\002,Assetmantle.Modules.Assets.Transaction" +
-      "s.Burn\312\002,Assetmantle\\Modules\\Assets\\Tran" +
-      "sactions\\Burn\342\0028Assetmantle\\Modules\\Asse" +
-      "ts\\Transactions\\Burn\\GPBMetadata\352\0020Asset" +
-      "mantle::Modules::Assets::Transactions::B" +
-      "urnb\006proto3"
+      "nse.proto2\247\001\n\003Msg\022\237\001\n\006Handle\0225.assetmant" +
+      "le.modules.assets.transactions.burn.Mess" +
+      "age\032A.assetmantle.modules.assets.transac" +
+      "tions.burn.TransactionResponse\"\033\202\323\344\223\002\025\"\023" +
+      "/mantle/assets/burnB\321\002\n0com.assetmantle." +
+      "modules.assets.transactions.burnB\014Servic" +
+      "eProtoP\001Z9github.com/AssetMantle/modules" +
+      "/x/assets/transactions/burn\242\002\005AMATB\252\002,As" +
+      "setmantle.Modules.Assets.Transactions.Bu" +
+      "rn\312\002,Assetmantle\\Modules\\Assets\\Transact" +
+      "ions\\Burn\342\0028Assetmantle\\Modules\\Assets\\T" +
+      "ransactions\\Burn\\GPBMetadata\352\0020Assetmant" +
+      "le::Modules::Assets::Transactions::Burnb" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

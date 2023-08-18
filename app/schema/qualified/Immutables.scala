@@ -31,4 +31,6 @@ object Immutables {
 
   def apply(protoBytes: Array[Byte]): Immutables = Immutables(protoImmutables.parseFrom(protoBytes))
 
+  def apply(properties: Seq[Property]): Immutables = Immutables(PropertyList(properties))
+
 }

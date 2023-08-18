@@ -8,41 +8,41 @@ public interface GenesisOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>repeated .assetmantle.modules.orders.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+   * <code>repeated .assetmantle.modules.orders.record.Record records = 1 [json_name = "records"];</code>
    */
-  java.util.List<com.assetmantle.modules.orders.mappable.Mappable> 
-      getMappablesList();
+  java.util.List<com.assetmantle.modules.orders.record.Record> 
+      getRecordsList();
   /**
-   * <code>repeated .assetmantle.modules.orders.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+   * <code>repeated .assetmantle.modules.orders.record.Record records = 1 [json_name = "records"];</code>
    */
-  com.assetmantle.modules.orders.mappable.Mappable getMappables(int index);
+  com.assetmantle.modules.orders.record.Record getRecords(int index);
   /**
-   * <code>repeated .assetmantle.modules.orders.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+   * <code>repeated .assetmantle.modules.orders.record.Record records = 1 [json_name = "records"];</code>
    */
-  int getMappablesCount();
+  int getRecordsCount();
   /**
-   * <code>repeated .assetmantle.modules.orders.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+   * <code>repeated .assetmantle.modules.orders.record.Record records = 1 [json_name = "records"];</code>
    */
-  java.util.List<? extends com.assetmantle.modules.orders.mappable.MappableOrBuilder> 
-      getMappablesOrBuilderList();
+  java.util.List<? extends com.assetmantle.modules.orders.record.RecordOrBuilder> 
+      getRecordsOrBuilderList();
   /**
-   * <code>repeated .assetmantle.modules.orders.mappable.Mappable mappables = 1 [json_name = "mappables"];</code>
+   * <code>repeated .assetmantle.modules.orders.record.Record records = 1 [json_name = "records"];</code>
    */
-  com.assetmantle.modules.orders.mappable.MappableOrBuilder getMappablesOrBuilder(
+  com.assetmantle.modules.orders.record.RecordOrBuilder getRecordsOrBuilder(
       int index);
 
   /**
-   * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+   * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
    * @return Whether the parameterList field is set.
    */
   boolean hasParameterList();
   /**
-   * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+   * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
    * @return The parameterList.
    */
-  com.assetmantle.schema.parameters.base.ParameterList getParameterList();
+  com.assetmantle.schema.lists.base.ParameterList getParameterList();
   /**
-   * <code>.assetmantle.schema.parameters.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
+   * <code>.assetmantle.schema.lists.base.ParameterList parameter_list = 2 [json_name = "parameterList"];</code>
    */
-  com.assetmantle.schema.parameters.base.ParameterListOrBuilder getParameterListOrBuilder();
+  com.assetmantle.schema.lists.base.ParameterListOrBuilder getParameterListOrBuilder();
 }

@@ -115,13 +115,12 @@ public final class TxProto {
       "mos.base.v1beta1.CoinB0\310\336\037\000\252\337\037(github.co" +
       "m/cosmos/cosmos-sdk/types.CoinsR\006amount\022" +
       "\033\n\tgas_limit\030\002 \001(\004R\010gasLimit\022\024\n\005payer\030\003 " +
-      "\001(\tR\005payer\022\030\n\007granter\030\004 \001(\tR\007granterB\302\001\n" +
-      "\025com.cosmos.tx.v1beta1B\007TxProtoP\001Z:githu" +
-      "b.com/AssetMantle/modules/cosmos/tx/v1be" +
-      "ta1;txv1beta1\242\002\003CTX\252\002\021Cosmos.Tx.V1beta1\312" +
-      "\002\021Cosmos\\Tx\\V1beta1\342\002\035Cosmos\\Tx\\V1beta1\\" +
-      "GPBMetadata\352\002\023Cosmos::Tx::V1beta1b\006proto" +
-      "3"
+      "\001(\tR\005payer\022\030\n\007granter\030\004 \001(\tR\007granterB\255\001\n" +
+      "\025com.cosmos.tx.v1beta1B\007TxProtoP\001Z%githu" +
+      "b.com/cosmos/cosmos-sdk/types/tx\242\002\003CTX\252\002" +
+      "\021Cosmos.Tx.V1beta1\312\002\021Cosmos\\Tx\\V1beta1\342\002" +
+      "\035Cosmos\\Tx\\V1beta1\\GPBMetadata\352\002\023Cosmos:" +
+      ":Tx::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

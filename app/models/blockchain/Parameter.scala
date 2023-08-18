@@ -30,7 +30,14 @@ class Parameters @Inject()(
                             getDistributionParams: GetDistribution,
                             getMintParams: GetMint,
                             getSlashingParams: GetSlashing,
-                            getStakingParams: GetStaking
+                            getStakingParams: GetStaking,
+                            getClassificationParams: GetClassification,
+                            getAssetParams: GetAsset,
+                            getIdentityParams: GetIdentity,
+                            getMaintainerParams: GetMaintainer,
+                            getMetaParams: GetMeta,
+                            getOrderParams: GetOrder,
+                            getSplitParams: GetSplit,
                           )(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -129,60 +136,105 @@ class Parameters @Inject()(
 
     def onParameterChange(parameterChange: ParameterChange): Future[Unit] = {
       val update = utilitiesOperations.traverse(parameterChange.changes)(change => {
-        val parameter: Future[abstractParameter] = change.subspace match {
-          case constants.Blockchain.ParameterType.AUTH =>
-            val authResponse = getAuthParams.Service.get()
-            for {
-              authResponse <- authResponse
-            } yield authResponse.params.toParameter
-          case constants.Blockchain.ParameterType.BANK =>
-            val bankResponse = getBankParams.Service.get()
-            for {
-              bankResponse <- bankResponse
-            } yield bankResponse.params.toParameter
-          case constants.Blockchain.ParameterType.DISTRIBUTION =>
-            val distributionResponse = getDistributionParams.Service.get()
-            for {
-              distributionResponse <- distributionResponse
-            } yield distributionResponse.params.toParameter
-          case constants.Blockchain.ParameterType.GOVERNANCE =>
-            val govResponse = getGovParams.Service.get()
-            for {
-              govResponse <- govResponse
-            } yield govResponse.toParameter
-          case constants.Blockchain.ParameterType.MINT =>
-            val mintResponse = getMintParams.Service.get()
-            for {
-              mintResponse <- mintResponse
-            } yield mintResponse.params.toParameter
-          case constants.Blockchain.ParameterType.SLASHING =>
-            val slashingResponse = getSlashingParams.Service.get()
-            for {
-              slashingResponse <- slashingResponse
-            } yield slashingResponse.params.toParameter
-          case constants.Blockchain.ParameterType.STAKING =>
-            val stakingResponse = getStakingParams.Service.get()
-            for {
-              stakingResponse <- stakingResponse
-            } yield stakingResponse.params.toParameter
-          case constants.Blockchain.ParameterType.CRISIS => Future(CrisisParameter(Coin(denom = "", amount = MicroNumber.zero)))
-          case constants.Blockchain.ParameterType.IBC => Future(IBCParameter(allowedClients = Seq.empty))
-          case constants.Blockchain.ParameterType.TRANSFER => Future(TransferParameter(receiveEnabled = true, sendEnabled = true))
-        }
-
-        def upsertParameter(parameterValue: abstractParameter) = if (parameterValue.parameterType != constants.Blockchain.ParameterType.CRISIS || parameterValue.parameterType != constants.Blockchain.ParameterType.IBC || parameterValue.parameterType != constants.Blockchain.ParameterType.TRANSFER)
-          Service.insertOrUpdate(Parameter(parameterType = parameterValue.parameterType, value = parameterValue)) else Future(0)
-
-        for {
-          parameter <- parameter
-          _ <- upsertParameter(parameter)
-        } yield ()
+        parameterUpdate(change.subspace)
       })
 
-      for {
+      (for {
         _ <- update
       } yield ()
+        ).recover {
+        case _: BaseException => logger.error("FAILED_TO_UPDATE_BLOCKCHAIN_PARAMETER")
+      }
+    }
+
+    private def parameterUpdate(parameterType: String) = {
+      val parameter: Future[abstractParameter] = parameterType match {
+        case constants.Blockchain.ParameterType.AUTH =>
+          val authResponse = getAuthParams.Service.get()
+          for {
+            authResponse <- authResponse
+          } yield authResponse.params.toParameter
+        case constants.Blockchain.ParameterType.BANK =>
+          val bankResponse = getBankParams.Service.get()
+          for {
+            bankResponse <- bankResponse
+          } yield bankResponse.params.toParameter
+        case constants.Blockchain.ParameterType.DISTRIBUTION =>
+          val distributionResponse = getDistributionParams.Service.get()
+          for {
+            distributionResponse <- distributionResponse
+          } yield distributionResponse.params.toParameter
+        case constants.Blockchain.ParameterType.GOVERNANCE =>
+          val govResponse = getGovParams.Service.get()
+          for {
+            govResponse <- govResponse
+          } yield govResponse.toParameter
+        case constants.Blockchain.ParameterType.MINT =>
+          val mintResponse = getMintParams.Service.get()
+          for {
+            mintResponse <- mintResponse
+          } yield mintResponse.params.toParameter
+        case constants.Blockchain.ParameterType.SLASHING =>
+          val slashingResponse = getSlashingParams.Service.get()
+          for {
+            slashingResponse <- slashingResponse
+          } yield slashingResponse.params.toParameter
+        case constants.Blockchain.ParameterType.STAKING =>
+          val stakingResponse = getStakingParams.Service.get()
+          for {
+            stakingResponse <- stakingResponse
+          } yield stakingResponse.params.toParameter
+        case constants.Blockchain.ParameterType.CRISIS => Future(CrisisParameter(Coin(denom = "", amount = MicroNumber.zero)))
+        case constants.Blockchain.ParameterType.IBC => Future(IBCParameter(allowedClients = Seq.empty))
+        case constants.Blockchain.ParameterType.TRANSFER => Future(TransferParameter(receiveEnabled = true, sendEnabled = true))
+        case constants.Blockchain.ParameterType.ASSETS =>
+          val response = getAssetParams.Service.get()
+          for {
+            response <- response
+          } yield response.toParameter
+        case constants.Blockchain.ParameterType.CLASSIFICATIONS =>
+          val response = getClassificationParams.Service.get()
+          for {
+            response <- response
+          } yield response.toParameter
+        case constants.Blockchain.ParameterType.IDENTITIES =>
+          val response = getIdentityParams.Service.get()
+          for {
+            response <- response
+          } yield response.toParameter
+        case constants.Blockchain.ParameterType.MAINTAINERS =>
+          val response = getMaintainerParams.Service.get()
+          for {
+            response <- response
+          } yield response.toParameter
+        case constants.Blockchain.ParameterType.METAS =>
+          val response = getMetaParams.Service.get()
+          for {
+            response <- response
+          } yield response.toParameter
+        case constants.Blockchain.ParameterType.ORDERS =>
+          val response = getOrderParams.Service.get()
+          for {
+            response <- response
+          } yield response.toParameter
+        case constants.Blockchain.ParameterType.SPLITS =>
+          val response = getSplitParams.Service.get()
+          for {
+            response <- response
+          } yield response.toParameter
+        case _ => constants.Response.PARAMETER_TYPE_NOT_FOUND.throwBaseException()
+      }
+
+      def upsertParameter(parameterValue: abstractParameter) = if (parameterValue.parameterType != constants.Blockchain.ParameterType.CRISIS || parameterValue.parameterType != constants.Blockchain.ParameterType.IBC || parameterValue.parameterType != constants.Blockchain.ParameterType.TRANSFER)
+        Service.insertOrUpdate(Parameter(parameterType = parameterValue.parameterType, value = parameterValue)) else Future(0)
+
+      for {
+        parameter <- parameter
+        _ <- upsertParameter(parameter)
+      } yield ()
+    }
+
+    def updateParameters(parameterTypes: Seq[String]): Future[Seq[Unit]] = utilitiesOperations.traverse(parameterTypes) { parameterType => parameterUpdate(parameterType)
     }
   }
-
 }

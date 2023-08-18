@@ -32,30 +32,33 @@ public final class AnyListableDataProto {
       "etmantle.schema.data.base\032 data/base/acc" +
       "_address_data.proto\032\034data/base/boolean_d" +
       "ata.proto\032\030data/base/dec_data.proto\032\033dat" +
-      "a/base/height_data.proto\032\027data/base/id_d" +
-      "ata.proto\032\033data/base/number_data.proto\032\033" +
-      "data/base/string_data.proto\032\024gogoproto/g" +
-      "ogo.proto\"\266\004\n\017AnyListableData\022X\n\020acc_add" +
-      "ress_data\030\001 \001(\0132,.assetmantle.schema.dat" +
-      "a.base.AccAddressDataH\000R\016accAddressData\022" +
-      "N\n\014boolean_data\030\002 \001(\0132).assetmantle.sche" +
-      "ma.data.base.BooleanDataH\000R\013booleanData\022" +
-      "B\n\010dec_data\030\003 \001(\0132%.assetmantle.schema.d" +
-      "ata.base.DecDataH\000R\007decData\022K\n\013height_da" +
-      "ta\030\004 \001(\0132(.assetmantle.schema.data.base." +
-      "HeightDataH\000R\nheightData\022@\n\010i_d_data\030\005 \001" +
-      "(\0132$.assetmantle.schema.data.base.IDData" +
-      "H\000R\006iDData\022K\n\013number_data\030\006 \001(\0132(.assetm" +
-      "antle.schema.data.base.NumberDataH\000R\nnum" +
-      "berData\022K\n\013string_data\030\007 \001(\0132(.assetmant" +
-      "le.schema.data.base.StringDataH\000R\nstring" +
-      "Data:\004\210\240\037\000B\006\n\004implB\370\001\n com.assetmantle.s" +
-      "chema.data.baseB\024AnyListableDataProtoP\001Z" +
-      "*github.com/AssetMantle/schema/go/data/b" +
-      "ase\242\002\004ASDB\252\002\034Assetmantle.Schema.Data.Bas" +
-      "e\312\002\034Assetmantle\\Schema\\Data\\Base\342\002(Asset" +
-      "mantle\\Schema\\Data\\Base\\GPBMetadata\352\002\037As" +
-      "setmantle::Schema::Data::Baseb\006proto3"
+      "a/base/linked_data.proto\032\033data/base/heig" +
+      "ht_data.proto\032\027data/base/id_data.proto\032\033" +
+      "data/base/number_data.proto\032\033data/base/s" +
+      "tring_data.proto\032\024gogoproto/gogo.proto\"\203" +
+      "\005\n\017AnyListableData\022X\n\020acc_address_data\030\001" +
+      " \001(\0132,.assetmantle.schema.data.base.AccA" +
+      "ddressDataH\000R\016accAddressData\022N\n\014boolean_" +
+      "data\030\002 \001(\0132).assetmantle.schema.data.bas" +
+      "e.BooleanDataH\000R\013booleanData\022B\n\010dec_data" +
+      "\030\003 \001(\0132%.assetmantle.schema.data.base.De" +
+      "cDataH\000R\007decData\022K\n\013height_data\030\004 \001(\0132(." +
+      "assetmantle.schema.data.base.HeightDataH" +
+      "\000R\nheightData\022@\n\010i_d_data\030\005 \001(\0132$.assetm" +
+      "antle.schema.data.base.IDDataH\000R\006iDData\022" +
+      "K\n\013linked_data\030\006 \001(\0132(.assetmantle.schem" +
+      "a.data.base.LinkedDataH\000R\nlinkedData\022K\n\013" +
+      "number_data\030\007 \001(\0132(.assetmantle.schema.d" +
+      "ata.base.NumberDataH\000R\nnumberData\022K\n\013str" +
+      "ing_data\030\010 \001(\0132(.assetmantle.schema.data" +
+      ".base.StringDataH\000R\nstringData:\004\210\240\037\000B\006\n\004" +
+      "implB\370\001\n com.assetmantle.schema.data.bas" +
+      "eB\024AnyListableDataProtoP\001Z*github.com/As" +
+      "setMantle/schema/go/data/base\242\002\004ASDB\252\002\034A" +
+      "ssetmantle.Schema.Data.Base\312\002\034Assetmantl" +
+      "e\\Schema\\Data\\Base\342\002(Assetmantle\\Schema\\" +
+      "Data\\Base\\GPBMetadata\352\002\037Assetmantle::Sch" +
+      "ema::Data::Baseb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -63,6 +66,7 @@ public final class AnyListableDataProto {
           com.assetmantle.schema.data.base.AccAddressDataProto.getDescriptor(),
           com.assetmantle.schema.data.base.BooleanDataProto.getDescriptor(),
           com.assetmantle.schema.data.base.DecDataProto.getDescriptor(),
+          com.assetmantle.schema.data.base.LinkedDataProto.getDescriptor(),
           com.assetmantle.schema.data.base.HeightDataProto.getDescriptor(),
           com.assetmantle.schema.data.base.IdDataProto.getDescriptor(),
           com.assetmantle.schema.data.base.NumberDataProto.getDescriptor(),
@@ -74,7 +78,7 @@ public final class AnyListableDataProto {
     internal_static_assetmantle_schema_data_base_AnyListableData_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_schema_data_base_AnyListableData_descriptor,
-        new java.lang.String[] { "AccAddressData", "BooleanData", "DecData", "HeightData", "IDData", "NumberData", "StringData", "Impl", });
+        new java.lang.String[] { "AccAddressData", "BooleanData", "DecData", "HeightData", "IDData", "LinkedData", "NumberData", "StringData", "Impl", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
@@ -83,6 +87,7 @@ public final class AnyListableDataProto {
     com.assetmantle.schema.data.base.AccAddressDataProto.getDescriptor();
     com.assetmantle.schema.data.base.BooleanDataProto.getDescriptor();
     com.assetmantle.schema.data.base.DecDataProto.getDescriptor();
+    com.assetmantle.schema.data.base.LinkedDataProto.getDescriptor();
     com.assetmantle.schema.data.base.HeightDataProto.getDescriptor();
     com.assetmantle.schema.data.base.IdDataProto.getDescriptor();
     com.assetmantle.schema.data.base.NumberDataProto.getDescriptor();

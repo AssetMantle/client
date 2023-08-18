@@ -59,13 +59,12 @@ public final class TxProto {
       "lowanceResponse\022s\n\017RevokeAllowance\022+.cos" +
       "mos.feegrant.v1beta1.MsgRevokeAllowance\032" +
       "3.cosmos.feegrant.v1beta1.MsgRevokeAllow" +
-      "anceResponseB\354\001\n\033com.cosmos.feegrant.v1b" +
-      "eta1B\007TxProtoP\001ZFgithub.com/AssetMantle/" +
-      "modules/cosmos/feegrant/v1beta1;feegrant" +
-      "v1beta1\242\002\003CFX\252\002\027Cosmos.Feegrant.V1beta1\312" +
-      "\002\027Cosmos\\Feegrant\\V1beta1\342\002#Cosmos\\Feegr" +
-      "ant\\V1beta1\\GPBMetadata\352\002\031Cosmos::Feegra" +
-      "nt::V1beta1b\006proto3"
+      "anceResponseB\315\001\n\033com.cosmos.feegrant.v1b" +
+      "eta1B\007TxProtoP\001Z\'github.com/cosmos/cosmo" +
+      "s-sdk/x/feegrant\242\002\003CFX\252\002\027Cosmos.Feegrant" +
+      ".V1beta1\312\002\027Cosmos\\Feegrant\\V1beta1\342\002#Cos" +
+      "mos\\Feegrant\\V1beta1\\GPBMetadata\352\002\031Cosmo" +
+      "s::Feegrant::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

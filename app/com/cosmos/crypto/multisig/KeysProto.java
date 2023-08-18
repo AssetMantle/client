@@ -34,13 +34,13 @@ public final class KeysProto {
       "minoPubKey\0222\n\tthreshold\030\001 \001(\rB\024\362\336\037\020yaml:" +
       "\"threshold\"R\tthreshold\022T\n\013public_keys\030\002 " +
       "\003(\0132\024.google.protobuf.AnyB\035\342\336\037\007PubKeys\362\336" +
-      "\037\016yaml:\"pubkeys\"R\npublicKeys:\004\210\240\037\000B\330\001\n\032c" +
-      "om.cosmos.crypto.multisigB\tKeysProtoP\001Z5" +
-      "github.com/AssetMantle/modules/cosmos/cr" +
-      "ypto/multisig\242\002\003CCM\252\002\026Cosmos.Crypto.Mult" +
-      "isig\312\002\026Cosmos\\Crypto\\Multisig\342\002\"Cosmos\\C" +
-      "rypto\\Multisig\\GPBMetadata\352\002\030Cosmos::Cry" +
-      "pto::Multisigb\006proto3"
+      "\037\016yaml:\"pubkeys\"R\npublicKeys:\004\210\240\037\000B\324\001\n\032c" +
+      "om.cosmos.crypto.multisigB\tKeysProtoP\001Z1" +
+      "github.com/cosmos/cosmos-sdk/crypto/keys" +
+      "/multisig\242\002\003CCM\252\002\026Cosmos.Crypto.Multisig" +
+      "\312\002\026Cosmos\\Crypto\\Multisig\342\002\"Cosmos\\Crypt" +
+      "o\\Multisig\\GPBMetadata\352\002\030Cosmos::Crypto:" +
+      ":Multisigb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -8,17 +8,17 @@ public interface QueryRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
-   * @return Whether the assetID field is set.
+   * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
+   * @return Whether the key field is set.
    */
-  boolean hasAssetID();
+  boolean hasKey();
   /**
-   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
-   * @return The assetID.
+   * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
-  com.assetmantle.schema.ids.base.AssetID getAssetID();
+  com.assetmantle.modules.assets.key.Key getKey();
   /**
-   * <code>.assetmantle.schema.ids.base.AssetID asset_i_d = 1 [json_name = "assetID"];</code>
+   * <code>.assetmantle.modules.assets.key.Key key = 1 [json_name = "key"];</code>
    */
-  com.assetmantle.schema.ids.base.AssetIDOrBuilder getAssetIDOrBuilder();
+  com.assetmantle.modules.assets.key.KeyOrBuilder getKeyOrBuilder();
 }

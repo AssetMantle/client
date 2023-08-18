@@ -149,6 +149,7 @@ object Response {
   val PARAMETER_UPSERT_FAILED = new Failure("PARAMETER_UPSERT_FAILED")
   val PARAMETER_DELETE_FAILED = new Failure("PARAMETER_DELETE_FAILED")
   val PARAMETER_NOT_FOUND = new Failure("PARAMETER_NOT_FOUND")
+  val PARAMETER_TYPE_NOT_FOUND = new Failure("PARAMETER_TYPE_NOT_FOUND")
   val EMPTY_QUERY = new Failure("EMPTY_QUERY")
 
   class Failure(private val response: String) {

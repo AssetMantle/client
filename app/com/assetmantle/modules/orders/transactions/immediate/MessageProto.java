@@ -31,51 +31,50 @@ public final class MessageProto {
       "\n+orders/transactions/immediate/message." +
       "proto\0221assetmantle.modules.orders.transa" +
       "ctions.immediate\032 ids/base/classificatio" +
-      "n_id.proto\032\032ids/base/identity_id.proto\032\035" +
-      "ids/base/any_ownable_id.proto\032\036lists/bas" +
-      "e/property_list.proto\032\027types/base/height" +
-      ".proto\"\336\007\n\007Message\022\022\n\004from\030\001 \001(\tR\004from\022A" +
-      "\n\010from_i_d\030\002 \001(\0132\'.assetmantle.schema.id" +
-      "s.base.IdentityIDR\006fromID\022[\n\022classificat" +
-      "ion_i_d\030\003 \001(\0132-.assetmantle.schema.ids.b" +
-      "ase.ClassificationIDR\020classificationID\022C" +
-      "\n\ttaker_i_d\030\004 \001(\0132\'.assetmantle.schema.i" +
-      "ds.base.IdentityIDR\007takerID\022T\n\021maker_own" +
-      "able_i_d\030\005 \001(\0132).assetmantle.schema.ids." +
-      "base.AnyOwnableIDR\016makerOwnableID\022T\n\021tak" +
-      "er_ownable_i_d\030\006 \001(\0132).assetmantle.schem" +
-      "a.ids.base.AnyOwnableIDR\016takerOwnableID\022" +
-      "D\n\nexpires_in\030\007 \001(\0132%.assetmantle.schema" +
-      ".types.base.HeightR\texpiresIn\022.\n\023maker_o" +
-      "wnable_split\030\010 \001(\tR\021makerOwnableSplit\022.\n" +
-      "\023taker_ownable_split\030\t \001(\tR\021takerOwnable" +
-      "Split\022g\n\031immutable_meta_properties\030\n \001(\013" +
-      "2+.assetmantle.schema.lists.base.Propert" +
-      "yListR\027immutableMetaProperties\022^\n\024immuta" +
-      "ble_properties\030\013 \001(\0132+.assetmantle.schem" +
-      "a.lists.base.PropertyListR\023immutableProp" +
-      "erties\022c\n\027mutable_meta_properties\030\014 \001(\0132" +
-      "+.assetmantle.schema.lists.base.Property" +
-      "ListR\025mutableMetaProperties\022Z\n\022mutable_p" +
-      "roperties\030\r \001(\0132+.assetmantle.schema.lis" +
-      "ts.base.PropertyListR\021mutablePropertiesB" +
-      "\357\002\n5com.assetmantle.modules.orders.trans" +
-      "actions.immediateB\014MessageProtoP\001Z>githu" +
-      "b.com/AssetMantle/modules/x/orders/trans" +
-      "actions/immediate\242\002\005AMOTI\252\0021Assetmantle." +
-      "Modules.Orders.Transactions.Immediate\312\0021" +
-      "Assetmantle\\Modules\\Orders\\Transactions\\" +
-      "Immediate\342\002=Assetmantle\\Modules\\Orders\\T" +
-      "ransactions\\Immediate\\GPBMetadata\352\0025Asse" +
-      "tmantle::Modules::Orders::Transactions::" +
-      "Immediateb\006proto3"
+      "n_id.proto\032\032ids/base/identity_id.proto\032\027" +
+      "ids/base/asset_id.proto\032\036lists/base/prop" +
+      "erty_list.proto\032\027types/base/height.proto" +
+      "\"\256\007\n\007Message\022\022\n\004from\030\001 \001(\tR\004from\022A\n\010from" +
+      "_i_d\030\002 \001(\0132\'.assetmantle.schema.ids.base" +
+      ".IdentityIDR\006fromID\022[\n\022classification_i_" +
+      "d\030\003 \001(\0132-.assetmantle.schema.ids.base.Cl" +
+      "assificationIDR\020classificationID\022C\n\ttake" +
+      "r_i_d\030\004 \001(\0132\'.assetmantle.schema.ids.bas" +
+      "e.IdentityIDR\007takerID\022K\n\017maker_asset_i_d" +
+      "\030\005 \001(\0132$.assetmantle.schema.ids.base.Ass" +
+      "etIDR\014makerAssetID\022K\n\017taker_asset_i_d\030\006 " +
+      "\001(\0132$.assetmantle.schema.ids.base.AssetI" +
+      "DR\014takerAssetID\022D\n\nexpires_in\030\007 \001(\0132%.as" +
+      "setmantle.schema.types.base.HeightR\texpi" +
+      "resIn\022\037\n\013maker_split\030\010 \001(\tR\nmakerSplit\022\037" +
+      "\n\013taker_split\030\t \001(\tR\ntakerSplit\022g\n\031immut" +
+      "able_meta_properties\030\n \001(\0132+.assetmantle" +
+      ".schema.lists.base.PropertyListR\027immutab" +
+      "leMetaProperties\022^\n\024immutable_properties" +
+      "\030\013 \001(\0132+.assetmantle.schema.lists.base.P" +
+      "ropertyListR\023immutableProperties\022c\n\027muta" +
+      "ble_meta_properties\030\014 \001(\0132+.assetmantle." +
+      "schema.lists.base.PropertyListR\025mutableM" +
+      "etaProperties\022Z\n\022mutable_properties\030\r \001(" +
+      "\0132+.assetmantle.schema.lists.base.Proper" +
+      "tyListR\021mutablePropertiesB\357\002\n5com.assetm" +
+      "antle.modules.orders.transactions.immedi" +
+      "ateB\014MessageProtoP\001Z>github.com/AssetMan" +
+      "tle/modules/x/orders/transactions/immedi" +
+      "ate\242\002\005AMOTI\252\0021Assetmantle.Modules.Orders" +
+      ".Transactions.Immediate\312\0021Assetmantle\\Mo" +
+      "dules\\Orders\\Transactions\\Immediate\342\002=As" +
+      "setmantle\\Modules\\Orders\\Transactions\\Im" +
+      "mediate\\GPBMetadata\352\0025Assetmantle::Modul" +
+      "es::Orders::Transactions::Immediateb\006pro" +
+      "to3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.assetmantle.schema.ids.base.ClassificationIdProto.getDescriptor(),
           com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor(),
-          com.assetmantle.schema.ids.base.AnyOwnableIdProto.getDescriptor(),
+          com.assetmantle.schema.ids.base.AssetIdProto.getDescriptor(),
           com.assetmantle.schema.lists.base.PropertyListProto.getDescriptor(),
           com.assetmantle.schema.types.base.HeightProto.getDescriptor(),
         });
@@ -84,10 +83,10 @@ public final class MessageProto {
     internal_static_assetmantle_modules_orders_transactions_immediate_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_orders_transactions_immediate_Message_descriptor,
-        new java.lang.String[] { "From", "FromID", "ClassificationID", "TakerID", "MakerOwnableID", "TakerOwnableID", "ExpiresIn", "MakerOwnableSplit", "TakerOwnableSplit", "ImmutableMetaProperties", "ImmutableProperties", "MutableMetaProperties", "MutableProperties", });
+        new java.lang.String[] { "From", "FromID", "ClassificationID", "TakerID", "MakerAssetID", "TakerAssetID", "ExpiresIn", "MakerSplit", "TakerSplit", "ImmutableMetaProperties", "ImmutableProperties", "MutableMetaProperties", "MutableProperties", });
     com.assetmantle.schema.ids.base.ClassificationIdProto.getDescriptor();
     com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor();
-    com.assetmantle.schema.ids.base.AnyOwnableIdProto.getDescriptor();
+    com.assetmantle.schema.ids.base.AssetIdProto.getDescriptor();
     com.assetmantle.schema.lists.base.PropertyListProto.getDescriptor();
     com.assetmantle.schema.types.base.HeightProto.getDescriptor();
   }

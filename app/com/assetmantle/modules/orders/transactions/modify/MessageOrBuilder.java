@@ -50,28 +50,28 @@ public interface MessageOrBuilder extends
   com.assetmantle.schema.ids.base.OrderIDOrBuilder getOrderIDOrBuilder();
 
   /**
-   * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
-   * @return The makerOwnableSplit.
+   * <code>string maker_split = 4 [json_name = "makerSplit"];</code>
+   * @return The makerSplit.
    */
-  java.lang.String getMakerOwnableSplit();
+  java.lang.String getMakerSplit();
   /**
-   * <code>string maker_ownable_split = 4 [json_name = "makerOwnableSplit"];</code>
-   * @return The bytes for makerOwnableSplit.
+   * <code>string maker_split = 4 [json_name = "makerSplit"];</code>
+   * @return The bytes for makerSplit.
    */
   com.google.protobuf.ByteString
-      getMakerOwnableSplitBytes();
+      getMakerSplitBytes();
 
   /**
-   * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
-   * @return The takerOwnableSplit.
+   * <code>string taker_split = 5 [json_name = "takerSplit"];</code>
+   * @return The takerSplit.
    */
-  java.lang.String getTakerOwnableSplit();
+  java.lang.String getTakerSplit();
   /**
-   * <code>string taker_ownable_split = 5 [json_name = "takerOwnableSplit"];</code>
-   * @return The bytes for takerOwnableSplit.
+   * <code>string taker_split = 5 [json_name = "takerSplit"];</code>
+   * @return The bytes for takerSplit.
    */
   com.google.protobuf.ByteString
-      getTakerOwnableSplitBytes();
+      getTakerSplitBytes();
 
   /**
    * <code>.assetmantle.schema.types.base.Height expires_in = 6 [json_name = "expiresIn"];</code>

@@ -30,21 +30,24 @@ public final class TransactionResponseProto {
     java.lang.String[] descriptorData = {
       "\n3assets/transactions/mint/transaction_r" +
       "esponse.proto\022,assetmantle.modules.asset" +
-      "s.transactions.mint\"1\n\023TransactionRespon" +
-      "se\022\032\n\tasset_i_d\030\001 \001(\tR\007assetIDB\335\002\n0com.a" +
-      "ssetmantle.modules.assets.transactions.m" +
-      "intB\030TransactionResponseProtoP\001Z9github." +
-      "com/AssetMantle/modules/x/assets/transac" +
-      "tions/mint\242\002\005AMATM\252\002,Assetmantle.Modules" +
-      ".Assets.Transactions.Mint\312\002,Assetmantle\\" +
-      "Modules\\Assets\\Transactions\\Mint\342\0028Asset" +
-      "mantle\\Modules\\Assets\\Transactions\\Mint\\" +
-      "GPBMetadata\352\0020Assetmantle::Modules::Asse" +
-      "ts::Transactions::Mintb\006proto3"
+      "s.transactions.mint\032\027ids/base/asset_id.p" +
+      "roto\"W\n\023TransactionResponse\022@\n\tasset_i_d" +
+      "\030\001 \001(\0132$.assetmantle.schema.ids.base.Ass" +
+      "etIDR\007assetIDB\335\002\n0com.assetmantle.module" +
+      "s.assets.transactions.mintB\030TransactionR" +
+      "esponseProtoP\001Z9github.com/AssetMantle/m" +
+      "odules/x/assets/transactions/mint\242\002\005AMAT" +
+      "M\252\002,Assetmantle.Modules.Assets.Transacti" +
+      "ons.Mint\312\002,Assetmantle\\Modules\\Assets\\Tr" +
+      "ansactions\\Mint\342\0028Assetmantle\\Modules\\As" +
+      "sets\\Transactions\\Mint\\GPBMetadata\352\0020Ass" +
+      "etmantle::Modules::Assets::Transactions:" +
+      ":Mintb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.assetmantle.schema.ids.base.AssetIdProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_assets_transactions_mint_TransactionResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -52,6 +55,7 @@ public final class TransactionResponseProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_assets_transactions_mint_TransactionResponse_descriptor,
         new java.lang.String[] { "AssetID", });
+    com.assetmantle.schema.ids.base.AssetIdProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

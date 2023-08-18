@@ -28,22 +28,22 @@ public final class ServiceProto {
       "ransactions.define\032\034google/api/annotatio" +
       "ns.proto\032,identities/transactions/define" +
       "/message.proto\0329identities/transactions/" +
-      "define/transaction_response.proto2\275\001\n\007Se" +
-      "rvice\022\261\001\n\006Handle\022;.assetmantle.modules.i" +
-      "dentities.transactions.define.Message\032G." +
-      "assetmantle.modules.identities.transacti" +
-      "ons.define.TransactionResponse\"!\202\323\344\223\002\033\"\031" +
-      "/mantle/identities/defineB\365\002\n6com.assetm" +
-      "antle.modules.identities.transactions.de" +
-      "fineB\014ServiceProtoP\001Z?github.com/AssetMa" +
-      "ntle/modules/x/identities/transactions/d" +
-      "efine\242\002\005AMITD\252\0022Assetmantle.Modules.Iden" +
-      "tities.Transactions.Define\312\0022Assetmantle" +
-      "\\Modules\\Identities\\Transactions\\Define\342" +
-      "\002>Assetmantle\\Modules\\Identities\\Transac" +
-      "tions\\Define\\GPBMetadata\352\0026Assetmantle::" +
-      "Modules::Identities::Transactions::Defin" +
-      "eb\006proto3"
+      "define/transaction_response.proto2\271\001\n\003Ms" +
+      "g\022\261\001\n\006Handle\022;.assetmantle.modules.ident" +
+      "ities.transactions.define.Message\032G.asse" +
+      "tmantle.modules.identities.transactions." +
+      "define.TransactionResponse\"!\202\323\344\223\002\033\"\031/man" +
+      "tle/identities/defineB\365\002\n6com.assetmantl" +
+      "e.modules.identities.transactions.define" +
+      "B\014ServiceProtoP\001Z?github.com/AssetMantle" +
+      "/modules/x/identities/transactions/defin" +
+      "e\242\002\005AMITD\252\0022Assetmantle.Modules.Identiti" +
+      "es.Transactions.Define\312\0022Assetmantle\\Mod" +
+      "ules\\Identities\\Transactions\\Define\342\002>As" +
+      "setmantle\\Modules\\Identities\\Transaction" +
+      "s\\Define\\GPBMetadata\352\0026Assetmantle::Modu" +
+      "les::Identities::Transactions::Defineb\006p" +
+      "roto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

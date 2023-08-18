@@ -80,37 +80,31 @@ public interface MessageOrBuilder extends
   com.assetmantle.schema.lists.base.PropertyListOrBuilder getMaintainedPropertiesOrBuilder();
 
   /**
-   * <code>bool can_mint_asset = 6 [json_name = "canMintAsset"];</code>
-   * @return The canMintAsset.
+   * <code>bool can_make_order = 6 [json_name = "canMakeOrder"];</code>
+   * @return The canMakeOrder.
    */
-  boolean getCanMintAsset();
+  boolean getCanMakeOrder();
 
   /**
-   * <code>bool can_burn_asset = 7 [json_name = "canBurnAsset"];</code>
-   * @return The canBurnAsset.
+   * <code>bool can_cancel_order = 7 [json_name = "canCancelOrder"];</code>
+   * @return The canCancelOrder.
    */
-  boolean getCanBurnAsset();
+  boolean getCanCancelOrder();
 
   /**
-   * <code>bool can_renumerate_asset = 8 [json_name = "canRenumerateAsset"];</code>
-   * @return The canRenumerateAsset.
-   */
-  boolean getCanRenumerateAsset();
-
-  /**
-   * <code>bool can_add_maintainer = 9 [json_name = "canAddMaintainer"];</code>
+   * <code>bool can_add_maintainer = 8 [json_name = "canAddMaintainer"];</code>
    * @return The canAddMaintainer.
    */
   boolean getCanAddMaintainer();
 
   /**
-   * <code>bool can_remove_maintainer = 10 [json_name = "canRemoveMaintainer"];</code>
+   * <code>bool can_remove_maintainer = 9 [json_name = "canRemoveMaintainer"];</code>
    * @return The canRemoveMaintainer.
    */
   boolean getCanRemoveMaintainer();
 
   /**
-   * <code>bool can_mutate_maintainer = 11 [json_name = "canMutateMaintainer"];</code>
+   * <code>bool can_mutate_maintainer = 10 [json_name = "canMutateMaintainer"];</code>
    * @return The canMutateMaintainer.
    */
   boolean getCanMutateMaintainer();

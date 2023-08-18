@@ -1,0 +1,17 @@
+@import views.html.base.infos._
+@import com.assetmantle.modules.orders.transactions.put.Message
+@import schema.id.base._
+@import schema.types.Height
+@import views.html.component.blockchain.txMessages.common._
+@import views.html.base.buttons.commonJavascriptLink
+@import schema.data.base.DecData
+
+@(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
+@commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
+@commonTextInfo(constants.View.EXPIRATION, Height(msg.getExpiryHeight).AsString)
+@commonTextInfo(constants.View.MAKER_OWNABLE_SPLIT, msg.getMakerSplit)
+@commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, msg.getTakerSplit)
+@commonTextInfo(constants.View.MAKER_OWNABLE_ID, AssetID(msg.getMakerAssetID).asString)
+@commonTextInfo(constants.View.TAKER_OWNABLE_SPLIT, AssetID(msg.getTakerAssetID).asString)

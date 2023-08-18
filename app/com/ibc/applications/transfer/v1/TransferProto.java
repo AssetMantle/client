@@ -40,14 +40,14 @@ public final class TransferProto {
       "om\"\211\001\n\006Params\022:\n\014send_enabled\030\001 \001(\010B\027\362\336\037" +
       "\023yaml:\"send_enabled\"R\013sendEnabled\022C\n\017rec" +
       "eive_enabled\030\002 \001(\010B\032\362\336\037\026yaml:\"receive_en" +
-      "abled\"R\016receiveEnabledB\214\002\n com.ibc.appli" +
-      "cations.transfer.v1B\rTransferProtoP\001ZFgi" +
-      "thub.com/AssetMantle/modules/ibc/applica" +
-      "tions/transfer/v1;transferv1\242\002\003IAT\252\002\034Ibc" +
-      ".Applications.Transfer.V1\312\002\034Ibc\\Applicat" +
-      "ions\\Transfer\\V1\342\002(Ibc\\Applications\\Tran" +
-      "sfer\\V1\\GPBMetadata\352\002\037Ibc::Applications:" +
-      ":Transfer::V1b\006proto3"
+      "abled\"R\016receiveEnabledB\375\001\n com.ibc.appli" +
+      "cations.transfer.v1B\rTransferProtoP\001Z7gi" +
+      "thub.com/cosmos/ibc-go/v4/modules/apps/t" +
+      "ransfer/types\242\002\003IAT\252\002\034Ibc.Applications.T" +
+      "ransfer.V1\312\002\034Ibc\\Applications\\Transfer\\V" +
+      "1\342\002(Ibc\\Applications\\Transfer\\V1\\GPBMeta" +
+      "data\352\002\037Ibc::Applications::Transfer::V1b\006" +
+      "proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

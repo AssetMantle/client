@@ -8,17 +8,17 @@ public interface QueryRequestOrBuilder extends
     com.google.protobuf.MessageOrBuilder {
 
   /**
-   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
-   * @return Whether the maintainerID field is set.
+   * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
+   * @return Whether the key field is set.
    */
-  boolean hasMaintainerID();
+  boolean hasKey();
   /**
-   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
-   * @return The maintainerID.
+   * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
+   * @return The key.
    */
-  com.assetmantle.schema.ids.base.MaintainerID getMaintainerID();
+  com.assetmantle.modules.maintainers.key.Key getKey();
   /**
-   * <code>.assetmantle.schema.ids.base.MaintainerID maintainer_i_d = 1 [json_name = "maintainerID"];</code>
+   * <code>.assetmantle.modules.maintainers.key.Key key = 1 [json_name = "key"];</code>
    */
-  com.assetmantle.schema.ids.base.MaintainerIDOrBuilder getMaintainerIDOrBuilder();
+  com.assetmantle.modules.maintainers.key.KeyOrBuilder getKeyOrBuilder();
 }

@@ -30,22 +30,25 @@ public final class TransactionResponseProto {
     java.lang.String[] descriptorData = {
       "\n8identities/transactions/issue/transact" +
       "ion_response.proto\0221assetmantle.modules." +
-      "identities.transactions.issue\"7\n\023Transac" +
-      "tionResponse\022 \n\014identity_i_d\030\001 \001(\tR\niden" +
-      "tityIDB\373\002\n5com.assetmantle.modules.ident" +
-      "ities.transactions.issueB\030TransactionRes" +
-      "ponseProtoP\001Z>github.com/AssetMantle/mod" +
-      "ules/x/identities/transactions/issue\242\002\005A" +
-      "MITI\252\0021Assetmantle.Modules.Identities.Tr" +
-      "ansactions.Issue\312\0021Assetmantle\\Modules\\I" +
-      "dentities\\Transactions\\Issue\342\002=Assetmant" +
-      "le\\Modules\\Identities\\Transactions\\Issue" +
-      "\\GPBMetadata\352\0025Assetmantle::Modules::Ide" +
-      "ntities::Transactions::Issueb\006proto3"
+      "identities.transactions.issue\032\032ids/base/" +
+      "identity_id.proto\"`\n\023TransactionResponse" +
+      "\022I\n\014identity_i_d\030\001 \001(\0132\'.assetmantle.sch" +
+      "ema.ids.base.IdentityIDR\nidentityIDB\373\002\n5" +
+      "com.assetmantle.modules.identities.trans" +
+      "actions.issueB\030TransactionResponseProtoP" +
+      "\001Z>github.com/AssetMantle/modules/x/iden" +
+      "tities/transactions/issue\242\002\005AMITI\252\0021Asse" +
+      "tmantle.Modules.Identities.Transactions." +
+      "Issue\312\0021Assetmantle\\Modules\\Identities\\T" +
+      "ransactions\\Issue\342\002=Assetmantle\\Modules\\" +
+      "Identities\\Transactions\\Issue\\GPBMetadat" +
+      "a\352\0025Assetmantle::Modules::Identities::Tr" +
+      "ansactions::Issueb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_identities_transactions_issue_TransactionResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -53,6 +56,7 @@ public final class TransactionResponseProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_assetmantle_modules_identities_transactions_issue_TransactionResponse_descriptor,
         new java.lang.String[] { "IdentityID", });
+    com.assetmantle.schema.ids.base.IdentityIdProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

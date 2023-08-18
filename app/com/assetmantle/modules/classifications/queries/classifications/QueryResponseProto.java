@@ -31,28 +31,28 @@ public final class QueryResponseProto {
       "\n<classifications/queries/classification" +
       "s/query_response.proto\022;assetmantle.modu" +
       "les.classifications.queries.classificati" +
-      "ons\032\024gogoproto/gogo.proto\032\'classificatio" +
-      "ns/mappable/mappable.proto\"a\n\rQueryRespo" +
-      "nse\022J\n\004list\030\001 \003(\01326.assetmantle.modules." +
-      "classifications.mappable.MappableR\004list:" +
-      "\004\210\240\037\000B\261\003\n?com.assetmantle.modules.classi" +
-      "fications.queries.classificationsB\022Query" +
-      "ResponseProtoP\001ZHgithub.com/AssetMantle/" +
-      "modules/x/classifications/queries/classi" +
-      "fications\242\002\005AMCQC\252\002;Assetmantle.Modules." +
-      "Classifications.Queries.Classifications\312" +
-      "\002;Assetmantle\\Modules\\Classifications\\Qu" +
-      "eries\\Classifications\342\002GAssetmantle\\Modu" +
-      "les\\Classifications\\Queries\\Classificati" +
-      "ons\\GPBMetadata\352\002?Assetmantle::Modules::" +
-      "Classifications::Queries::Classification" +
-      "sb\006proto3"
+      "ons\032#classifications/record/record.proto" +
+      "\032\024gogoproto/gogo.proto\"]\n\rQueryResponse\022" +
+      "F\n\004list\030\001 \003(\01322.assetmantle.modules.clas" +
+      "sifications.record.RecordR\004list:\004\210\240\037\000B\261\003" +
+      "\n?com.assetmantle.modules.classification" +
+      "s.queries.classificationsB\022QueryResponse" +
+      "ProtoP\001ZHgithub.com/AssetMantle/modules/" +
+      "x/classifications/queries/classification" +
+      "s\242\002\005AMCQC\252\002;Assetmantle.Modules.Classifi" +
+      "cations.Queries.Classifications\312\002;Assetm" +
+      "antle\\Modules\\Classifications\\Queries\\Cl" +
+      "assifications\342\002GAssetmantle\\Modules\\Clas" +
+      "sifications\\Queries\\Classifications\\GPBM" +
+      "etadata\352\002?Assetmantle::Modules::Classifi" +
+      "cations::Queries::Classificationsb\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.assetmantle.modules.classifications.record.RecordProto.getDescriptor(),
           com.gogoproto.GogoProto.getDescriptor(),
-          com.assetmantle.modules.classifications.mappable.MappableProto.getDescriptor(),
         });
     internal_static_assetmantle_modules_classifications_queries_classifications_QueryResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -65,8 +65,8 @@ public final class QueryResponseProto {
     registry.add(com.gogoproto.GogoProto.goprotoGetters);
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
+    com.assetmantle.modules.classifications.record.RecordProto.getDescriptor();
     com.gogoproto.GogoProto.getDescriptor();
-    com.assetmantle.modules.classifications.mappable.MappableProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

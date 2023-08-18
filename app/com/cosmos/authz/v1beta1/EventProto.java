@@ -39,13 +39,12 @@ public final class EventProto {
       "\tR\007granter\022\030\n\007grantee\030\004 \001(\tR\007grantee\"c\n\013" +
       "EventRevoke\022 \n\014msg_type_url\030\002 \001(\tR\nmsgTy" +
       "peUrl\022\030\n\007granter\030\003 \001(\tR\007granter\022\030\n\007grant" +
-      "ee\030\004 \001(\tR\007granteeB\332\001\n\030com.cosmos.authz.v" +
-      "1beta1B\nEventProtoP\001Z@github.com/AssetMa" +
-      "ntle/modules/cosmos/authz/v1beta1;authzv" +
-      "1beta1\242\002\003CAX\252\002\024Cosmos.Authz.V1beta1\312\002\024Co" +
-      "smos\\Authz\\V1beta1\342\002 Cosmos\\Authz\\V1beta" +
-      "1\\GPBMetadata\352\002\026Cosmos::Authz::V1beta1b\006" +
-      "proto3"
+      "ee\030\004 \001(\tR\007granteeB\276\001\n\030com.cosmos.authz.v" +
+      "1beta1B\nEventProtoP\001Z$github.com/cosmos/" +
+      "cosmos-sdk/x/authz\242\002\003CAX\252\002\024Cosmos.Authz." +
+      "V1beta1\312\002\024Cosmos\\Authz\\V1beta1\342\002 Cosmos\\" +
+      "Authz\\V1beta1\\GPBMetadata\352\002\026Cosmos::Auth" +
+      "z::V1beta1b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

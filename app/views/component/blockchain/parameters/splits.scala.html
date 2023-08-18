@@ -1,4 +1,5 @@
 @import views.html.base.cards._
+@import views.html.base.commonIcon
 @import models.common.Parameters.SplitParameter
 
 @(splitParameter: SplitParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
@@ -10,8 +11,14 @@
         <tr>
             <td>
                 <div class="tableField">
-                    <div class="tableFieldTitle">@Messages(constants.View.WRAPPING_ALLOWED_DENOMS):</div>
-                    <div class="tableFieldValue">@splitParameter.wrapAllowedCoins.mkString(", ")<div>
+                    <div class="tableFieldTitle">@Messages(constants.View.TRANSFER_ENABLED):</div>
+                    <div class="tableFieldValue">
+                    @if(splitParameter.transferEnabled) {
+                        <span class="statusCheck">@commonIcon("check")</span>
+                    } else {
+                        <span class="statusClose">@commonIcon("close")</span>
+                    }
+                    </div>
                 </div>
             </td>
         </tr>

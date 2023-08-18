@@ -231,6 +231,10 @@ object View {
   val AMOUNTS = "AMOUNTS"
   val MINT = "MINT"
   val BURN = "BURN"
+  val CAN_MAKE = "CAN_MAKE"
+  val CAN_CANCEL = "CAN_CANCEL"
+  val CAN_ISSUE = "CAN_ISSUE"
+  val CAN_QUASH = "CAN_QUASH"
   val MAINTAINER = "MAINTAINER"
   val ADD_MAINTAINER = "ADD_MAINTAINER"
   val MUTATE_MAINTAINER = "MUTATE_MAINTAINER"
@@ -379,11 +383,17 @@ object View {
   val REVEAL_ENABLED = "REVEAL_ENABLED"
   val MAX_ORDER_LIFE = "MAX_ORDER_LIFE"
   val WRAPPING_ALLOWED_DENOMS = "WRAPPING_ALLOWED_DENOMS"
+  val UNWRAPPING_ALLOWED_DENOMS = "UNWRAPPING_ALLOWED_DENOMS"
   val TOKEN_DETAILS = "TOKEN_DETAILS"
   val ASSET = "ASSET"
   val IDENTITY = "IDENTITY"
   val ORDER = "ORDER"
   val CLASSIFICATION = "CLASSIFICATION"
+  val TRANSFER_ENABLED = "TRANSFER_ENABLED"
+  val DEFINE_ENABLED = "DEFINE_ENABLED"
+  val ISSUE_ENABLED = "ISSUE_ENABLED"
+  val QUASH_ENABLED = "QUASH_ENABLED"
+  val PUT_ENABLED = "PUT_ENABLED"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
     constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
@@ -454,20 +464,20 @@ object View {
     schema.constants.Messages.ASSET_MUTATE -> "MESSAGE_ASSET_MUTATE",
     schema.constants.Messages.ASSET_RENUMERATE -> "MESSAGE_ASSET_RENUMERATE",
     schema.constants.Messages.ASSET_REVOKE -> "MESSAGE_ASSET_REVOKE",
+    schema.constants.Messages.ASSET_SEND -> "MESSAGE_ASSET_SEND",
+    schema.constants.Messages.ASSET_WRAP -> "MESSAGE_ASSET_WRAP",
+    schema.constants.Messages.ASSET_UNWRAP -> "MESSAGE_ASSET_UNWRAP",
     //identities
     schema.constants.Messages.IDENTITY_DEFINE -> "MESSAGE_IDENTITY_DEFINE",
     schema.constants.Messages.IDENTITY_DEPUTIZE -> "MESSAGE_IDENTITY_DEPUTIZE",
     schema.constants.Messages.IDENTITY_ISSUE -> "MESSAGE_IDENTITY_ISSUE",
     schema.constants.Messages.IDENTITY_MUTATE -> "MESSAGE_IDENTITY_MUTATE",
-    schema.constants.Messages.IDENTITY_NUB -> "MESSAGE_IDENTITY_NUB",
+    schema.constants.Messages.IDENTITY_NAME -> "MESSAGE_IDENTITY_NAME",
     schema.constants.Messages.IDENTITY_PROVISION -> "MESSAGE_IDENTITY_PROVISION",
     schema.constants.Messages.IDENTITY_QUASH -> "MESSAGE_IDENTITY_QUASH",
     schema.constants.Messages.IDENTITY_REVOKE -> "MESSAGE_IDENTITY_REVOKE",
     schema.constants.Messages.IDENTITY_UNPROVISION -> "MESSAGE_IDENTITY_UNPROVISION",
-    //splits
-    schema.constants.Messages.SPLIT_SEND -> "MESSAGE_SPLIT_SEND",
-    schema.constants.Messages.SPLIT_WRAP -> "MESSAGE_SPLIT_WRAP",
-    schema.constants.Messages.SPLIT_UNWRAP -> "MESSAGE_SPLIT_UNWRAP",
+    schema.constants.Messages.IDENTITY_UPDATE -> "MESSAGE_IDENTITY_UPDATE",
     //orders
     schema.constants.Messages.ORDER_CANCEL -> "MESSAGE_ORDER_CANCEL",
     schema.constants.Messages.ORDER_DEFINE -> "MESSAGE_ORDER_DEFINE",
@@ -477,6 +487,8 @@ object View {
     schema.constants.Messages.ORDER_MODIFY -> "MESSAGE_ORDER_MODIFY",
     schema.constants.Messages.ORDER_REVOKE -> "MESSAGE_ORDER_REVOKE",
     schema.constants.Messages.ORDER_TAKE -> "MESSAGE_ORDER_TAKE",
+    schema.constants.Messages.ORDER_PUT -> "MESSAGE_ORDER_PUT",
+    schema.constants.Messages.ORDER_GET -> "MESSAGE_ORDER_GET",
     //metas
     schema.constants.Messages.META_REVEAL -> "MESSAGE_META_REVEAL",
   )
