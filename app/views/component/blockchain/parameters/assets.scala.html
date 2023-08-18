@@ -1,5 +1,5 @@
-@import views.html.base.cards._
 @import models.common.Parameters.AssetParameter
+@import views.html.base.cards._
 @import views.html.base.commonIcon
 
 @(assetParameter: AssetParameter)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
@@ -42,6 +42,22 @@
                     } else {
                         <span class="statusClose">@commonIcon("close")</span>
                     }
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.WRAPPING_ALLOWED_DENOMS):</div>
+                    <div class="tableFieldValue">
+                    @assetParameter.wrapAllowedCoins.mkString(", ")
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.UNWRAPPING_ALLOWED_DENOMS):</div>
+                    <div class="tableFieldValue">
+                    @assetParameter.unwrapAllowedCoins.mkString(", ")
                     </div>
                 </div>
             </td>

@@ -78,14 +78,14 @@ body .block {
     height: 50%;
 }
 
-#tokensPrices .cmuk-card-body{
+#tokensPrices .cmuk-card-body {
     margin: 0px 16px 0px 16px;
     padding: 16px;
     background-color: var(--bg-popup);
     border-radius: 10px;
 }
 
-#tokensPrices .cmuk-card-body .chartContainer{
+#tokensPrices .cmuk-card-body .chartContainer {
     padding: 16px;
     background-color: var(--card-color);
     border-radius: 10px;
@@ -216,7 +216,7 @@ body.darkMode .commonList {
     filter: drop-shadow(0px 2px 14px rgba(0, 0, 0, 0.25));
 }
 
-body.darkMode .cmuk-card-default{
+body.darkMode .cmuk-card-default {
     border: none;
 }
 
@@ -404,19 +404,19 @@ body.darkMode .loginForm .formBody .forgotPassword {
 }
 
 body.darkMode .tableCard table tr {
-    border:none !important;
+    border: none !important;
 }
 
 body.darkMode .tableCard table tr th {
     color: var(--darkmode-color-1);
 }
 
-body.darkMode .tableCard table td .tableField{
+body.darkMode .tableCard table td .tableField {
     display: flex;
     flex-direction: column;
 }
 
-body.darkMode .tableCard table td .tableFieldTitle{
+body.darkMode .tableCard table td .tableFieldTitle {
     font-family: var(--font-type-1);
     font-weight: 400;
     font-size: 14px;
@@ -424,7 +424,7 @@ body.darkMode .tableCard table td .tableFieldTitle{
     color: var(--gray);
 }
 
-body.darkMode .tableCard table td .tableFieldValue{
+body.darkMode .tableCard table td .tableFieldValue {
     font-family: var(--font-type-1);
     font-weight: 500;
     font-size: 14px;
@@ -691,7 +691,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     align-items: center;
 }
 
-.commodityImage img, .leftContainer .walletIcon .icon, .leftContainer .receivableIcon .icon, .leftContainer .payableIcon .icon{
+.commodityImage img, .leftContainer .walletIcon .icon, .leftContainer .receivableIcon .icon, .leftContainer .payableIcon .icon {
     position: absolute;
     left: 0;
     right: 0;
@@ -1521,7 +1521,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     width: 150px;
 }
 
-.cmuk-card-default .cmuk-card-header{
+.cmuk-card-default .cmuk-card-header {
     border: none !important;
 }
 
@@ -1530,7 +1530,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 }
 
-.comdex .tableCard .cmuk-card-body .productTable{
+.comdex .tableCard .cmuk-card-body .productTable {
     background-color: var(--bg-popup);
     border-radius: 10px;
     padding: 16px 24px;
@@ -1586,7 +1586,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     font-weight: 500;
 }
 
-.comdex .searchForm .cmuk-search-input:focus{
+.comdex .searchForm .cmuk-search-input:focus {
     border-color: var(--primary-color);
     color: var(--mantle-off-white);
 }
@@ -1634,7 +1634,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     padding-bottom: 10px;
 }
 
-.comdex table.dataTable tbody tr:last-child td, .comdex table.cmuk-table tbody tr:last-child td{
+.comdex table.dataTable tbody tr:last-child td, .comdex table.cmuk-table tbody tr:last-child td {
     padding-bottom: 0;
 }
 
@@ -1654,7 +1654,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
     line-height: 17px;
     text-transform: capitalize;
     color: var(--mantle-off-white);
-    padding: 0px 0px 16px 0px ;
+    padding: 0px 0px 16px 0px;
 }
 
 .comdex table.dataTable tfoot th {
@@ -1790,17 +1790,17 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 .header .singUpIcon,
 .header .loginIcon,
 .header .proposalsIcon,
-.header .walletIcon{
+.header .walletIcon {
     margin-right: 6px;
     width: 20px;
     height: 20px;
 }
 
-.header .walletLinkIcon{
+.header .walletLinkIcon {
     margin-left: 4px;
 }
 
-.header .icon{
+.header .icon {
     width: 20px;
     height: 20px;
     fill: var(--white-font);
@@ -2991,13 +2991,13 @@ form .formBody {
     font-size: 1rem;
 }
 
-.rightContainer .votingPowerContainer .votingPowerContent{
+.rightContainer .votingPowerContainer .votingPowerContent {
     background-color: var(--bg-popup);
     padding: 32px 0px;
     border-radius: 10px;
 }
 
-.rightContainer .votingPowerContainer .cmuk-card-body{
+.rightContainer .votingPowerContainer .cmuk-card-body {
     padding: 0 16px 16px 16px;
 }
 
@@ -3144,7 +3144,7 @@ form .formBody {
     display: none;
 }
 
-header:before{
+header:before {
     content: '';
     display: block;
     width: 100%;
@@ -3187,7 +3187,7 @@ header:before{
     transition: all 0.3s ease;
 }
 
-.timeline .timeline-item .timeline-content .activityContent  .timelineItemTitle{
+.timeline .timeline-item .timeline-content .activityContent .timelineItemTitle {
     font-family: var(--font-type-2);
     font-weight: 700;
     font-size: 12px;
@@ -3196,7 +3196,7 @@ header:before{
     color: var(--mantle-off-white);
 }
 
-.timeline .timeline-item .timeline-content .activityContent  .timelineItemMessage{
+.timeline .timeline-item .timeline-content .activityContent .timelineItemMessage {
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 12px;
@@ -3204,7 +3204,7 @@ header:before{
     color: var(--inactive-grey);
 }
 
-.timeline .timeline-item .timeline-content .activityContent  .timelineItemTime{
+.timeline .timeline-item .timeline-content .activityContent .timelineItemTime {
     font-family: var(--font-type-2);
     font-weight: 500;
     font-size: 10px;
@@ -4259,23 +4259,24 @@ figure.zoom img {
     margin-right: 12px !important;
     background-color: var(--primary-color) !important;
 }
-.header .cmuk-navbar-right{
+
+.header .cmuk-navbar-right {
     margin-right: 40px;
     flex-wrap: nowrap;
     align-items: end;
     margin-bottom: 12px;
 }
 
-#explorerContent{
+#explorerContent {
     background-color: var(--card-color);
     border-radius: 20px;
 }
 
-.cmuk-grid+.cmuk-grid {
+.cmuk-grid + .cmuk-grid {
     margin-top: 0px !important;
 }
 
-#transactionStatistics .cmuk-card-body{
+#transactionStatistics .cmuk-card-body {
     height: calc(100% - 56px) !important;
     margin: 0px 16px 0px 16px;
     padding: 16px;
@@ -4283,13 +4284,13 @@ figure.zoom img {
     border-radius: 10px;
 }
 
-#transactionStatistics .cmuk-card-body .chartContainer{
+#transactionStatistics .cmuk-card-body .chartContainer {
     padding: 16px;
     background-color: var(--card-color);
     border-radius: 10px;
 }
 
-#transactionMessagesStatistics .cmuk-card-body{
+#transactionMessagesStatistics .cmuk-card-body {
     height: calc(100% - 72px) !important;
     margin: 0px 16px 16px 16px;
     padding: 16px;
@@ -4297,7 +4298,7 @@ figure.zoom img {
     border-radius: 10px;
 }
 
-#transactionMessagesStatistics .cmuk-card-body .chartContainer{
+#transactionMessagesStatistics .cmuk-card-body .chartContainer {
     padding: 16px;
     background-color: var(--card-color);
     border-radius: 10px;
@@ -4310,22 +4311,31 @@ figure {
     max-width: 1100px;
     position: relative;
 }
+
 @keyframes expand {
-    from {width: 0%;}
-    to {width: 100%;}
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
 }
+
 figure .chart {
     overflow: hidden;
     width: 0%;
     animation: expand 1.5s ease forwards;
     margin: 0px;
 }
+
 .row + .row .chart {
     animation-delay: .2s;
 }
+
 .row + .row + .row .chart {
     animation-delay: .4s;
 }
+
 figure .block {
     display: block;
     height: 80px;
@@ -4344,9 +4354,11 @@ figure .block {
     line-height: 14px;
     color: var(--mantle-off-white);
 }
+
 figure .block:hover {
     opacity: .65;
 }
+
 .legend {
     padding: 0;
     display: grid;
@@ -4354,27 +4366,33 @@ figure .block:hover {
     grid-auto-flow: row dense;
     margin: 16px 16px 0 16px;
 }
+
 .legend .legendItem {
     padding: .5em 2em;
     display: flex;
     gap: 8px;
     align-items: center;
 }
+
 .legend .legendItem.section1 {
     grid-column-start: 1;
 }
+
 .legend .legendItem.section2 {
     grid-column-start: 2;
 }
+
 .legend .legendItem.section3 {
     grid-column-start: 3;
 }
-.legend .legendItem .legendColor{
+
+.legend .legendItem .legendColor {
     display: inline-block;
     width: 16px;
     height: 16px;
 }
-.legend .legendItem .legendLabel{
+
+.legend .legendItem .legendLabel {
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 12px;
@@ -4385,7 +4403,7 @@ figure .block:hover {
 .blocksList .leftText,
 .transactionsList .leftText,
 #validatorsList .leftText,
-.proposals .leftText{
+.proposals .leftText {
     font-family: var(--font-type-1);
     font-weight: 600;
     font-size: 16px;
@@ -4394,11 +4412,11 @@ figure .block:hover {
     color: var(--dark);
 }
 
-.blocksList .cmuk-table{
+.blocksList .cmuk-table {
     margin-bottom: 0px;
 }
 
-.blocksList table.cmuk-table tbody td{
+.blocksList table.cmuk-table tbody td {
     padding: 16px 0px 0px 0px;
     font-family: var(--font-type-2);
     font-weight: 400;
@@ -4407,7 +4425,7 @@ figure .block:hover {
     color: var(--gray);
 }
 
-.paginationButton{
+.paginationButton {
     font-family: var(--font-type-1);
     font-weight: 400;
     font-size: 14px;
@@ -4415,13 +4433,15 @@ figure .block:hover {
     color: var(--primary-color);
     cursor: pointer;
 }
-.paginationButton .buttonContainer{
+
+.paginationButton .buttonContainer {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 4px;
 }
-.paginationButton.small .icon{
+
+.paginationButton.small .icon {
     width: 14px;
     height: 14px;
     fill: var(--primary-color);
@@ -4430,7 +4450,7 @@ figure .block:hover {
     align-items: center;
 }
 
-.paginationButtonContainer{
+.paginationButtonContainer {
     display: flex;
     justify-content: right;
     align-items: center;
@@ -4443,8 +4463,7 @@ figure .block:hover {
 #validatorDetails .cmuk-card-body,
 #proposalDetails .cmuk-card-body,
 .tableGridLayout .cmuk-card-body,
-#documentDetails .cmuk-card-body
-{
+#documentDetails .cmuk-card-body {
     height: auto;
     margin: 0px 16px 0px 16px;
     padding: 16px 24px;
@@ -4457,8 +4476,7 @@ figure .block:hover {
 #validatorDetails .cmuk-card-body .productTable,
 #proposalDetails .cmuk-card-body .productTable,
 .tableGridLayout .cmuk-card-body .productTable,
-#documentDetails .cmuk-card-body .productTable
-{
+#documentDetails .cmuk-card-body .productTable {
     padding: 0px;
 }
 
@@ -4469,8 +4487,7 @@ figure .block:hover {
 #accountWallet .cmuk-card-body .productTable td,
 #accountDelegations .cmuk-card-body .productTable td,
 .tableGridLayout .cmuk-card-body .productTable td,
-#documentDetails .cmuk-card-body .productTable td
-{
+#documentDetails .cmuk-card-body .productTable td {
     padding-bottom: 12px;
 }
 
@@ -4481,8 +4498,7 @@ figure .block:hover {
 #accountWallet .cmuk-card-body .productTable .tableFieldTitle,
 #accountDelegations .cmuk-card-body .productTable .tableFieldTitle,
 .tableGridLayout .cmuk-card-body .productTable .tableFieldTitle,
-#documentDetails .cmuk-card-body .productTable .tableFieldTitle
-{
+#documentDetails .cmuk-card-body .productTable .tableFieldTitle {
     font-family: var(--font-type-2);
     font-weight: 700;
     font-size: 14px;
@@ -4498,14 +4514,13 @@ figure .block:hover {
 #accountWallet .cmuk-card-body .productTable .tableFieldValue,
 #accountDelegations .cmuk-card-body .productTable .tableFieldValue,
 .tableGridLayout .cmuk-card-body .productTable .tableFieldValue,
-#documentDetails .cmuk-card-body .productTable .tableFieldValue
-{
+#documentDetails .cmuk-card-body .productTable .tableFieldValue {
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 12px;
     line-height: 14px;
     color: var(--text-medium);
-    margin-top:4px;
+    margin-top: 4px;
     word-break: break-word;
 }
 
@@ -4516,12 +4531,11 @@ figure .block:hover {
 #accountWallet .cmuk-card-body .productTable .tableFieldValue a,
 #accountDelegations .cmuk-card-body .productTable .tableFieldValue a,
 .tableGridLayout .cmuk-card-body .productTable .tableFieldValue a,
-#documentDetails .cmuk-card-body .productTable .tableFieldValue a
-{
+#documentDetails .cmuk-card-body .productTable .tableFieldValue a {
     color: var(--primary-color);
 }
 
-#blockTransactions .cmuk-card-body{
+#blockTransactions .cmuk-card-body {
     height: auto;
     margin: 0px 16px 16px 16px;
     padding: 16px 24px;
@@ -4529,7 +4543,7 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-#blockTransactions .cmuk-card-body .emptyBlockTransaction{
+#blockTransactions .cmuk-card-body .emptyBlockTransaction {
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 14px;
@@ -4537,11 +4551,11 @@ figure .block:hover {
     color: var(--disabled);
 }
 
-#blockTransactions table.cmuk-table thead th{
+#blockTransactions table.cmuk-table thead th {
     text-align: center;
 }
 
-#blockTransactions table.cmuk-table tbody td{
+#blockTransactions table.cmuk-table tbody td {
     padding: 16px 0px 0px 0px;
     font-family: var(--font-type-2);
     font-weight: 400;
@@ -4551,15 +4565,15 @@ figure .block:hover {
     text-align: center;
 }
 
-#blockTransactions table.cmuk-table tbody td.blockHeightItem{
+#blockTransactions table.cmuk-table tbody td.blockHeightItem {
     width: 180px;
 }
 
-#blockTransactions table.cmuk-table tbody td.blockHeightItem .cmuk-link{
+#blockTransactions table.cmuk-table tbody td.blockHeightItem .cmuk-link {
     width: 180px;
 }
 
-#blockTransactions table.cmuk-table tbody td .check svg{
+#blockTransactions table.cmuk-table tbody td .check svg {
     background: transparent;
 }
 
@@ -4570,10 +4584,13 @@ figure .block:hover {
 #validatorTransactions table.cmuk-table tbody td .statusCheck .icon,
 #accountTransactions table.cmuk-table tbody td .statusCheck .icon,
 #distributionParameters table.cmuk-table tbody td .statusCheck .icon,
+#ordersParameters table.cmuk-table tbody td .statusCheck .icon,
+#classificationsParameters table.cmuk-table tbody td .statusCheck .icon,
+#splitsParameters table.cmuk-table tbody td .statusCheck .icon,
+#identitiesParameters table.cmuk-table tbody td .statusCheck .icon,
 #assetsParameters table.cmuk-table tbody td .statusCheck .icon,
 #maintainersParameters table.cmuk-table tbody td .statusCheck .icon,
-#metasParameters table.cmuk-table tbody td .statusCheck .icon
-{
+#metasParameters table.cmuk-table tbody td .statusCheck .icon {
     height: 16px;
     width: 16px;
     fill: var(--success-color);
@@ -4586,20 +4603,23 @@ figure .block:hover {
 #validatorTransactions table.cmuk-table tbody td .statusClose .icon,
 #accountTransactions table.cmuk-table tbody td .statusClose .icon,
 #distributionParameters table.cmuk-table tbody td .statusClose .icon,
+#ordersParameters table.cmuk-table tbody td .statusClose .icon,
+#identitiesParameters table.cmuk-table tbody td .statusClose .icon,
+#splitsParameters table.cmuk-table tbody td .statusClose .icon,
 #assetsParameters table.cmuk-table tbody td .statusClose .icon,
 #maintainersParameters table.cmuk-table tbody td .statusClose .icon,
-#metasParameters table.cmuk-table tbody td .statusClose .icon
-{
+#classificationsParameters table.cmuk-table tbody td .statusClose .icon,
+#metasParameters table.cmuk-table tbody td .statusClose .icon {
     height: 16px;
     width: 16px;
     fill: var(--error-color);
 }
 
-.transactionsList table.cmuk-table .tableHead th{
+.transactionsList table.cmuk-table .tableHead th {
     text-align: center;
 }
 
-.transactionsList table.cmuk-table tbody td{
+.transactionsList table.cmuk-table tbody td {
     padding: 16px 0px 0px 0px;
     font-family: var(--font-type-2);
     font-weight: 400;
@@ -4609,19 +4629,19 @@ figure .block:hover {
     text-align: center;
 }
 
-.transactionsList table.cmuk-table tbody td.blockHeightItem .cmuk-link{
+.transactionsList table.cmuk-table tbody td.blockHeightItem .cmuk-link {
     width: 140px;
 }
 
-#transactionDetails .cmuk-card-body .productTable .tableFieldValue .infoRowLabel{
+#transactionDetails .cmuk-card-body .productTable .tableFieldValue .infoRowLabel {
     display: none;
 }
 
-#transactionDetails .cmuk-card-body .productTable .tableFieldValue .infoRowValue{
+#transactionDetails .cmuk-card-body .productTable .tableFieldValue .infoRowValue {
     padding: 0px;
 }
 
-#transactionDetails .cmuk-card-body .productTable .tableFieldValue.longText{
+#transactionDetails .cmuk-card-body .productTable .tableFieldValue.longText {
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -4629,7 +4649,7 @@ figure .block:hover {
     cursor: pointer;
 }
 
-#transactionMessages .cmuk-card-body{
+#transactionMessages .cmuk-card-body {
     height: auto;
     margin: 0px 16px 16px 16px;
     padding: 16px;
@@ -4637,18 +4657,18 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-#transactionMessages .cmuk-card-body .cmuk-card{
+#transactionMessages .cmuk-card-body .cmuk-card {
     height: auto;
     padding: 16px 0px 0 0;
-    background-color:var(--card-color);
+    background-color: var(--card-color);
     border-radius: 10px;
 }
 
-#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-header{
+#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-header {
     padding: 0px 16px 6px 16px;
 }
 
-#transactionMessages .cmuk-card-body .cmuk-card  .headerFontSize{
+#transactionMessages .cmuk-card-body .cmuk-card .headerFontSize {
     font-family: var(--font-type-2);
     font-weight: 600;
     font-size: 14px;
@@ -4657,7 +4677,7 @@ figure .block:hover {
     color: var(--mantle-off-white);
 }
 
-#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body{
+#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body {
     height: auto;
     margin: 0px;
     padding: 0px;
@@ -4665,7 +4685,7 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body .infoRowLabel{
+#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body .infoRowLabel {
     font-family: var(--font-type-2);
     font-weight: 700;
     font-size: 12px;
@@ -4674,7 +4694,7 @@ figure .block:hover {
     color: var(--text-medium);
 }
 
-#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body .infoRowValue{
+#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body .infoRowValue {
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 12px;
@@ -4682,25 +4702,26 @@ figure .block:hover {
     color: var(--gray);
 }
 
-#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body .infoRowValue a{
+#transactionMessages .cmuk-card-body .cmuk-card .cmuk-card-body .infoRowValue a {
     color: var(--primary-color);
 }
 
-#validatorsList .cmuk-subnav{
+#validatorsList .cmuk-subnav {
     margin-left: 0px !important;
     justify-content: end;
 }
 
-#validatorsList .cmuk-subnav>*{
+#validatorsList .cmuk-subnav > * {
     padding-left: 0px !important;
     border: 1px solid var(--line);
 }
 
-#validatorsList .cmuk-subnav li:first-child{
+#validatorsList .cmuk-subnav li:first-child {
     border-radius: 4px 0 0 4px;
     overflow: hidden;
 }
-#validatorsList .cmuk-subnav li:last-child{
+
+#validatorsList .cmuk-subnav li:last-child {
     border-radius: 0 4px 4px 0;
     overflow: hidden;
 }
@@ -4710,7 +4731,7 @@ figure .block:hover {
     color: var(--button-text);
 }
 
-#validatorsList .cmuk-subnav li a{
+#validatorsList .cmuk-subnav li a {
     font-family: var(--font-type-2);
     font-weight: 700;
     font-size: 10px;
@@ -4736,7 +4757,7 @@ figure .block:hover {
     color: var(--gray);
 }
 
-#validatorsList .dataTables_wrapper .dataTables_filter input{
+#validatorsList .dataTables_wrapper .dataTables_filter input {
     width: 100%;
     margin-right: 0px;
     background-color: transparent;
@@ -4746,17 +4767,17 @@ figure .block:hover {
     padding-right: 8px;
 }
 
-#validatorsList .dataTables_wrapper .dataTables_filter input:focus{
+#validatorsList .dataTables_wrapper .dataTables_filter input:focus {
     color: var(--mantle-off-white);
     border-color: var(--primary-color);
 }
 
-#validatorsList table.dataTable thead th{
+#validatorsList table.dataTable thead th {
     padding: 10px 0px 10px 16px;
     white-space: nowrap;
 }
 
-#validatorsList table.dataTable tbody td{
+#validatorsList table.dataTable tbody td {
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 12px;
@@ -4766,13 +4787,13 @@ figure .block:hover {
     padding: 16px 0 0 0;
 }
 
-#validatorsList table.dataTable tbody td.blockHeightItem{
+#validatorsList table.dataTable tbody td.blockHeightItem {
     display: flex;
     align-items: center;
     gap: 0.8rem;
 }
 
-#validatorsList table.dataTable tbody td.blockHeightItem img{
+#validatorsList table.dataTable tbody td.blockHeightItem img {
     margin-right: 0px;
 }
 
@@ -4780,15 +4801,15 @@ figure .block:hover {
     text-align: left;
 }
 
-#validatorsList .cmuk-switcher{
+#validatorsList .cmuk-switcher {
     overflow-x: hidden;
 }
 
-#validatorsList .cmuk-card{
+#validatorsList .cmuk-card {
     padding-bottom: 16px;
 }
 
-#validatorsList .cmuk-card-body{
+#validatorsList .cmuk-card-body {
     height: auto;
     margin: 0px 16px;
     padding: 16px 16px 10px 16px;
@@ -4796,7 +4817,7 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-#validatorUptime .cmuk-card-body{
+#validatorUptime .cmuk-card-body {
     height: auto;
     margin: 0px 16px;
     padding: 16px 16px 10px 16px;
@@ -4804,7 +4825,7 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-#validatorUptime .cmuk-card-body #missingBlocksCounter{
+#validatorUptime .cmuk-card-body #missingBlocksCounter {
     margin-left: 8px;
     align-items: center;
     justify-content: center;
@@ -4817,27 +4838,26 @@ figure .block:hover {
     margin-right: 10px;
 }
 
-#validatorUptime .cmuk-card-body .block .full{
+#validatorUptime .cmuk-card-body .block .full {
     height: 100%;
     width: 100%;
     background-color: var(--primary-color);
     border-radius: 2px;
 }
 
-#validatorUptime .cmuk-card-body .block .empty{
+#validatorUptime .cmuk-card-body .block .empty {
     height: 100%;
     width: 100%;
     background-color: transparent;
 }
 
-#validatorUptime .cmuk-card-body .block .empty .emptyBlock .icon
-{
-    margin-top:-5px;
+#validatorUptime .cmuk-card-body .block .empty .emptyBlock .icon {
+    margin-top: -5px;
     height: 14px;
     fill: var(--primary-color);
 }
 
-#validatorDelegations .cmuk-card-body{
+#validatorDelegations .cmuk-card-body {
     height: auto;
     margin: 0px 16px;
     padding: 16px 16px 10px 16px;
@@ -4845,11 +4865,11 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-.validatorDelegation{
+.validatorDelegation {
     padding-left: 0px !important;
 }
 
-#validatorTransactions .cmuk-card-body{
+#validatorTransactions .cmuk-card-body {
     height: auto;
     margin: 0px 16px 16px 16px;
     padding: 16px 24px 0px 24px;
@@ -4858,8 +4878,7 @@ figure .block:hover {
 }
 
 #validatorTransactions .cmuk-card-body .emptyBlockTransaction,
-#accountTransactions .cmuk-card-body .emptyBlockTransaction
-{
+#accountTransactions .cmuk-card-body .emptyBlockTransaction {
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 14px;
@@ -4869,11 +4888,11 @@ figure .block:hover {
     text-align: center;
 }
 
-#validatorTransactions table.cmuk-table thead th{
+#validatorTransactions table.cmuk-table thead th {
     text-align: center;
 }
 
-#validatorTransactions table.cmuk-table tbody td{
+#validatorTransactions table.cmuk-table tbody td {
     padding: 16px 0px 0px 0px;
     font-family: var(--font-type-2);
     font-weight: 400;
@@ -4883,19 +4902,19 @@ figure .block:hover {
     text-align: center;
 }
 
-#validatorTransactions table.cmuk-table tbody td .cmuk-link{
+#validatorTransactions table.cmuk-table tbody td .cmuk-link {
     color: var(--primary-color);
 }
 
-#validatorTransactions table.cmuk-table tbody td.blockHeightItem .cmuk-link{
+#validatorTransactions table.cmuk-table tbody td.blockHeightItem .cmuk-link {
     width: 150px;
 }
 
-.proposals{
+.proposals {
     padding-bottom: 1px;
 }
 
-.proposals .cmuk-card-body{
+.proposals .cmuk-card-body {
     height: auto;
     margin: 0px 16px 16px 16px;
     padding: 16px 16px 16px 16px;
@@ -4903,11 +4922,11 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-.proposals table.cmuk-table thead th{
+.proposals table.cmuk-table thead th {
     padding-right: 8px;
 }
 
-.proposals table.cmuk-table tbody td{
+.proposals table.cmuk-table tbody td {
     padding: 16px 0px 0px 0px;
     font-family: var(--font-type-2);
     font-weight: 400;
@@ -4917,11 +4936,11 @@ figure .block:hover {
     padding-right: 8px;
 }
 
-.proposals table.cmuk-table tbody td .cmuk-link{
+.proposals table.cmuk-table tbody td .cmuk-link {
     color: var(--primary-color);
 }
 
-#proposalDetails .cmuk-card-body.cmuk-height-medium{
+#proposalDetails .cmuk-card-body.cmuk-height-medium {
     height: auto;
     margin: 0px 16px 0px 16px;
     padding: 16px 24px;
@@ -4929,14 +4948,14 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-#proposalDetails .cmuk-card-body .separator{
+#proposalDetails .cmuk-card-body .separator {
     height: 2px;
     width: 100%;
     background-color: var(--line);
     margin: 12px 0px;
 }
 
-#proposalDetails .cmuk-card-body .tableSubHeading{
+#proposalDetails .cmuk-card-body .tableSubHeading {
     font-family: var(--font-type-2);
     font-weight: 700;
     font-size: 14px;
@@ -4945,7 +4964,7 @@ figure .block:hover {
     color: var(--inactive-grey);
 }
 
-#proposalDeposits .cmuk-card-body{
+#proposalDeposits .cmuk-card-body {
     height: auto;
     margin: 0px 16px 0px 16px;
     padding: 16px 24px;
@@ -4953,7 +4972,7 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-#proposalDeposits table.cmuk-table tbody td{
+#proposalDeposits table.cmuk-table tbody td {
     padding: 16px 0px 0px 0px;
     font-family: var(--font-type-2);
     font-weight: 400;
@@ -4963,11 +4982,11 @@ figure .block:hover {
     padding-right: 8px;
 }
 
-#proposalDeposits  table.cmuk-table tbody td .cmuk-link{
+#proposalDeposits table.cmuk-table tbody td .cmuk-link {
     color: var(--primary-color);
 }
 
-#proposalVotes .cmuk-card-body{
+#proposalVotes .cmuk-card-body {
     height: auto;
     margin: 0px 16px 16px 16px;
     padding: 16px 24px;
@@ -4975,7 +4994,7 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-#proposalVotes table.cmuk-table tbody td{
+#proposalVotes table.cmuk-table tbody td {
     padding: 16px 0px 0px 0px;
     font-family: var(--font-type-2);
     font-weight: 400;
@@ -4984,18 +5003,17 @@ figure .block:hover {
     color: var(--gray);
 }
 
-#proposalVotes  table.cmuk-table tbody td .cmuk-link{
+#proposalVotes table.cmuk-table tbody td .cmuk-link {
     color: var(--primary-color);
 }
 
-#accountWallet .walletAddress{
+#accountWallet .walletAddress {
     display: flex;
     gap: 8px;
     align-items: center;
 }
 
-#accountWallet .walletAddress .icon
-{
+#accountWallet .walletAddress .icon {
     height: 16px;
     width: 16px;
     fill: var(--primary-color);
@@ -5004,30 +5022,29 @@ figure .block:hover {
 
 #accountWallet .cmuk-subnav,
 #accountDelegations .cmuk-subnav,
-#accountAuthorizations .cmuk-subnav
-{
+#accountAuthorizations .cmuk-subnav {
     border: none;
     justify-content: start;
     gap: 24px;
     margin-bottom: 12px;
     margin-left: 24px;
 }
+
 #accountWallet .cmuk-subnav-pill li:not(:last-child),
 #accountDelegations .cmuk-subnav-pill li:not(:last-child),
-#accountAuthorizations .cmuk-subnav-pill li:not(:last-child)
-{
+#accountAuthorizations .cmuk-subnav-pill li:not(:last-child) {
     border: none;
 }
+
 #accountWallet .cmuk-subnav li,
 #accountDelegations .cmuk-subnav li,
-#accountAuthorizations .cmuk-subnav li
-{
+#accountAuthorizations .cmuk-subnav li {
     flex: none;
 }
+
 #accountWallet .cmuk-subnav li a,
 #accountDelegations .cmuk-subnav li a,
-#accountAuthorizations .cmuk-subnav li a
-{
+#accountAuthorizations .cmuk-subnav li a {
     font-family: var(--font-type-1);
     font-weight: 500;
     font-size: 14px;
@@ -5035,82 +5052,82 @@ figure .block:hover {
     text-transform: capitalize;
     color: var(--gray);
 }
+
 #accountWallet .cmuk-subnav-pill > .cmuk-active > a,
 #accountDelegations .cmuk-subnav-pill > .cmuk-active > a,
-#accountAuthorizations .cmuk-subnav-pill > .cmuk-active > a
-{
+#accountAuthorizations .cmuk-subnav-pill > .cmuk-active > a {
     font-weight: 700;
     color: var(--primary-color);
     border: none;
 }
+
 #accountWallet .cmuk-subnav-pill > * > :first-child,
 #accountDelegations .cmuk-subnav-pill > * > :first-child,
-#accountAuthorizations .cmuk-subnav-pill > * > :first-child
-{
+#accountAuthorizations .cmuk-subnav-pill > * > :first-child {
     padding: 0px;
 }
+
 #accountWallet .cmuk-switcher,
 #accountDelegations .cmuk-switcher,
-#accountAuthorizations .cmuk-switcher
-{
+#accountAuthorizations .cmuk-switcher {
     height: auto;
     margin: 0px 16px 0px 16px;
     padding: 16px 24px 4px 24px;
     background-color: var(--bg-popup);
     border-radius: 10px;
 }
+
 #accountWallet .cmuk-card-body,
 #accountDelegations .cmuk-card-body,
-#accountAuthorizations .cmuk-card-body
-{
+#accountAuthorizations .cmuk-card-body {
     height: auto;
 }
+
 #accountWallet .cmuk-card-body .productTable,
 #accountDelegations .cmuk-card-body .productTable,
-#accountAuthorizations .cmuk-card-body .productTable
-{
+#accountAuthorizations .cmuk-card-body .productTable {
     padding: 0px;
 }
+
 #accountWallet .pieChartContainer,
-#accountDelegations .pieChartContainer
-{
+#accountDelegations .pieChartContainer {
     align-items: center;
 }
+
 #accountWallet .cmuk-card-body .tableFieldTitle .cmuk-link,
 #accountDelegations .cmuk-card-body .tableFieldTitle .cmuk-link,
-#accountAuthorizations .cmuk-card-body .tableFieldTitle .cmuk-link
-{
+#accountAuthorizations .cmuk-card-body .tableFieldTitle .cmuk-link {
     color: var(--primary-color);
 }
+
 #accountWallet .allTokensContainer,
-#accountDelegations .delegationsDelegatedContainer
-{
+#accountDelegations .delegationsDelegatedContainer {
     display: flex;
     align-items: center;
 }
+
 #accountWallet .allTokensContainer .ibcDenom,
-#accountDelegations .delegationsDelegatedContainer .delegationInfo
-{
+#accountDelegations .delegationsDelegatedContainer .delegationInfo {
     align-self: start;
 }
+
 #accountDelegations table.cmuk-table tbody td.blockHeightItem .cmuk-link,
-#accountAuthorizations table.cmuk-table tbody td.blockHeightItem .cmuk-link
-{
+#accountAuthorizations table.cmuk-table tbody td.blockHeightItem .cmuk-link {
     width: 180px;
 }
+
 #accountDelegations table.cmuk-table.cmuk-table-striped,
-#accountAuthorizations table.cmuk-table.cmuk-table-striped
-{
+#accountAuthorizations table.cmuk-table.cmuk-table-striped {
     margin-bottom: 16px;
 }
-#accountDelegations table.cmuk-table.cmuk-table-striped thead th
-{
+
+#accountDelegations table.cmuk-table.cmuk-table-striped thead th {
     padding: 10px 0px 10px 16px;
     white-space: nowrap;
 }
+
 #accountDelegations table.cmuk-table.cmuk-table-striped tbody td,
-#accountAuthorizations table.cmuk-table.cmuk-table-striped tbody td
-{
+#accountAuthorizations table.cmuk-table.cmuk-table-striped tbody td {
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 12px;
@@ -5118,12 +5135,12 @@ figure .block:hover {
     color: var(--gray);
     padding: 16px 0 0 0;
 }
-#accountAuthorizations .cmuk-switcher{
+
+#accountAuthorizations .cmuk-switcher {
     margin: 0px 16px 16px 16px;
 }
 
-#accountTransactions .cmuk-card-body
-{
+#accountTransactions .cmuk-card-body {
     height: auto;
     margin: 0px 16px 0px 16px;
     padding: 16px 24px 0px 24px;
@@ -5131,7 +5148,7 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-#accountTransactions table.cmuk-table tbody td{
+#accountTransactions table.cmuk-table tbody td {
     padding: 16px 0px 0px 0px;
     font-family: var(--font-type-2);
     font-weight: 400;
@@ -5141,15 +5158,15 @@ figure .block:hover {
     padding-right: 8px;
 }
 
-#accountTransactions  table.cmuk-table tbody td .cmuk-link{
+#accountTransactions table.cmuk-table tbody td .cmuk-link {
     color: var(--primary-color);
 }
 
-#walletDetails .cmuk-card{
+#walletDetails .cmuk-card {
     padding-bottom: 1px;
 }
 
-#walletDetails .cmuk-card-body{
+#walletDetails .cmuk-card-body {
     height: auto;
     margin: 0px 16px 16px 16px;
     padding: 16px 24px 16px 24px;
@@ -5157,26 +5174,27 @@ figure .block:hover {
     border-radius: 10px;
 }
 
-#walletDetails .walletDetailsContent{
+#walletDetails .walletDetailsContent {
     display: flex;
     gap: 16px;
     justify-content: center;
     flex-direction: column;
 }
 
-#walletDetails .walletDetailsContent .QRContainer{
+#walletDetails .walletDetailsContent .QRContainer {
     padding: 8px;
     background-color: var(--card-color);
     border-radius: 10px;
 }
-#walletDetails .detail .value{
+
+#walletDetails .detail .value {
     display: flex;
     gap: 8px;
     align-items: center;
     justify-content: center;
 }
 
-#walletDetails .detail .title{
+#walletDetails .detail .title {
     font-family: var(--font-type-2);
     font-style: normal;
     font-weight: 600;
@@ -5189,30 +5207,34 @@ figure .block:hover {
     margin-bottom: 16px;
 }
 
-#walletDetails .detail .value .icon{
+#walletDetails .detail .value .icon {
     height: 16px;
     width: 16px;
     fill: var(--primary-color);
     cursor: pointer;
 }
 
-.tableGridLayout tr td:not(:last-child){
+.tableGridLayout tr td:not(:last-child) {
     width: 33%;
     border-right: 1px solid rgba(255, 253, 250, 0.5);
 }
-.tableGridLayout tr td:not(:first-child){
+
+.tableGridLayout tr td:not(:first-child) {
     padding-left: 32px !important;
 }
-.tableGridLayout .cmuk-card-body{
+
+.tableGridLayout .cmuk-card-body {
     padding: 0px !important;
 }
-.tableGridLayout .cmuk-height-medium{
+
+.tableGridLayout .cmuk-height-medium {
     height: fit-content !important;
 }
-#slashingParameters .cmuk-card-body{
+
+#slashingParameters .cmuk-card-body {
     margin: 0 16px 16px 16px;
 }
 
-#documentDetails .cmuk-card-body.cmuk-height-medium{
+#documentDetails .cmuk-card-body.cmuk-height-medium {
     margin: 0px 16px 16px 16px;
 }
