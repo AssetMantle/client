@@ -299,7 +299,7 @@ class Startup @Inject()(
   private var beforeStartRan = false
 
   private def beforeStart: Future[Unit] = if (!beforeStartRan) {
-    val updateParameters = blockchainParameters.Utility.updateParameters(Seq(
+    def updateParameters = blockchainParameters.Utility.updateParameters(Seq(
       constants.Blockchain.ParameterType.GOVERNANCE,
       constants.Blockchain.ParameterType.ASSETS,
       constants.Blockchain.ParameterType.CLASSIFICATIONS,
@@ -315,9 +315,9 @@ class Startup @Inject()(
     def identities = blockchainIdentities.Utility.beforeRun
 
     (for {
-      _ <- updateParameters
       _ <- classifications
       _ <- identities
+      _ <- updateParameters
     } yield ()).recover{
       case exception: Exception => logger.error(exception.getLocalizedMessage)
         beforeStartRan = true

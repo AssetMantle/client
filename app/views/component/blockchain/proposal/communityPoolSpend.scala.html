@@ -1,0 +1,20 @@
+@import models.common.ProposalContents._
+
+@(communityPoolSpend: CommunityPoolSpend)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<tr>
+    <td>
+        <div class="tableField">
+            <div class="tableFieldTitle">@Messages(constants.View.RECIPIENT)</div>
+            <div class="tableFieldValue">@communityPoolSpend.recipient</div>
+        </div>
+    </td>
+</tr>
+<tr>
+    <td>
+        <div class="tableField">
+            <div class="tableFieldTitle">@Messages(constants.View.AMOUNT)</div>
+            <div class="tableFieldValue">@communityPoolSpend.amount.map(amt => amt.getAmountWithNormalizedDenom()).mkString(", ")</div>
+        </div>
+    </td>
+</tr>

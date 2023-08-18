@@ -4,10 +4,10 @@
     <div class="infoRowLabel">
         @Messages(key)
     </div>
-    @defining(arguments.toMap.get(Symbol("id")).map(_.toString).getOrElse(utilities.IDGenerator.hexadecimal)) {id =>
+    @defining(arguments.toMap.get(Symbol("id")).map(_.toString).getOrElse(utilities.IDGenerator.hexadecimal)) { id =>
         <div id='@id' class='@arguments.toMap.get(Symbol("class")).map(_.toString).getOrElse("infoRowValue")'>
         @value
         </div>
-      <script>fromEpochDateToLocal(@value, '@id')</script>
+        <script>fromNanoSecondToLocal('@value', '@id')</script>
     }
 </div>

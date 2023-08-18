@@ -1,0 +1,28 @@
+@import models.common.ProposalContents._
+
+@(softwareUpgrade: SoftwareUpgrade)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<tr>
+    <td>
+        <div class="tableField">
+            <div class="tableFieldTitle">@Messages(constants.View.NAME)</div>
+            <div class="tableFieldValue">@softwareUpgrade.plan.name</div>
+        </div>
+    </td>
+</tr>
+<tr>
+    <td>
+        <div class="tableField">
+            <div class="tableFieldTitle">@Messages(constants.View.HEIGHT)</div>
+            <div class="tableFieldValue">@softwareUpgrade.plan.height</div>
+        </div>
+    </td>
+</tr>
+<tr>
+    <td>
+        <div class="tableField">
+            <div class="tableFieldTitle">@Messages(constants.View.INFO)</div>
+            <div class="tableFieldValue">@softwareUpgrade.plan.info</div>
+        </div>
+    </td>
+</tr>
