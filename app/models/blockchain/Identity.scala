@@ -186,8 +186,8 @@ class Identities @Inject()(
     }
 
     def onName(msg: identityTransactions.name.Message): Future[String] = {
-      val immutables = Immutables(PropertyList(Seq(schema.constants.Properties.NameProperty.copy(data = IDData(StringID(msg.getName))))))
-      val mutables = Mutables(PropertyList(Seq(schema.constants.Properties.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(msg.getFrom)))))))
+      val immutables = Immutables(PropertyList(Seq(schema.constants.Properties.NameProperty.mutate(IDData(StringID(msg.getName))))))
+      val mutables = Mutables(PropertyList(Seq(schema.constants.Properties.AuthenticationProperty.mutate(ListData(Seq(AccAddressData(msg.getFrom)))))))
       val identityID = schema.utilities.ID.getIdentityID(classificationID = schema.document.NameIdentity.DocumentClassificationID, immutables = immutables)
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = schema.document.NameIdentity.DocumentClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(identity)
