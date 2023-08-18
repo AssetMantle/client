@@ -158,7 +158,16 @@ class Classifications @Inject()(
         //        classification <- classification
         _ <- burn
       } yield ()
+    }
 
+    def beforeRun: Future[Int] = {
+      Service.insertOrUpdate(Seq(
+        Classification(schema.document.NameIdentity.DocumentClassificationID.getBytes, idString = schema.document.NameIdentity.DocumentClassificationID.asString, immutables = schema.document.NameIdentity.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.NameIdentity.DocumentMutables.asProtoMutables.toByteString.toByteArray),
+        Classification(schema.document.CoinAsset.DocumentClassificationID.getBytes, idString = schema.document.CoinAsset.DocumentClassificationID.asString, immutables = schema.document.CoinAsset.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.CoinAsset.DocumentMutables.asProtoMutables.toByteString.toByteArray),
+        Classification(schema.document.Maintainer.DocumentClassificationID.getBytes, idString = schema.document.Maintainer.DocumentClassificationID.asString, immutables = schema.document.Maintainer.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.Maintainer.DocumentMutables.asProtoMutables.toByteString.toByteArray),
+        Classification(schema.document.ModuleIdentity.DocumentClassificationID.getBytes, idString = schema.document.ModuleIdentity.DocumentClassificationID.asString, immutables = schema.document.ModuleIdentity.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.ModuleIdentity.DocumentMutables.asProtoMutables.toByteString.toByteArray),
+        Classification(schema.document.PutOrder.DocumentClassificationID.getBytes, idString = schema.document.PutOrder.DocumentClassificationID.asString, immutables = schema.document.PutOrder.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.PutOrder.DocumentMutables.asProtoMutables.toByteString.toByteArray),
+      ))
     }
   }
 }

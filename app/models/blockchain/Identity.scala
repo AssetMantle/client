@@ -107,6 +107,8 @@ class Identities @Inject()(
 
     def insertOrUpdate(identity: Identity): Future[Int] = upsert(identity)
 
+    def insertOrUpdate(identities: Seq[Identity]): Future[Int] = upsertMultiple(identities)
+
     def get(id: String): Future[Option[Identity]] = getById(utilities.Secrets.base64URLDecode(id))
 
     def get(id: IdentityID): Future[Option[Identity]] = getById(id.getBytes)
@@ -186,8 +188,8 @@ class Identities @Inject()(
     def onName(msg: identityTransactions.name.Message): Future[String] = {
       val immutables = Immutables(PropertyList(Seq(schema.constants.Properties.NameProperty.copy(data = IDData(StringID(msg.getName))))))
       val mutables = Mutables(PropertyList(Seq(schema.constants.Properties.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(msg.getFrom)))))))
-      val identityID = schema.utilities.ID.getIdentityID(classificationID = schema.document.NameIdentity.NameIdentityClassificationID, immutables = immutables)
-      val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = schema.document.NameIdentity.NameIdentityClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
+      val identityID = schema.utilities.ID.getIdentityID(classificationID = schema.document.NameIdentity.DocumentClassificationID, immutables = immutables)
+      val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = schema.document.NameIdentity.DocumentClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(identity)
 
       for {
@@ -240,6 +242,13 @@ class Identities @Inject()(
         identity <- identity
         _ <- update(identity)
       } yield msg.getFrom
+    }
+
+    def beforeRun: Future[Int] = {
+      val identities = Seq("assets", "classifications", "identities", "maintainers", "metas", "orders", "splits").map(x =>
+        Identity(id = schema.document.ModuleIdentity.getModuleIdentityID(x).getBytes, idString = schema.document.ModuleIdentity.getModuleIdentityID(x).asString, classificationID = schema.document.ModuleIdentity.DocumentClassificationID.getBytes, immutables = schema.document.ModuleIdentity.getModuleIdentityImmutables(x).getProtoBytes, mutables = schema.document.ModuleIdentity.getModuleIdentityMutables.getProtoBytes)
+      )
+      Service.insertOrUpdate(identities)
     }
 
   }

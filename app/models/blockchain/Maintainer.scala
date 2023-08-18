@@ -21,9 +21,9 @@ case class Maintainer(id: Array[Byte], idString: String, maintainedClassificatio
 
   def getID: MaintainerID = MaintainerID(HashID(this.id))
 
-  def getClassificationIDString: String = schema.document.Maintainer.MaintainerClassificationID.asString
+  def getClassificationIDString: String = schema.document.Maintainer.DocumentClassificationID.asString
 
-  def getClassificationID: ClassificationID = schema.document.Maintainer.MaintainerClassificationID
+  def getClassificationID: ClassificationID = schema.document.Maintainer.DocumentClassificationID
 
   def getMaintainedClassificationID: ClassificationID = ClassificationID(this.maintainedClassificationID)
 
@@ -123,13 +123,13 @@ class Maintainers @Inject()(
 
     def deputizeAuxiliary(fromID: IdentityID, toID: IdentityID, maintainedClassificationID: ClassificationID, maintainedProperties: PropertyList, permissionIDs: Seq[StringID], canAddMaintainer: Boolean, canRemoveMaintainer: Boolean, canMutateMaintainer: Boolean): Future[Unit] = {
       val fromMaintainerID = schema.utilities.ID.getMaintainerID(
-        classificationID = schema.document.Maintainer.MaintainerClassificationID,
+        classificationID = schema.document.Maintainer.DocumentClassificationID,
         immutables = Immutables(PropertyList(Seq(
           schema.constants.Properties.MaintainedClassificationIDProperty.mutate(IDData(maintainedClassificationID)),
           schema.constants.Properties.IdentityIDProperty.mutate(IDData(fromID))
         ))))
       val toMaintainerID = schema.utilities.ID.getMaintainerID(
-        classificationID = schema.document.Maintainer.MaintainerClassificationID,
+        classificationID = schema.document.Maintainer.DocumentClassificationID,
         immutables = Immutables(PropertyList(Seq(
           schema.constants.Properties.MaintainedClassificationIDProperty.mutate(IDData(maintainedClassificationID)),
           schema.constants.Properties.IdentityIDProperty.mutate(IDData(toID))
@@ -170,7 +170,7 @@ class Maintainers @Inject()(
     }
 
     private def newMaintainer(document: Document, maintainedClassificationID: ClassificationID): Maintainer = {
-      val maintainerID = schema.utilities.ID.getMaintainerID(classificationID = schema.document.Maintainer.MaintainerClassificationID, immutables = document.immutables)
+      val maintainerID = schema.utilities.ID.getMaintainerID(classificationID = schema.document.Maintainer.DocumentClassificationID, immutables = document.immutables)
       Maintainer(id = maintainerID.getBytes, idString = maintainerID.asString, maintainedClassificationID = maintainedClassificationID.getBytes, immutables = document.immutables.getProtoBytes, mutables = document.mutables.getProtoBytes)
     }
   }

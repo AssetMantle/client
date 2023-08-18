@@ -7,16 +7,16 @@ import schema.list.PropertyList
 import schema.qualified.{Immutables, Mutables}
 
 object PutOrder {
-  private val PutOrderImmutables: Immutables = Immutables(PropertyList(Seq(
+  val DocumentImmutables: Immutables = Immutables(PropertyList(Seq(
     MakerIDProperty,
     MakerAssetIDProperty,
     TakerAssetIDProperty,
     MakerSplitProperty,
     TakerSplitProperty,
     ExpiryHeightProperty)))
-  private val PutOrderMutables: Mutables = Mutables(Seq())
+  val DocumentMutables: Mutables = Mutables(Seq())
 
-  val PutOrderClassificationID: ClassificationID = schema.utilities.ID.getClassificationID(PutOrderImmutables, PutOrderMutables)
+  val DocumentClassificationID: ClassificationID = schema.utilities.ID.getClassificationID(DocumentImmutables, DocumentMutables)
 
   def getPutOrderImmutables(makerID: IdentityID, makerAssetID: AssetID, takerAssetID: AssetID, makerSplit: NumberData, takerSplit: NumberData, expiryHeight: HeightData): Immutables = Immutables(PropertyList(Seq(
     MakerIDProperty.mutate(IDData(makerID)),
@@ -27,10 +27,10 @@ object PutOrder {
     ExpiryHeightProperty.mutate(expiryHeight),
   )))
 
-  def getPutOrderDocument(makerID: IdentityID, makerAssetID: AssetID, takerAssetID: AssetID, makerSplit: NumberData, takerSplit: NumberData, expiryHeight: HeightData): Document = Document(classificationID = PutOrderClassificationID,
+  def getPutOrderDocument(makerID: IdentityID, makerAssetID: AssetID, takerAssetID: AssetID, makerSplit: NumberData, takerSplit: NumberData, expiryHeight: HeightData): Document = Document(classificationID = DocumentClassificationID,
     immutables = getPutOrderImmutables(makerID = makerID, makerAssetID = makerAssetID, takerAssetID = takerAssetID, makerSplit = makerSplit, takerSplit = takerSplit, expiryHeight = expiryHeight),
-    mutables = PutOrderMutables)
+    mutables = DocumentMutables)
 
-  def getPutOrderID(makerID: IdentityID, makerAssetID: AssetID, takerAssetID: AssetID, makerSplit: NumberData, takerSplit: NumberData, expiryHeight: HeightData): OrderID = schema.utilities.ID.getOrderID(classificationID = PutOrderClassificationID, immutables = getPutOrderImmutables(makerID = makerID, makerAssetID = makerAssetID, takerAssetID = takerAssetID, makerSplit = makerSplit, takerSplit = takerSplit, expiryHeight = expiryHeight))
+  def getPutOrderID(makerID: IdentityID, makerAssetID: AssetID, takerAssetID: AssetID, makerSplit: NumberData, takerSplit: NumberData, expiryHeight: HeightData): OrderID = schema.utilities.ID.getOrderID(classificationID = DocumentClassificationID, immutables = getPutOrderImmutables(makerID = makerID, makerAssetID = makerAssetID, takerAssetID = takerAssetID, makerSplit = makerSplit, takerSplit = takerSplit, expiryHeight = expiryHeight))
 
 }

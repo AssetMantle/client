@@ -6,12 +6,14 @@ import schema.qualified.{Immutables, Mutables}
 
 object CoinAsset {
 
-  val CoinAssetClassificationID: ClassificationID = schema.utilities.ID.getClassificationID(immutables = Immutables(Seq(schema.constants.Properties.DenomProperty)), mutables = Mutables(Seq()))
+  val DocumentImmutables: Immutables = Immutables(Seq(schema.constants.Properties.DenomProperty))
+  val DocumentMutables: Mutables = Mutables(Seq())
+  val DocumentClassificationID: ClassificationID = schema.utilities.ID.getClassificationID(immutables = DocumentImmutables, mutables = coinAssetMutables)
 
   def getCoinAssetImmutables(denom: String): Immutables = Immutables(Seq(schema.constants.Properties.DenomProperty.mutate(StringData(denom))))
 
-  def getCoinAssetDocument(denom: String): Document = Document(classificationID = CoinAssetClassificationID, immutables = getCoinAssetImmutables(denom), mutables = Mutables(Seq()))
+  def getCoinAssetDocument(denom: String): Document = Document(classificationID = DocumentClassificationID, immutables = getCoinAssetImmutables(denom), mutables = Mutables(Seq()))
 
-  def getCoinAssetID(denom: String): AssetID = schema.utilities.ID.getAssetID(classificationID = CoinAssetClassificationID, immutables = getCoinAssetImmutables(denom))
+  def getCoinAssetID(denom: String): AssetID = schema.utilities.ID.getAssetID(classificationID = DocumentClassificationID, immutables = getCoinAssetImmutables(denom))
 
 }

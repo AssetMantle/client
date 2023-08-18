@@ -7,14 +7,16 @@ import schema.list.PropertyList
 import schema.qualified.{Immutables, Mutables}
 
 object ModuleIdentity {
-  private val ModuleIdentityImmutables: Immutables = Immutables(PropertyList(Seq(ModuleNameProperty)))
-
-  val ModuleIdentityClassificationID: ClassificationID = schema.utilities.ID.getClassificationID(ModuleIdentityImmutables, Mutables(Seq()))
+  val DocumentImmutables: Immutables = Immutables(PropertyList(Seq(ModuleNameProperty)))
+  val DocumentMutables: Mutables = Mutables(Seq())
+  val DocumentClassificationID: ClassificationID = schema.utilities.ID.getClassificationID(DocumentImmutables, DocumentMutables)
 
   def getModuleIdentityImmutables(moduleName: String): Immutables = Immutables(PropertyList(Seq(ModuleNameProperty.mutate(IDData(StringID(moduleName))))))
 
-  def getModuleIdentityDocument(moduleName: String): Document = Document(classificationID = ModuleIdentityClassificationID, immutables = getModuleIdentityImmutables(moduleName), mutables = Mutables(Seq()))
+  def getModuleIdentityMutables: Mutables = DocumentMutables
 
-  def getModuleIdentityID(moduleName: String): IdentityID = schema.utilities.ID.getIdentityID(classificationID = ModuleIdentityClassificationID, immutables = getModuleIdentityImmutables(moduleName))
+  def getModuleIdentityDocument(moduleName: String): Document = Document(classificationID = DocumentClassificationID, immutables = getModuleIdentityImmutables(moduleName), mutables = DocumentMutables)
+
+  def getModuleIdentityID(moduleName: String): IdentityID = schema.utilities.ID.getIdentityID(classificationID = DocumentClassificationID, immutables = getModuleIdentityImmutables(moduleName))
 
 }

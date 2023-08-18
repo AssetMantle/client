@@ -300,6 +300,7 @@ class Startup @Inject()(
 
   private def beforeStart: Future[Unit] = if (!beforeStartRan) {
     val updateParameters = blockchainParameters.Utility.updateParameters(Seq(
+      constants.Blockchain.ParameterType.GOVERNANCE,
       constants.Blockchain.ParameterType.ASSETS,
       constants.Blockchain.ParameterType.CLASSIFICATIONS,
       constants.Blockchain.ParameterType.IDENTITIES,
@@ -308,9 +309,15 @@ class Startup @Inject()(
       constants.Blockchain.ParameterType.ORDERS,
       constants.Blockchain.ParameterType.SPLITS
     ))
+    val classifications = blockchainClassifications.Utility.beforeRun
+
+    //Should be run only after classifications
+    def identities = blockchainIdentities.Utility.beforeRun
 
     for {
       _ <- updateParameters
+      _ <- classifications
+      _ <- identities
     } yield ()
   } else {
     beforeStartRan = true
