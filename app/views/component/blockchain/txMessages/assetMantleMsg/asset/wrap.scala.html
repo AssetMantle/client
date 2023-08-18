@@ -1,0 +1,12 @@
+@import com.assetmantle.modules.assets.transactions.wrap.Message
+@import models.common.Serializable.Coin
+@import schema.id.base._
+@import views.html.base.infos._
+@import views.html.base.buttons.commonJavascriptLink
+@import scala.jdk.CollectionConverters.CollectionHasAsScala
+
+@(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
+@commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
+@commonTextInfo(constants.View.COIN, msg.getCoinsList.asScala.toSeq.map(x => Coin(x).getAmountWithNormalizedDenom()).mkString(", "))

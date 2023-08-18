@@ -229,6 +229,57 @@ class Parameters @Inject()(
         case _: BaseException => logger.error("FAILED_TO_UPDATE_BLOCKCHAIN_PARAMETER")
       }
     }
+
+    def updateParameters(parameterTypes: Seq[String]): Future[Seq[Unit]] = {
+      utilitiesOperations.traverse(parameterTypes) { parameterType => {
+        val parameter: Future[abstractParameter] = parameterType match {
+          case constants.Blockchain.ParameterType.ASSETS =>
+            val response = getAssetParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.CLASSIFICATIONS =>
+            val response = getClassificationParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.IDENTITIES =>
+            val response = getIdentityParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.MAINTAINERS =>
+            val response = getMaintainerParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.METAS =>
+            val response = getMetaParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.ORDERS =>
+            val response = getOrderParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+          case constants.Blockchain.ParameterType.SPLITS =>
+            val response = getSplitParams.Service.get()
+            for {
+              response <- response
+            } yield response.toParameter
+        }
+
+        def upsertParameter(parameterValue: abstractParameter) = if (parameterValue.parameterType != constants.Blockchain.ParameterType.CRISIS || parameterValue.parameterType != constants.Blockchain.ParameterType.IBC || parameterValue.parameterType != constants.Blockchain.ParameterType.TRANSFER)
+          Service.insertOrUpdate(Parameter(parameterType = parameterValue.parameterType, value = parameterValue)) else Future(0)
+
+        for {
+          parameter <- parameter
+          _ <- upsertParameter(parameter)
+        } yield ()
+      }
+      }
+    }
   }
 
 }

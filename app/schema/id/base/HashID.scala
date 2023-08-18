@@ -20,6 +20,7 @@ case class HashID(value: Array[Byte]) extends ID {
 
   def getProtoBytes: Array[Byte] = this.asProtoHashID.toByteString.toByteArray
 
+  def compare(id: ID): Int = schema.utilities.common.byteArraysCompare(this.getBytes, id.asInstanceOf[AssetID].getBytes)
 }
 
 object HashID {

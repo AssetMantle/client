@@ -92,7 +92,7 @@ object Parameters {
 
   implicit val transferParameterReads: Reads[TransferParameter] = Json.reads[TransferParameter]
 
-  case class ClassificationParameter(bondRate: BigInt, maxPropertyCount: BigInt) extends Parameter {
+  case class ClassificationParameter(bondRate: BigInt, maxPropertyCount: BigInt, defineEnabled: Boolean) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.CLASSIFICATIONS
   }
 
@@ -100,7 +100,7 @@ object Parameters {
 
   implicit val classificationParameterReads: Reads[ClassificationParameter] = Json.reads[ClassificationParameter]
 
-  case class AssetParameter(burnEnabled: Boolean, mintEnabled: Boolean, renumerateEnabled: Boolean) extends Parameter {
+  case class AssetParameter(burnEnabled: Boolean, mintEnabled: Boolean, renumerateEnabled: Boolean, wrapAllowedCoins: Seq[String], unwrapAllowedCoins: Seq[String]) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.ASSETS
   }
 
@@ -108,7 +108,7 @@ object Parameters {
 
   implicit val AssetParameterReads: Reads[AssetParameter] = Json.reads[AssetParameter]
 
-  case class IdentityParameter(maxProvisionAddressCount: BigInt) extends Parameter {
+  case class IdentityParameter(issueEnabled: Boolean, maxProvisionAddressCount: BigInt, quashEnabled: Boolean) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.IDENTITIES
   }
 
@@ -132,7 +132,7 @@ object Parameters {
 
   implicit val MetaParameterReads: Reads[MetaParameter] = Json.reads[MetaParameter]
 
-  case class OrderParameter(maxOrderLife: Long) extends Parameter {
+  case class OrderParameter(maxOrderLife: Long, putEnabled: Boolean) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.ORDERS
   }
 
@@ -140,7 +140,7 @@ object Parameters {
 
   implicit val OrderParameterReads: Reads[OrderParameter] = Json.reads[OrderParameter]
 
-  case class SplitParameter(wrapAllowedCoins: Seq[String], unwrapAllowedCoins: Seq[String]) extends Parameter {
+  case class SplitParameter(transferEnabled: Boolean) extends Parameter {
     val parameterType: String = constants.Blockchain.ParameterType.SPLITS
   }
 

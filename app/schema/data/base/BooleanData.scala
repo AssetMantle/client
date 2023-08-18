@@ -5,6 +5,7 @@ import schema.data._
 import schema.id.base.{HashID, StringID}
 
 case class BooleanData(value: Boolean) extends ListableData {
+
   def getType: StringID = constants.BooleanDataTypeID
 
   def getBondWeight: Int = constants.BooleanBondWeight

@@ -9,6 +9,9 @@ object constants {
 
   val TypeAndValueSeparator = "|"
   val ListBytesSeparator = "\\#"
+  val MaxListLength = 20
+  val CompositeDataStringSeparator = ","
+  val ListStringSeparator = ",,"
 
   val DecFactor: Long = 1000000000000000000L
   val DecStringFormat = new DecimalFormat("#0.000000000000000000")
@@ -31,7 +34,7 @@ object constants {
   val DecDataWeight = 16
   val HeightDataWeight = 8
   val IDDataWeight = 64
-  val ListDataWeight = 1024
+  val ListDataWeight = 2560
   val LinkedDataWeight = 384
   val NumberDataWeight = 8
   val StringDataWeight = 256

@@ -28,6 +28,8 @@ case class IDList(idList: Seq[ID]) {
     IDList(idList = updatedList).sort
   }
 
+  def add(id: ID): IDList = this.add(Seq(id))
+
   def remove(ids: Seq[ID]): IDList = {
     var updatedList = this.sort.idList
     ids.foreach(x => {
@@ -36,6 +38,8 @@ case class IDList(idList: Seq[ID]) {
     })
     IDList(idList = updatedList)
   }
+
+  def remove(id: ID): IDList = this.remove(Seq(id))
 
   def sort: IDList = IDList(this.idList.sortWith((x, y) => byteArraysCompare(x.getBytes, y.getBytes) < 0))
 

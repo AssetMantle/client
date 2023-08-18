@@ -5,7 +5,7 @@ import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import schema.data.Data
-import schema.data.base.{AccAddressData, IDData, ListData}
+import schema.data.base.{AccAddressData, IDData, ListData, NumberData}
 import schema.document.Document
 import schema.id.base._
 import schema.list.PropertyList
@@ -41,6 +41,11 @@ case class Identity(id: Array[Byte], idString: String, classificationID: Array[B
       if (property.get.isMeta) ListData(MetaProperty(property.get.getProtoBytes).getData.toAnyData.getListData)
       else ListData(schema.constants.Properties.AuthenticationProperty.getData.getProtoBytes)
     } else ListData(Seq())
+  }
+
+  def getBondAmount: NumberData = {
+    val value = this.getMutables.getProperty(schema.constants.Properties.BondAmountProperty.getID)
+    NumberData((if (value.isDefined) MetaProperty(value.get.getProtoBytes) else schema.constants.Properties.BondAmountProperty).getData.getProtoBytes)
   }
 
   def getAuthenticationAddress: Seq[String] = this.getAuthentication.getAnyDataList.map(x => Data(x).viewString)
@@ -128,7 +133,7 @@ class Identities @Inject()(
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).add(Seq(schema.constants.Properties.AuthenticationProperty)).properties))
       val add = blockchainClassifications.Utility.defineAuxiliary(msg.getFrom, mutables, immutables)
 
-      def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables)
+      def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables, schema.utilities.Permissions.getIdentitiesPermissions(true, true))
 
       for {
         classificationID <- add
@@ -137,7 +142,13 @@ class Identities @Inject()(
     }
 
     def onDeputize(msg: identityTransactions.deputize.Message): Future[String] = {
-      val deputize = blockchainMaintainers.Utility.deputizeAuxiliary(fromID = IdentityID(msg.getFromID), toID = IdentityID(msg.getToID), maintainedClassificationID = ClassificationID(msg.getClassificationID), maintainedProperties = PropertyList(msg.getMaintainedProperties), canMintAsset = msg.getCanMintAsset, canBurnAsset = msg.getCanBurnAsset, canRenumerateAsset = msg.getCanRenumerateAsset, canAddMaintainer = msg.getCanAddMaintainer, canRemoveMaintainer = msg.getCanRemoveMaintainer, canMutateMaintainer = msg.getCanMutateMaintainer)
+      val deputize = blockchainMaintainers.Utility.deputizeAuxiliary(
+        fromID = IdentityID(msg.getFromID),
+        toID = IdentityID(msg.getToID),
+        maintainedClassificationID = ClassificationID(msg.getClassificationID),
+        maintainedProperties = PropertyList(msg.getMaintainedProperties),
+        permissionIDs = schema.utilities.Permissions.getIdentitiesPermissions(canIssue = msg.getCanIssueIdentity, canQuash = msg.getCanQuashIdentity),
+        canAddMaintainer = msg.getCanAddMaintainer, canRemoveMaintainer = msg.getCanRemoveMaintainer, canMutateMaintainer = msg.getCanMutateMaintainer)
       for {
         _ <- deputize
       } yield msg.getFrom
@@ -148,10 +159,9 @@ class Identities @Inject()(
       val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val classificationID = ClassificationID(msg.getClassificationID)
       val identityID = schema.utilities.ID.getIdentityID(classificationID = classificationID, immutables = immutables)
-      val authenticationProperty = schema.constants.Properties.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(msg.getTo))))
-      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(Seq(authenticationProperty)).add(PropertyList(msg.getMutableProperties).properties))
+      val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = ClassificationID(msg.getClassificationID).getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
-      val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom, classificationID)
+      val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom, classificationID, identity.getBondAmount)
       val add = Service.add(identity)
 
       for {
@@ -160,7 +170,7 @@ class Identities @Inject()(
       } yield msg.getFrom
     }
 
-    def onMutate(msg: identityTransactions.mutate.Message): Future[String] = {
+    def onUpdate(msg: identityTransactions.update.Message): Future[String] = {
       val identityID = IdentityID(msg.getIdentityID)
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
       val identity = Service.tryGet(identityID)
@@ -173,8 +183,8 @@ class Identities @Inject()(
       } yield msg.getFrom
     }
 
-    def onNub(msg: identityTransactions.nub.Message): Future[String] = {
-      val immutables = Immutables(PropertyList(Seq(schema.constants.Properties.NubProperty.copy(data = IDData(StringID(msg.getNubID))))))
+    def onName(msg: identityTransactions.name.Message): Future[String] = {
+      val immutables = Immutables(PropertyList(Seq(schema.constants.Properties.NameProperty.copy(data = IDData(StringID(msg.getName))))))
       val mutables = Mutables(PropertyList(Seq(schema.constants.Properties.AuthenticationProperty.copy(data = ListData(Seq(AccAddressData(msg.getFrom)))))))
       val identityID = schema.utilities.ID.getIdentityID(classificationID = schema.document.NameIdentity.NameIdentityClassificationID, immutables = immutables)
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = schema.document.NameIdentity.NameIdentityClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
@@ -201,7 +211,7 @@ class Identities @Inject()(
 
       def updateUnbondAndDelete(identity: Identity) = {
         val delete = Service.delete(identity.getID)
-        val unbond = blockchainClassifications.Utility.unbondAuxiliary(msg.getFrom, identity.getClassificationID)
+        val unbond = blockchainClassifications.Utility.unbondAuxiliary(msg.getFrom, identity.getClassificationID, identity.getBondAmount)
         for {
           _ <- delete
           _ <- unbond

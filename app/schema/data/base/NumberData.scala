@@ -5,6 +5,7 @@ import schema.data._
 import schema.id.base.{HashID, StringID}
 
 case class NumberData(value: BigInt) extends ListableData {
+
   def getType: StringID = constants.NumberDataTypeID
 
   def getBondWeight: Int = constants.NumberDataWeight

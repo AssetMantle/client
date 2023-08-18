@@ -10,6 +10,8 @@ import scala.jdk.CollectionConverters._
 
 case class ListData(value: Seq[ListableData]) extends Data {
 
+  require(value.length <= schema.data.constants.MaxListLength, "LIST_DATA_SIZE_EXCEEDED")
+
   def getType: StringID = constants.ListDataTypeID
 
   def getBondWeight: Int = constants.ListDataWeight
@@ -58,6 +60,8 @@ case class ListData(value: Seq[ListableData]) extends Data {
     ListData(updatedList).sort
   }
 
+  def add(data: ListableData): ListData = this.add(Seq(data))
+
   def remove(removeDataList: Seq[ListableData]): ListData = {
     var updatedList = this.sort.value
     removeDataList.foreach(x => {
@@ -66,6 +70,8 @@ case class ListData(value: Seq[ListableData]) extends Data {
     })
     ListData(updatedList)
   }
+
+  def remove(data: ListableData): ListData = this.remove(Seq(data))
 }
 
 object ListData {

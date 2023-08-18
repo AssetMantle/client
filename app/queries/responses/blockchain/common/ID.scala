@@ -30,12 +30,6 @@ object ID {
 
   implicit val ClassificationIDReads: Reads[ClassificationID] = Json.reads[ClassificationID]
 
-  case class CoinID(string_i_d: StringID) {
-    def toCoinID: baseSchemaID.CoinID = baseSchemaID.CoinID(this.string_i_d.toStringID)
-  }
-
-  implicit val CoinIDReads: Reads[CoinID] = Json.reads[CoinID]
-
   case class DataID(type_i_d: StringID, hash_i_d: HashID) {
     def toDataID: baseSchemaID.DataID = baseSchemaID.DataID(typeID = this.type_i_d.toStringID, hashID = this.hash_i_d.toHashID)
   }
@@ -66,28 +60,15 @@ object ID {
 
   implicit val PropertyIDReads: Reads[PropertyID] = Json.reads[PropertyID]
 
-  case class AnyOwnableID(
-                           asset_i_d: Option[AssetID],
-                           coin_i_d: Option[CoinID]) {
-    def toOwnableID: schema.id.OwnableID = {
-      if (this.asset_i_d.isDefined) this.asset_i_d.get.toAssetID
-      else this.coin_i_d.get.toCoinID
-    }
-  }
-
-  implicit val AnyOwnableIDReads: Reads[AnyOwnableID] = Json.reads[AnyOwnableID]
-
-  case class SplitID(owner_i_d: IdentityID, ownable_i_d: AnyOwnableID) {
-    def toSplitID: baseSchemaID.SplitID = baseSchemaID.SplitID(ownerID = this.owner_i_d.toIdentityID, ownableID = this.ownable_i_d.toOwnableID)
+  case class SplitID(asset_i_d: AssetID, owner_i_d: IdentityID) {
+    def toSplitID: baseSchemaID.SplitID = baseSchemaID.SplitID(ownerID = this.owner_i_d.toIdentityID, assetID = this.asset_i_d.toAssetID)
   }
 
   implicit val SplitIDReads: Reads[SplitID] = Json.reads[SplitID]
 
   case class AnyID(
-                    ownable_i_d: Option[AnyOwnableID],
                     asset_i_d: Option[AssetID],
                     classification_i_d: Option[ClassificationID],
-                    coin_i_d: Option[CoinID],
                     data_i_d: Option[DataID],
                     hash_i_d: Option[HashID],
                     identity_i_d: Option[IdentityID],
@@ -97,11 +78,9 @@ object ID {
                     split_i_d: Option[SplitID],
                     string_i_d: Option[StringID]) {
 
-    def toID: schema.id.ID = {
-      if (this.ownable_i_d.isDefined) this.ownable_i_d.get.toOwnableID
-      else if (this.asset_i_d.isDefined) this.asset_i_d.get.toAssetID
+    def toID: schema.id.ID =
+      if (this.asset_i_d.isDefined) this.asset_i_d.get.toAssetID
       else if (this.classification_i_d.isDefined) this.classification_i_d.get.toClassificationID
-      else if (this.coin_i_d.isDefined) this.coin_i_d.get.toCoinID
       else if (this.data_i_d.isDefined) this.data_i_d.get.toDataID
       else if (this.hash_i_d.isDefined) this.hash_i_d.get.toHashID
       else if (this.identity_i_d.isDefined) this.identity_i_d.get.toIdentityID
@@ -110,7 +89,6 @@ object ID {
       else if (this.property_i_d.isDefined) this.property_i_d.get.toPropertyID
       else if (this.split_i_d.isDefined) this.split_i_d.get.toSplitID
       else this.string_i_d.get.toStringID
-    }
   }
 
   implicit val AnyIDReads: Reads[AnyID] = Json.reads[AnyID]

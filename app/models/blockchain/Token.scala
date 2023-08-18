@@ -88,7 +88,7 @@ class Tokens @Inject()(
 
   private def updateExceptBurnAndLock(denom: String, totalSupply: BigDecimal, bondedAmount: BigDecimal, notBondedAmount: BigDecimal, communityPool: BigDecimal, inflation: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(x => (x.totalSupply, x.bondedAmount, x.notBondedAmount, x.communityPool, x.inflation)).update((totalSupply, bondedAmount, notBondedAmount, communityPool, inflation)).asTry).map {
     case Success(result) => result match {
-      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => constants.Response.NO_SUCH_ELEMENT_EXCEPTION.throwBaseException()
       case _ => result
     }
     case Failure(exception) => exception match {
@@ -100,7 +100,7 @@ class Tokens @Inject()(
 
   private def updateBondingTokenByDenom(denom: String, bondedAmount: MicroNumber, notBondedAmount: MicroNumber): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(x => (x.bondedAmount, x.notBondedAmount)).update((bondedAmount.toBigDecimal, notBondedAmount.toBigDecimal)).asTry).map {
     case Success(result) => result match {
-      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => constants.Response.NO_SUCH_ELEMENT_EXCEPTION.throwBaseException()
       case _ => result
     }
     case Failure(exception) => exception match {
@@ -110,7 +110,7 @@ class Tokens @Inject()(
 
   private def updateTotalLockedByDenom(denom: String, totalLocked: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(_.totalLocked).update(totalLocked).asTry).map {
     case Success(result) => result match {
-      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => constants.Response.NO_SUCH_ELEMENT_EXCEPTION.throwBaseException()
       case _ => result
     }
     case Failure(exception) => exception match {
@@ -120,7 +120,7 @@ class Tokens @Inject()(
 
   private def updateTotalBurntByDenom(denom: String, totalBurnt: BigDecimal): Future[Int] = db.run(tokenTable.filter(_.denom === denom).map(_.totalBurnt).update(totalBurnt).asTry).map {
     case Success(result) => result match {
-      case 0 => throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case 0 => constants.Response.NO_SUCH_ELEMENT_EXCEPTION.throwBaseException()
       case _ => result
     }
     case Failure(exception) => exception match {

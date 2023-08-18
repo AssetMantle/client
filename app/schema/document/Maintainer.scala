@@ -14,8 +14,11 @@ object Maintainer {
 
   def getMaintainerImmutables(identityID: IdentityID, maintainedClassificationID: ClassificationID): Immutables = Immutables(PropertyList(Seq(IdentityIDProperty.mutate(IDData(identityID)), MaintainedClassificationIDProperty.mutate(IDData(maintainedClassificationID)))))
 
-  def getMaintainerMutables(maintainedPropertyIDList: IDList, permissions: IDList): Immutables = Immutables(PropertyList(Seq(MaintainedPropertiesProperty.mutate(maintainedPropertyIDList.toListData), PermissionsProperty.mutate(permissions.toListData))))
+  def getMaintainerMutables(maintainedPropertyIDList: IDList, permissions: IDList): Mutables = Mutables(PropertyList(Seq(MaintainedPropertiesProperty.mutate(maintainedPropertyIDList.toListData), PermissionsProperty.mutate(permissions.toListData))))
 
-  def getMaintainerDocument(identityID: IdentityID, maintainedPropertyIDList: IDList, maintainedClassificationID: ClassificationID, permissions: IDList): Document = Document(classificationID = MaintainerClassificationID, immutables = getMaintainerImmutables(identityID, maintainedClassificationID), mutables = getMaintainerMutables(maintainedPropertyIDList = maintainedPropertyIDList, permissions = permissions))
+  def getMaintainerDocument(identityID: IdentityID, maintainedPropertyIDList: IDList, maintainedClassificationID: ClassificationID, permissions: IDList): Document = Document(
+    classificationID = MaintainerClassificationID,
+    immutables = getMaintainerImmutables(identityID, maintainedClassificationID),
+    mutables = getMaintainerMutables(maintainedPropertyIDList = maintainedPropertyIDList, permissions = permissions))
 
 }

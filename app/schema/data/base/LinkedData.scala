@@ -7,6 +7,7 @@ import schema.id.base.{HashID, StringID}
 import java.io.ByteArrayOutputStream
 
 case class LinkedData(resourceID: HashID, extensionID: StringID, serviceEndpoint: String) extends ListableData {
+
   def getType: StringID = constants.LinkedDataTypeID
 
   def getBondWeight: Int = constants.LinkedDataWeight
