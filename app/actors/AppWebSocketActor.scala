@@ -5,9 +5,10 @@ import akka.actor.{Actor, ActorRef, ActorSystem}
 import akka.dispatch.{PriorityGenerator, UnboundedStablePriorityMailbox}
 import akka.routing.{BroadcastRoutingLogic, Router}
 import com.typesafe.config.Config
-import javax.inject.Singleton
 import play.api.Logger
 import play.api.libs.json.{Json, OWrites}
+
+import javax.inject.Singleton
 
 @Singleton
 class AppWebSocketActor extends Actor {
@@ -22,10 +23,7 @@ class AppWebSocketActor extends Actor {
 
   implicit val messageWrites: OWrites[Message] = Json.writes[Message]
 
-  private var publicRouter: Router = {
-    val routees = Vector.empty
-    Router(BroadcastRoutingLogic(), routees)
-  }
+  private var publicRouter: Router = Router(BroadcastRoutingLogic(), Vector.empty)
 
   private var privateActorMap = Map[String, ActorRef]()
 
