@@ -396,6 +396,7 @@ object View {
   val ISSUE_ENABLED = "ISSUE_ENABLED"
   val QUASH_ENABLED = "QUASH_ENABLED"
   val PUT_ENABLED = "PUT_ENABLED"
+  val AUTHORIZATION_NOT_FOUND = "AUTHORIZATION_NOT_FOUND"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
     constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
