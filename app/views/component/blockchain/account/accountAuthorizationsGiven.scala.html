@@ -1,23 +1,22 @@
 @import views.html.component.blockchain.authorization
 @import models.blockchain.Authorization
 @import views.html.base.buttons._
-@import views.html.base.cards.commonTable
 
-@(assigned: Seq[Authorization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(granted: Seq[Authorization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@if(assigned.nonEmpty) {
+@if(granted.nonEmpty) {
     <table class="cmuk-table cmuk-table-striped">
         <thead>
             <tr>
-                <th>@Messages(constants.View.GRANTER)</th>
+                <th>@Messages(constants.View.TO)</th>
                 <th>@Messages(constants.View.MESSAGES_TYPE)</th>
                 <th>@Messages(constants.View.EXPIRATION)</th>
             </tr>
         </thead>
         <tbody>
-        @assigned.zipWithIndex.map { case (authz, index) =>
+        @granted.zipWithIndex.map { case (authz, index) =>
             <tr>
-                <td class="blockHeightItem">@commonJavascriptLink(authz.granter, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${authz.granter}'))"))</td>
+                <td class="blockHeightItem">@commonJavascriptLink(authz.grantee, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${authz.grantee}'))"))</td>
                 <td>@Messages(constants.View.TxMessagesMap.getOrElse(authz.msgTypeURL, authz.msgTypeURL))</td>
                 <td id='@Seq(authz.granter, authz.grantee, index.toString).mkString("_")'>
                     <script>
