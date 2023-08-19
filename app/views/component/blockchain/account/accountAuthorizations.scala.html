@@ -1,6 +1,6 @@
 @import views.html.base._
 @import views.html.base.cards._
-@import views.html.component.blockchain.account.{accountAuthorizationsGranted, accountAuthorizationsAssigned}
+@import views.html.component.blockchain.account.{accountAuthorizationsGiven, accountAuthorizationsReceived}
 @import models.blockchain.Authorization
 @import scala.collection.immutable.ListMap
 
@@ -9,7 +9,7 @@
 @commonCard(constants.View.AUTHORIZATION) {
 } {
     @commonHorizontalSwitcher(ListMap(
-        constants.View.GRANTED -> accountAuthorizationsGranted(granted),
-        constants.View.ASSIGNED -> accountAuthorizationsAssigned(assigned),
+        constants.View.GIVEN -> accountAuthorizationsGiven(granted),
+        constants.View.RECEIVED -> accountAuthorizationsReceived(assigned),
     ))
 }

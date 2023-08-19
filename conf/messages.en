@@ -992,3 +992,5 @@ QUASH_ENABLED=Quash Enabled
 ISSUE_ENABLED=Issue Enabled
 PUT_ENABLED=Put Enabled
 MESSAGE_IDENTITY_NAME=Self Identity
+RECEIVED=Received
+GIVEN=Given
