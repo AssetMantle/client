@@ -4878,13 +4878,24 @@ figure .block:hover {
 }
 
 #validatorTransactions .cmuk-card-body .emptyBlockTransaction,
-#accountTransactions .cmuk-card-body .emptyBlockTransaction {
+#accountTransactions .cmuk-card-body .emptyBlockTransaction
+{
     font-family: var(--font-type-2);
     font-weight: 400;
     font-size: 14px;
     line-height: 17px;
     color: var(--disabled);
     padding-top: 16px;
+    text-align: center;
+}
+#accountAuthorizations .cmuk-card-body .emptyBlockTransaction
+{
+    font-family: var(--font-type-2);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--disabled);
+    padding: 0 0 12px 0;
     text-align: center;
 }
 
@@ -5231,7 +5242,8 @@ figure .block:hover {
     height: fit-content !important;
 }
 
-#slashingParameters .cmuk-card-body {
+#slashingParameters .cmuk-card-body,
+#splitsParameters .cmuk-card-body{
     margin: 0 16px 16px 16px;
 }
 
