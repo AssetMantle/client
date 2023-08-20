@@ -17,7 +17,7 @@
                             <div class="timelineItemMessage">@Messages(notification.template, notification.notificationTemplate.parameters: _*)</div>
                         </div>
                         <div id="time_@notification.id" class="notificationTime timelineItemTime">@notification.createdOnMillisEpoch</div>
-                        <script>fromEpochDateToLocal(@notification.createdOnMillisEpoch, 'time_@notification.id')</script>
+                        <script>fromMillisToLocal(@notification.createdOnMillisEpoch, 'time_@notification.id')</script>
                     </div>
                 </div>
             </div>
