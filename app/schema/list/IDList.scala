@@ -10,6 +10,8 @@ import scala.jdk.CollectionConverters._
 
 case class IDList(idList: Seq[ID]) {
 
+  require(this.idList.map(_.getType.value).forall(_ == this.idList.head.getType.value), "ID_LIST_DOES_NOT_CONTAINS_SAME_ELEMENT_TYPE")
+
   def getIDs: Seq[ID] = this.idList
 
   def getAnyIDs: Seq[AnyID] = this.getIDs.map(_.toAnyID)

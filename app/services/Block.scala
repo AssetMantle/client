@@ -194,6 +194,7 @@ class Block @Inject()(
     } yield actors.Service.appWebSocketActor ! getWebSocketNewBlock(proposer)
   }
 
+  // Cannot use this for getting WalletTx and ValidatorTx because only successful tx goes here.
   def actionsOnTransactions(transactions: Seq[blockchainTransaction])(implicit header: Header): Future[Seq[Unit]] = utilitiesOperations.traverse(transactions) { transaction =>
     val signers = if (transaction.status) utilitiesOperations.traverse(transaction.getMessages)(stdMsg => actionOnTxMessages(stdMsg = stdMsg)) else Future(Seq())
     val updateAccount = blockchainAccounts.Utility.insertOrUpdateAccount(transaction.getSigners.head)

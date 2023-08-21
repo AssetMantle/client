@@ -11,6 +11,7 @@ import scala.jdk.CollectionConverters._
 case class ListData(value: Seq[ListableData]) extends Data {
 
   require(value.length <= schema.data.constants.MaxListLength, "LIST_DATA_SIZE_EXCEEDED")
+  require(this.value.map(_.getType.value).forall(_ == this.value.head.getType.value), "LIST_DATA_DOES_NOT_CONTAINS_SAME_ELEMENT_TYPE")
 
   def getType: StringID = constants.ListDataTypeID
 

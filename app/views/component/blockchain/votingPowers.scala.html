@@ -7,10 +7,10 @@
 
 @commonCard(constants.View.VOTING_POWERS) {
 } {
+    @commonTextInfo(constants.View.TOTAL_ACTIVE_VALIDATORS, s"${totalActiveValidators.toString}/${totalValidators.toString}")
+    @commonTextInfo(constants.View.TOP_VALIDATORS, s"${sortedVotingPowerMap.size - 1}")
+    <br>
     <div class="votingPowerContent">
-@*//    @commonTextInfo(constants.View.TOTAL_ACTIVE_VALIDATORS, s"${totalActiveValidators.toString}/${totalValidators.toString}")*@
-@*//    @commonTextInfo(constants.View.TOP_VALIDATORS, s"${sortedVotingPowerMap.size - 1}")*@
-@*    <br>*@
         @commonPieChart("votingPowersChart", sortedVotingPowerMap, showLegend = false)
     </div>
 }
