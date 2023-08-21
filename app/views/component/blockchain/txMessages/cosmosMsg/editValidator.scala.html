@@ -6,8 +6,13 @@
 
 @commonHtmlInfo(constants.View.VALIDATOR_ADDRESS, commonJavascriptLink(msg.getValidatorAddress, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${msg.getValidatorAddress}'))")))
 @commonTextInfo(constants.View.VALIDATOR_MONIKER, msg.getDescription.getMoniker)
+@commonTextInfo(constants.View.VALIDATOR_IDENTITY, msg.getDescription.getIdentity)
 @commonTextInfo(constants.View.VALIDATOR_WEBSITE, msg.getDescription.getWebsite)
 @commonTextInfo(constants.View.VALIDATOR_SECURITY_CONTACT, msg.getDescription.getSecurityContact)
 @commonTextInfo(constants.View.VALIDATOR_DESCRIPTION_DETAILS, msg.getDescription.getDetails)
-@commonTextInfo(constants.View.COMMISSION_RATE, s"${(BigDecimal(msg.getCommissionRate) * 100).toString} %")
-@commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, msg.getMinSelfDelegation)
+@if(msg.getCommissionRate.nonEmpty) {
+    @commonTextInfo(constants.View.COMMISSION_RATE, s"${(BigDecimal(msg.getCommissionRate) * 100).toString} %")
+}
+@if(msg.getMinSelfDelegation.nonEmpty) {
+    @commonTextInfo(constants.View.MINIMUM_SELF_DELEGATION, msg.getMinSelfDelegation)
+}

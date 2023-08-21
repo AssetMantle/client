@@ -296,37 +296,6 @@ class Startup @Inject()(
     } yield ()
   }
 
-  private var beforeStartRan = false
-
-  private def beforeStart: Future[Unit] = if (!beforeStartRan) {
-    def updateParameters = blockchainParameters.Utility.updateParameters(Seq(
-      constants.Blockchain.ParameterType.GOVERNANCE,
-      constants.Blockchain.ParameterType.ASSETS,
-      constants.Blockchain.ParameterType.CLASSIFICATIONS,
-      constants.Blockchain.ParameterType.IDENTITIES,
-      constants.Blockchain.ParameterType.MAINTAINERS,
-      constants.Blockchain.ParameterType.METAS,
-      constants.Blockchain.ParameterType.ORDERS,
-      constants.Blockchain.ParameterType.SPLITS
-    ))
-    val classifications = blockchainClassifications.Utility.beforeRun
-
-    //Should be run only after classifications
-    def identities = blockchainIdentities.Utility.beforeRun
-
-    (for {
-      _ <- classifications
-      _ <- identities
-      _ <- updateParameters
-    } yield ()).recover{
-      case exception: Exception => logger.error(exception.getLocalizedMessage)
-        beforeStartRan = true
-    }
-  } else {
-    beforeStartRan = true
-    Future()
-  }
-
   private val explorerRunnable = new Runnable {
     def run(): Unit = if (!utilities.Scheduler.getSignalReceived) {
       //TODO Bug Source: Continuously emits sometimes when app starts - queries.blockchain.GetABCIInfo in application-akka.actor.default-dispatcher-66  - LOG.ILLEGAL_STATE_EXCEPTION
@@ -364,7 +333,6 @@ class Startup @Inject()(
       }
 
       val forComplete = (for {
-        _ <- beforeStart
         abciInfo <- abciInfo
         latestExplorerBlockHeight <- latestExplorerBlockHeight
         _ <- checkAndInsertBlock(abciInfo.result.response.last_block_height.toInt, latestExplorerBlockHeight)
