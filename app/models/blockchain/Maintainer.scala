@@ -50,6 +50,8 @@ case class Maintainer(id: Array[Byte], idString: String, maintainedClassificatio
   def mutate(properties: Seq[Property]): Maintainer = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
 
   def maintainsProperty(id: PropertyID): Boolean = this.getMaintainedProperties.getDataList.exists(_.getBytes.sameElements(IDData(id).getBytes))
+
+  def getDocumentType: String = constants.Document.Type.MAINTAINER
 }
 
 private[blockchain] object Maintainers {
@@ -140,14 +142,14 @@ class Maintainers @Inject()(
       //def getRemoveMaintainedPropertyList(fromMaintainer: Maintainer) = fromMaintainer.getMutables.remove(maintainedProperties.getProperties)
 
       def addOrUpdate(fromMaintainer: Maintainer, toMaintainer: Option[Maintainer]) = {
-//        if (toMaintainer.isEmpty) {
-//          Service.add(newMaintainer(identityID = toID, maintainedClassificationID = maintainedClassificationID, maintainedPropertyIDList = maintainedProperties.getPropertyIDList, permissions = permissions))
-//        } else {
-//          val updatedMaintainedProperties = toMaintainer.get.getMutables.propertyList
-//            .add(maintainedProperties.getProperties)
-//            .remove(fromMaintainer.getMutables.remove(maintainedProperties.getProperties).getProperties)
-//          Service.update(newMaintainer(identityID = toID, maintainedClassificationID = maintainedClassificationID, maintainedPropertyIDList = updatedMaintainedProperties.getPropertyIDList, permissions = permissions))
-//        }
+        //        if (toMaintainer.isEmpty) {
+        //          Service.add(newMaintainer(identityID = toID, maintainedClassificationID = maintainedClassificationID, maintainedPropertyIDList = maintainedProperties.getPropertyIDList, permissions = permissions))
+        //        } else {
+        //          val updatedMaintainedProperties = toMaintainer.get.getMutables.propertyList
+        //            .add(maintainedProperties.getProperties)
+        //            .remove(fromMaintainer.getMutables.remove(maintainedProperties.getProperties).getProperties)
+        //          Service.update(newMaintainer(identityID = toID, maintainedClassificationID = maintainedClassificationID, maintainedPropertyIDList = updatedMaintainedProperties.getPropertyIDList, permissions = permissions))
+        //        }
         Future()
       }
 

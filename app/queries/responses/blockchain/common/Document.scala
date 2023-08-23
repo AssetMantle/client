@@ -14,7 +14,7 @@ case class Document(classification_i_d: ClassificationID, immutables: Immutables
   }
 
   def toClassification: Classification = {
-    Classification(this.classification_i_d.toClassificationID.getBytes, idString = this.classification_i_d.toClassificationID.asString, immutables = this.immutables.toImmutables.asProtoImmutables.toByteString.toByteArray, mutables = this.mutables.toMutables.asProtoMutables.toByteString.toByteArray)
+    Classification(this.classification_i_d.toClassificationID.getBytes, idString = this.classification_i_d.toClassificationID.asString, immutables = this.immutables.toImmutables.asProtoImmutables.toByteString.toByteArray, mutables = this.mutables.toMutables.asProtoMutables.toByteString.toByteArray, classificationType = "")
   }
 
   def toIdentity: Identity = {

@@ -57,6 +57,8 @@ case class Asset(id: Array[Byte], idString: String, classificationID: Array[Byte
   }
 
   def mutate(properties: Seq[Property]): Asset = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
+
+  def getDocumentType: String = constants.Document.Type.ASSET
 }
 
 private[blockchain] object Assets {
@@ -128,6 +130,7 @@ class Assets @Inject()(
 
     def delete(assetID: AssetID): Future[Int] = deleteById(assetID.getBytes)
 
+    def countAll: Future[Int] = countTotal()
 
   }
 
@@ -136,7 +139,7 @@ class Assets @Inject()(
     def onDefine(msg: assetsTransactions.define.Message): Future[String] = {
       val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
-      val add = blockchainClassifications.Utility.defineAuxiliary(msg.getFrom, mutables, immutables)
+      val add = blockchainClassifications.Utility.defineAuxiliary(msg.getFrom, mutables, immutables, constants.Document.ClassificationType.ASSET)
 
       def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables, schema.utilities.Permissions.getAssetsPermissions(true, true, true))
 

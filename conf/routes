@@ -47,6 +47,8 @@ GET        /component/tokensPrices                         controllers.Component
 GET        /component/transactionStatistics                controllers.ComponentViewController.transactionStatistics
 GET        /component/transactionMessagesStatistics        controllers.ComponentViewController.transactionMessagesStatistics
 
+GET        /component/assetMantleStatistics                controllers.ComponentViewController.assetMantleStatistics
+
 GET        /component/accountWallet                        controllers.ComponentViewController.accountWallet(address: String)
 GET        /component/accountDelegations                   controllers.ComponentViewController.accountDelegations(address: String)
 GET        /component/accountTransactions                  controllers.ComponentViewController.accountTransactions(address: String)
