@@ -60,12 +60,20 @@
     @if(documentType == constants.Document.Type.IDENTITY && document.isDefined) {
         <div class="cmuk-grid-match" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-                <div id="documentSubProperties" class="cardSelectHeader cmuk-card-styles">
+                <div id="documentSubProperties" class="cardSelectHeader">
                 @commonCard(constants.View.AUTHENTICATED_ADDRESSES) {
                 } {
+                    <table class="productTable">
                     @utilities.Document.getIdentity(document.get).getAuthenticationAddress.map { address =>
-                        @commonJavascriptLink(address, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${address}'))")) <br>
+                        <tr>
+                            <td>
+                                <div class="tableField">
+                                    <div class="tableFieldValue">@commonJavascriptLink(address, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${address}'))")) </div>
+                                </div>
+                            </td>
+                        </tr>
                     }
+                    </table>
                 }
                 </div>
             </div>
