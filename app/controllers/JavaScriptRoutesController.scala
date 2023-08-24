@@ -33,6 +33,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.tokensStatistics,
           routes.javascript.ComponentViewController.votingPowers,
 
+          routes.javascript.ComponentViewController.assetMantleStatistics,
+
           routes.javascript.ComponentViewController.tokensPrices,
           routes.javascript.ComponentViewController.transactionStatistics,
           routes.javascript.ComponentViewController.transactionMessagesStatistics,

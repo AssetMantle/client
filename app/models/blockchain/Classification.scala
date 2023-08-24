@@ -16,7 +16,7 @@ import utilities.MicroNumber
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Classification(id: Array[Byte], idString: String, immutables: Array[Byte], mutables: Array[Byte], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
+case class Classification(id: Array[Byte], idString: String, immutables: Array[Byte], mutables: Array[Byte], classificationType: String, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[Array[Byte]] {
 
   def getIDString: String = utilities.Secrets.base64URLEncoder(this.id)
 
@@ -35,13 +35,14 @@ case class Classification(id: Array[Byte], idString: String, immutables: Array[B
     MicroNumber((if (property.isDefined && property.get.isMeta) NumberData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes) else NumberData(0)).value)
   }
 
+  def getDocumentType: String = constants.Document.Type.CLASSIFICATION + "_" + this.classificationType
 }
 
 private[blockchain] object Classifications {
 
   class ClassificationTable(tag: Tag) extends Table[Classification](tag, "Classification") with ModelTable[Array[Byte]] {
 
-    def * = (id, idString, immutables, mutables, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Classification.tupled, Classification.unapply)
+    def * = (id, idString, immutables, mutables, classificationType, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (Classification.tupled, Classification.unapply)
 
     def id = column[Array[Byte]]("id", O.PrimaryKey)
 
@@ -50,6 +51,8 @@ private[blockchain] object Classifications {
     def immutables = column[Array[Byte]]("immutables")
 
     def mutables = column[Array[Byte]]("mutables")
+
+    def classificationType = column[String]("classificationType")
 
     def createdBy = column[String]("createdBy")
 
@@ -99,12 +102,13 @@ class Classifications @Inject()(
 
     def fetchAll: Future[Seq[Classification]] = getAll
 
+    def countClasses(classificationType: String): Future[Int] = filterAndCount(_.classificationType === classificationType)
 
   }
 
   object Utility {
 
-    def defineAuxiliary(address: String, mutables: Mutables, immutables: Immutables): Future[ClassificationID] = {
+    def defineAuxiliary(address: String, mutables: Mutables, immutables: Immutables, classificationType: String): Future[ClassificationID] = {
       val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(address)
       val classificationParameter = blockchainParameters.Service.tryGetClassificationParameter
       val totalWeight = mutables.getTotalBondWeight + immutables.getTotalBondWeight
@@ -112,7 +116,7 @@ class Classifications @Inject()(
       def add(classificationParameter: ClassificationParameter) = {
         val updatedMutables = Mutables(mutables.propertyList.add(Seq(schema.constants.Properties.BondAmountProperty.copy(data = NumberData(totalWeight * classificationParameter.bondRate)))))
         val classificationID = schema.utilities.ID.getClassificationID(immutables = immutables, mutables = updatedMutables)
-        val classification = Classification(classificationID.getBytes, idString = classificationID.asString, immutables = immutables.asProtoImmutables.toByteString.toByteArray, mutables = updatedMutables.asProtoMutables.toByteString.toByteArray)
+        val classification = Classification(classificationID.getBytes, idString = classificationID.asString, immutables = immutables.asProtoImmutables.toByteString.toByteArray, mutables = updatedMutables.asProtoMutables.toByteString.toByteArray, classificationType = classificationType)
         Service.add(classification)
       }
 
@@ -158,16 +162,6 @@ class Classifications @Inject()(
         //        classification <- classification
         _ <- burn
       } yield ()
-    }
-
-    def beforeRun: Future[Int] = {
-      Service.insertOrUpdate(Seq(
-        Classification(schema.document.NameIdentity.DocumentClassificationID.getBytes, idString = schema.document.NameIdentity.DocumentClassificationID.asString, immutables = schema.document.NameIdentity.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.NameIdentity.DocumentMutables.asProtoMutables.toByteString.toByteArray),
-        Classification(schema.document.CoinAsset.DocumentClassificationID.getBytes, idString = schema.document.CoinAsset.DocumentClassificationID.asString, immutables = schema.document.CoinAsset.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.CoinAsset.DocumentMutables.asProtoMutables.toByteString.toByteArray),
-        Classification(schema.document.Maintainer.DocumentClassificationID.getBytes, idString = schema.document.Maintainer.DocumentClassificationID.asString, immutables = schema.document.Maintainer.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.Maintainer.DocumentMutables.asProtoMutables.toByteString.toByteArray),
-        Classification(schema.document.ModuleIdentity.DocumentClassificationID.getBytes, idString = schema.document.ModuleIdentity.DocumentClassificationID.asString, immutables = schema.document.ModuleIdentity.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.ModuleIdentity.DocumentMutables.asProtoMutables.toByteString.toByteArray),
-        Classification(schema.document.PutOrder.DocumentClassificationID.getBytes, idString = schema.document.PutOrder.DocumentClassificationID.asString, immutables = schema.document.PutOrder.DocumentImmutables.asProtoImmutables.toByteString.toByteArray, mutables = schema.document.PutOrder.DocumentMutables.asProtoMutables.toByteString.toByteArray),
-      ))
     }
   }
 }

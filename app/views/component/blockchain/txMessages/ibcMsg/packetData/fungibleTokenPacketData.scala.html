@@ -1,0 +1,21 @@
+@import views.html.base.buttons._
+@import views.html.base.infos._
+@import models.common.Serializable.IBC
+
+@(key: String, fungibleTokenPacketData: IBC.FungibleTokenPacketData)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(key):
+<div>
+    @commonTextInfo(constants.View.DENOM, fungibleTokenPacketData.denom)
+    @commonTextInfo(constants.View.AMOUNT, utilities.NumericOperation.formatNumber(fungibleTokenPacketData.amount, normalize = false))
+    @if(fungibleTokenPacketData.sender.matches(constants.Blockchain.AccountRegexString)) {
+        @commonHtmlInfo(constants.View.SENDER, commonJavascriptLink(fungibleTokenPacketData.sender, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${fungibleTokenPacketData.sender}'))")))
+    } else {
+        @commonTextInfo(constants.View.SENDER, fungibleTokenPacketData.sender)
+    }
+    @if(fungibleTokenPacketData.receiver.matches(constants.Blockchain.AccountRegexString)) {
+        @commonHtmlInfo(constants.View.RECEIVER, commonJavascriptLink(fungibleTokenPacketData.receiver, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${fungibleTokenPacketData.receiver}'))")))
+    } else {
+        @commonTextInfo(constants.View.RECEIVER, fungibleTokenPacketData.receiver)
+    }
+</div>

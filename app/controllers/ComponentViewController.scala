@@ -101,15 +101,15 @@ class ComponentViewController @Inject()(
           maintainer <- maintainer
         } yield {
           if (asset.isDefined)
-            Ok(views.html.component.blockchain.document.document(id, Option(asset.get.getDocument), constants.View.ASSET))
+            Ok(views.html.component.blockchain.document.document(id, Option(asset.get.getDocument), asset.get.getDocumentType))
           else if (identity.isDefined)
-            Ok(views.html.component.blockchain.document.document(id, Option(identity.get.getDocument), constants.View.IDENTITY))
+            Ok(views.html.component.blockchain.document.document(id, Option(identity.get.getDocument), identity.get.getDocumentType))
           else if (order.isDefined)
-            Ok(views.html.component.blockchain.document.document(id, Option(order.get.getDocument), constants.View.ORDER))
+            Ok(views.html.component.blockchain.document.document(id, Option(order.get.getDocument), order.get.getDocumentType))
           else if (classification.isDefined)
-            Ok(views.html.component.blockchain.document.document(id, Option(classification.get.getDocument), constants.View.CLASSIFICATION))
+            Ok(views.html.component.blockchain.document.document(id, Option(classification.get.getDocument), classification.get.getDocumentType))
           else if (maintainer.isDefined)
-            Ok(views.html.component.blockchain.document.document(id, Option(maintainer.get.getDocument), constants.View.MAINTAINER))
+            Ok(views.html.component.blockchain.document.document(id, Option(maintainer.get.getDocument), maintainer.get.getDocumentType))
           else Ok(views.html.component.blockchain.document.document(id, None, ""))
 
         }
@@ -746,6 +746,34 @@ class ComponentViewController @Inject()(
         ).recover {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
+  }
+
+  def assetMantleStatistics: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+    withoutLoginActionAsync { implicit loginState =>
+      implicit request =>
+        val identitiesIssued = blockchainIdentities.Service.countAll
+        val namedIdentities = blockchainIdentities.Service.namedIdentities
+        val identityClasses = blockchainClassifications.Service.countClasses(constants.Document.ClassificationType.IDENTITY)
+
+        val assetsMinted = blockchainAssets.Service.countAll
+        val assetsClasses = blockchainClassifications.Service.countClasses(constants.Document.ClassificationType.ASSET)
+
+        val liveOrders = blockchainOrders.Service.countAll
+        val orderClasses = blockchainClassifications.Service.countClasses(constants.Document.ClassificationType.ORDER)
+
+        (for {
+          identitiesIssued <- identitiesIssued
+          namedIdentities <- namedIdentities
+          identityClasses <- identityClasses
+          assetsMinted <- assetsMinted
+          assetsClasses <- assetsClasses
+          liveOrders <- liveOrders
+          orderClasses <- orderClasses
+        } yield Ok(views.html.component.blockchain.dashboard.assetMantleStatistics(identitiesIssued = identitiesIssued, namedIdentities = namedIdentities, identityClasses = identityClasses, assetsMinted = assetsMinted, assetsClasses = assetsClasses, liveOrders = liveOrders, orderClasses = orderClasses))
+          ).recover {
+          case baseException: BaseException => InternalServerError(baseException.failure.message)
+        }
+    }
   }
 
 }

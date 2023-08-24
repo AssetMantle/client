@@ -1,0 +1,11 @@
+@import models.common.Serializable.IBC.InterChainAccountPacketData
+@import views.html.base.infos._
+
+@(key: String, interChainAccountPacketData: InterChainAccountPacketData)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(key):
+<div>
+    @commonTextInfo(constants.View.TYPE, interChainAccountPacketData.`type`)
+    @commonTextInfo(constants.View.DATA, utilities.Secrets.base64Encoder(interChainAccountPacketData.data))
+    @commonTextInfo(constants.View.MEMO, interChainAccountPacketData.memo)
+</div>

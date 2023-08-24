@@ -6,4 +6,4 @@
 @(msg: Message)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @commonHtmlInfo(constants.View.FROM, commonJavascriptLink(msg.getFrom, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${msg.getFrom}'))")))
-@commonTextInfo(constants.View.NUB_ID, StringID(msg.getName).asString)
+@commonTextInfo(constants.View.NAME, StringID(msg.getName).asString)
