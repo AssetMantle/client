@@ -57,7 +57,6 @@ object View {
   val FOOTER_LOGO = "FOOTER_LOGO"
   val FROM = "FROM"
   val TO = "TO"
-  val NUB_ID = "NUB_ID"
 
   val BLOCKS = "BLOCKS"
   val TRANSACTION_STATISTICS_X_LABEL = "TRANSACTION_STATISTICS_X_LABEL"

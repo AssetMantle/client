@@ -9,6 +9,8 @@ object Blockchain {
   val AccountPrefix: String = AppConfig.configuration.get[String]("blockchain.account.prefix")
   val ValidatorPrefix: String = AccountPrefix + "valoper"
   val ValidatorConsensusPublicPrefix: String = AccountPrefix + "valconspub"
+  val AccountRegexString: String = AccountPrefix + RegularExpression.ADDRESS_SUFFIX.regex
+  val ValidatorRegexString: String = ValidatorPrefix + RegularExpression.ADDRESS_SUFFIX.regex
   val IBCDenoms: Seq[AppConfig.IBCDenom] = AppConfig.configuration.get[Seq[Configuration]]("blockchain.ibcDenoms.ibcDenomList").map { ibcDenoms =>
     constants.AppConfig.IBCDenom(hash = ibcDenoms.get[String]("hash"), name = ibcDenoms.get[String]("name"))
   }
@@ -192,4 +194,10 @@ object Blockchain {
     val ALLOWED_MSG_ALLOWANCE = "/cosmos.feegrant.v1beta1.AllowedMsgAllowance"
   }
 
+  object IBC {
+    object PacketDataType {
+      val FUNGIBLE_TOKEN_PACKET_DATA = "FUNGIBLE_TOKEN_PACKET_DATA"
+      val INTER_CHAIN_ACCOUNT_PACKET_DATA = "INTER_CHAIN_ACCOUNT_PACKET_DATA"
+    }
+  }
 }

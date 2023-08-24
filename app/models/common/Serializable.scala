@@ -1,6 +1,7 @@
 package models.common
 
 import com.cosmos.base.v1beta1.{Coin => protoCoin}
+import com.google.protobuf.{Any => protoAny}
 import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.functional.syntax._
@@ -156,43 +157,57 @@ object Serializable {
 
     implicit val connectionCounterpartyReads: Reads[ConnectionCounterparty] = Json.reads[ConnectionCounterparty]
 
-    implicit val connectionCounterpartyWrites: OWrites[ConnectionCounterparty] = Json.writes[ConnectionCounterparty]
-
     case class ChannelCounterparty(portID: String, channelID: String)
 
     implicit val channelCounterpartyReads: Reads[ChannelCounterparty] = Json.reads[ChannelCounterparty]
-
-    implicit val channelCounterpartyWrites: OWrites[ChannelCounterparty] = Json.writes[ChannelCounterparty]
 
     case class Version(identifier: String, features: Seq[String])
 
     implicit val versionReads: Reads[Version] = Json.reads[Version]
 
-    implicit val versionWrites: OWrites[Version] = Json.writes[Version]
-
     case class ClientHeight(revisionNumber: Int, revisionHeight: Int)
 
     implicit val clientHeightReads: Reads[ClientHeight] = Json.reads[ClientHeight]
-
-    implicit val clientHeightWrites: OWrites[ClientHeight] = Json.writes[ClientHeight]
 
     case class Channel(state: String, ordering: String, counterparty: ChannelCounterparty, connectionHops: Seq[String], version: String)
 
     implicit val channelReads: Reads[Channel] = Json.reads[Channel]
 
-    implicit val channelWrites: OWrites[Channel] = Json.writes[Channel]
+    abstract class PacketData {
 
-    case class FungibleTokenPacketData(denom: String, amount: MicroNumber, sender: String, receiver: String)
+      def getType: String
+
+      def getAffectedWalletAddresses: Seq[String]
+    }
+
+    case class FungibleTokenPacketData(denom: String, amount: MicroNumber, sender: String, receiver: String) extends PacketData {
+      def getType: String = constants.Blockchain.IBC.PacketDataType.FUNGIBLE_TOKEN_PACKET_DATA
+
+      def getAffectedWalletAddresses: Seq[String] = Seq(sender, receiver)
+    }
 
     implicit val fungibleTokenPacketDataReads: Reads[FungibleTokenPacketData] = Json.reads[FungibleTokenPacketData]
 
-    implicit val fungibleTokenPacketDataWrites: OWrites[FungibleTokenPacketData] = Json.writes[FungibleTokenPacketData]
+    case class InterChainAccountPacketData(`type`: String, data: Array[Byte], memo: String) extends PacketData {
 
-    case class Packet(sequence: String, sourcePort: String, sourceChannel: String, destinationPort: String, destinationChannel: String, data: FungibleTokenPacketData, timeoutHeight: ClientHeight, timeoutTimestamp: String)
+      // TODO Implement
+      def getTxMessages: Seq[protoAny] = Seq()
+
+      def getAffectedWalletAddresses: Seq[String] = Seq()
+
+      def getType: String = constants.Blockchain.IBC.PacketDataType.INTER_CHAIN_ACCOUNT_PACKET_DATA
+    }
+
+    implicit val interChainAccountPacketDataReads: Reads[InterChainAccountPacketData] = Json.reads[InterChainAccountPacketData]
+
+    implicit val packetDataReads: Reads[PacketData] = {
+      Json.format[FungibleTokenPacketData].map(x => x: FungibleTokenPacketData) or
+        Json.format[InterChainAccountPacketData].map(x => x: InterChainAccountPacketData)
+    }
+
+    case class Packet(sequence: String, sourcePort: String, sourceChannel: String, destinationPort: String, destinationChannel: String, data: PacketData, timeoutHeight: ClientHeight, timeoutTimestamp: String)
 
     implicit val packetReads: Reads[Packet] = Json.reads[Packet]
-
-    implicit val packetWrites: OWrites[Packet] = Json.writes[Packet]
 
   }
 

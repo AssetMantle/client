@@ -1,7 +1,8 @@
 @import com.ibc.core.channel.v1.Packet
 @import models.common.Serializable.IBC
-@import views.html.base.infos._
 @import play.api.Logger
+@import views.html.base.infos._
+@import views.html.component.blockchain.txMessages.ibcMsg
 
 @(key: String, packet: Packet)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="cmuk-text-left title">@Messages(key):</div>
@@ -11,7 +12,19 @@
     @commonTextInfo(constants.View.SOURCE_CHANNEL, packet.getSourceChannel)
     @commonTextInfo(constants.View.DESTINATION_PORT, packet.getDestinationPort)
     @commonTextInfo(constants.View.DESTINATION_CHANNEL, packet.getDestinationChannel)
-    @views.html.component.blockchain.txMessages.ibcMsg.commonFungibleTokenPacketData(constants.View.DATA, utilities.JSON.convertJsonStringToObject[IBC.FungibleTokenPacketData](packet.getData.toStringUtf8)("commonPacket", Logger("commonPacket"), IBC.fungibleTokenPacketDataReads))
-    @views.html.component.blockchain.txMessages.ibcMsg.commonClientHeight(constants.View.TIMEOUT_HEIGHT, packet.getTimeoutHeight)
+    @defining(utilities.JSON.convertJsonStringToObject[IBC.PacketData](packet.getData.toStringUtf8)("commonPacket", Logger("commonPacket"), IBC.packetDataReads)) { packetData =>
+        @packetData.getType match {
+            case constants.Blockchain.IBC.PacketDataType.FUNGIBLE_TOKEN_PACKET_DATA => {
+                @ibcMsg.packetData.fungibleTokenPacketData(packetData.getType, packetData.asInstanceOf[IBC.FungibleTokenPacketData])
+            }
+            case constants.Blockchain.IBC.PacketDataType.INTER_CHAIN_ACCOUNT_PACKET_DATA => {
+                @ibcMsg.packetData.interChainAccountPacketData(packetData.getType, packetData.asInstanceOf[IBC.InterChainAccountPacketData])
+            }
+            case _ => {
+
+            }
+        }
+    }
+    @ibcMsg.commonClientHeight(constants.View.TIMEOUT_HEIGHT, packet.getTimeoutHeight)
     @commonEpochInfo(constants.View.TIMEOUT_TIMESTAMP, packet.getTimeoutTimestamp)
 </div>

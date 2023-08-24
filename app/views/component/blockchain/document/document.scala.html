@@ -1,6 +1,7 @@
 @import schema.document.Document
 @import schema.list.PropertyList
 @import views.html.base.cards._
+@import views.html.base.buttons._
 @import views.html.component.blockchain.txMessages.common._
 
 @(id: String, document: Option[Document], documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
@@ -63,7 +64,7 @@
                 @commonCard(constants.View.AUTHENTICATED_ADDRESSES) {
                 } {
                     @utilities.Document.getIdentity(document.get).getAuthenticationAddress.map { address =>
-                        @address <br>
+                        @commonJavascriptLink(address, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${address}'))")) <br>
                     }
                 }
                 </div>

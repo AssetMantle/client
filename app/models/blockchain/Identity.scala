@@ -48,7 +48,7 @@ case class Identity(id: Array[Byte], idString: String, classificationID: Array[B
     NumberData((if (value.isDefined) MetaProperty(value.get.getProtoBytes) else schema.constants.Properties.BondAmountProperty).getData.getProtoBytes)
   }
 
-  def getAuthenticationAddress: Seq[String] = this.getAuthentication.getAnyDataList.map(x => Data(x).viewString)
+  def getAuthenticationAddress: Seq[String] = this.getAuthentication.getAnyDataList.map(x => Data(x).asInstanceOf[AccAddressData].toBech32Address)
 
   def mutate(properties: Seq[Property]): Identity = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
 
@@ -128,7 +128,7 @@ class Identities @Inject()(
 
     def countAll: Future[Int] = countTotal()
 
-    def namedIdentities: Future[Int] = filterAndCount(_.id === schema.document.NameIdentity.DocumentClassificationID.getBytes)
+    def namedIdentities: Future[Int] = filterAndCount(_.classificationID === schema.document.NameIdentity.DocumentClassificationID.getBytes)
 
   }
 

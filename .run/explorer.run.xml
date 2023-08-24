@@ -9,7 +9,7 @@
         <entry key="BLOCKCHAIN_ACCOUNT_PREFIX" value="mantle" />
         <entry key="BLOCKCHAIN_REST_URL" value="http://localhost:1317" />
         <entry key="BLOCKCHAIN_RPC_URL" value="http://localhost:26657" />
-        <entry key="CHAIN_ID" value="test" />
+        <entry key="CHAIN_ID" value="mantle-1" />
         <entry key="COINGECKO_URL" value="https://api.coingecko.com/api/v3" />
         <entry key="GENESIS_FILE_PATH" value="$USER_HOME$/.mantleNode/config/genesis.json" />
         <entry key="KEY_STORE_FILE_PATH" value="$USER_HOME$/others/comdexKeyStore" />
