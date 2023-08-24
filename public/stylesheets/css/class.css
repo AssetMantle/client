@@ -4463,7 +4463,8 @@ figure .block:hover {
 #validatorDetails .cmuk-card-body,
 #proposalDetails .cmuk-card-body,
 .tableGridLayout .cmuk-card-body,
-#documentDetails .cmuk-card-body {
+#documentDetails .cmuk-card-body,
+#documentSubProperties .cmuk-card-body{
     height: auto;
     margin: 0px 16px 0px 16px;
     padding: 16px 24px;
@@ -4476,7 +4477,9 @@ figure .block:hover {
 #validatorDetails .cmuk-card-body .productTable,
 #proposalDetails .cmuk-card-body .productTable,
 .tableGridLayout .cmuk-card-body .productTable,
-#documentDetails .cmuk-card-body .productTable {
+#documentDetails .cmuk-card-body .productTable,
+#documentSubProperties .cmuk-card-body .productTable
+{
     padding: 0px;
 }
 
@@ -4487,7 +4490,8 @@ figure .block:hover {
 #accountWallet .cmuk-card-body .productTable td,
 #accountDelegations .cmuk-card-body .productTable td,
 .tableGridLayout .cmuk-card-body .productTable td,
-#documentDetails .cmuk-card-body .productTable td {
+#documentDetails .cmuk-card-body .productTable td
+{
     padding-bottom: 12px;
 }
 
@@ -4531,7 +4535,8 @@ figure .block:hover {
 #accountWallet .cmuk-card-body .productTable .tableFieldValue a,
 #accountDelegations .cmuk-card-body .productTable .tableFieldValue a,
 .tableGridLayout .cmuk-card-body .productTable .tableFieldValue a,
-#documentDetails .cmuk-card-body .productTable .tableFieldValue a {
+#documentDetails .cmuk-card-body .productTable .tableFieldValue a ,
+#documentSubProperties .cmuk-card-body .productTable .tableFieldValue a{
     color: var(--primary-color);
 }
 
@@ -5247,6 +5252,7 @@ figure .block:hover {
     margin: 0 16px 16px 16px;
 }
 
-#documentDetails .cmuk-card-body.cmuk-height-medium {
+#documentDetails .cmuk-card-body.cmuk-height-medium,
+#documentSubProperties .cmuk-card-body{
     margin: 0px 16px 16px 16px;
 }
