@@ -23,15 +23,15 @@ abstract class FeeAllowance {
 
 object FeeAllowance {
   def apply(feeGrantAny: protoAny): FeeAllowance = feeGrantAny.getTypeUrl match {
-    case constants.Blockchain.FeeGrant.BASIC_ALLOWANCE => {
+    case schema.constants.FeeGrant.BASIC_ALLOWANCE => {
       val protoBasicAllowance = protoFeeGrant.BasicAllowance.parseFrom(feeGrantAny.toByteString)
       BasicAllowance(spendLimit = protoBasicAllowance.getSpendLimitList.asScala.toSeq.map(x => Coin(x)), expiration = protoBasicAllowance.getExpiration.getSeconds)
     }
-    case constants.Blockchain.FeeGrant.PERIODIC_ALLOWANCE => {
+    case schema.constants.FeeGrant.PERIODIC_ALLOWANCE => {
       val protoAllowance = protoFeeGrant.PeriodicAllowance.parseFrom(feeGrantAny.toByteString)
       PeriodicAllowance(basicAllowance = BasicAllowance(protoAllowance.getBasic), period = protoAllowance.getPeriod.getSeconds, periodSpendLimit = protoAllowance.getPeriodSpendLimitList.asScala.toSeq.map(x => Coin(x)), periodCanSpend = protoAllowance.getPeriodCanSpendList.asScala.toSeq.map(x => Coin(x)), periodReset = protoAllowance.getPeriodReset.getSeconds)
     }
-    case constants.Blockchain.FeeGrant.ALLOWED_MSG_ALLOWANCE => {
+    case schema.constants.FeeGrant.ALLOWED_MSG_ALLOWANCE => {
       val protoAllowance = protoFeeGrant.AllowedMsgAllowance.parseFrom(feeGrantAny.toByteString)
       AllowedMsgAllowance(allowance = FeeAllowance(protoAllowance.getAllowance), allowedMessages = protoAllowance.getAllowedMessagesList.asScala.toSeq)
     }

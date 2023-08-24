@@ -11,15 +11,15 @@ object BlockResultResponse {
     lazy val decodedEvents: Seq[Event] = this.events.map(_.decode)
 
     def getSubmitProposalIDs: Seq[Int] = this.decodedEvents
-      .filter(x => x.`type` == constants.Blockchain.Event.SubmitProposal && x.attributes.exists(_.key == constants.Blockchain.Event.Attribute.ProposalID))
+      .filter(x => x.`type` == schema.constants.Event.SubmitProposal && x.attributes.exists(_.key == schema.constants.Event.Attribute.ProposalID))
       .flatMap(_.attributes)
-      .filter(_.key == constants.Blockchain.Event.Attribute.ProposalID)
+      .filter(_.key == schema.constants.Event.Attribute.ProposalID)
       .flatMap(_.value.map(_.toInt))
 
     def getProposalSubmitters: Seq[String] = this.decodedEvents
-      .filter(x => x.`type` == constants.Blockchain.Event.Message && x.attributes.exists(y => y.key == constants.Blockchain.Event.Attribute.Module && y.value.getOrElse("") == "governance") && x.attributes.exists(y => y.key == constants.Blockchain.Event.Attribute.Sender))
+      .filter(x => x.`type` == schema.constants.Event.Message && x.attributes.exists(y => y.key == schema.constants.Event.Attribute.Module && y.value.getOrElse("") == "governance") && x.attributes.exists(y => y.key == schema.constants.Event.Attribute.Sender))
       .flatMap(_.attributes)
-      .filter(_.key == constants.Blockchain.Event.Attribute.Sender)
+      .filter(_.key == schema.constants.Event.Attribute.Sender)
       .flatMap(_.value)
 
     def status: Boolean = code == 0
@@ -36,13 +36,13 @@ object BlockResultResponse {
 
     lazy val decodedEndBlockEvents: Seq[Event] = this.end_block_events.getOrElse(Seq()).map(_.decode)
 
-    def getSlashingEvents: Seq[Event] = this.decodedBeginBlockEvents.filter(_.`type` == constants.Blockchain.Event.Slash)
+    def getSlashingEvents: Seq[Event] = this.decodedBeginBlockEvents.filter(_.`type` == schema.constants.Event.Slash)
 
-    def getLivenessEvents: Seq[Event] = this.decodedBeginBlockEvents.filter(_.`type` == constants.Blockchain.Event.Liveness)
+    def getLivenessEvents: Seq[Event] = this.decodedBeginBlockEvents.filter(_.`type` == schema.constants.Event.Liveness)
 
     def getAllEvents: Seq[Event] = this.decodedBeginBlockEvents ++ this.decodedSuccessfulTxEvents ++ this.decodedEndBlockEvents
 
-    def getActiveInactiveProposalEvents: Seq[Event] = this.decodedEndBlockEvents.filter(x => x.`type` == constants.Blockchain.Event.ActiveProposal || x.`type` == constants.Blockchain.Event.InactiveProposal)
+    def getActiveInactiveProposalEvents: Seq[Event] = this.decodedEndBlockEvents.filter(x => x.`type` == schema.constants.Event.ActiveProposal || x.`type` == schema.constants.Event.InactiveProposal)
 
   }
 

@@ -283,8 +283,8 @@ class Startup @Inject()(
   private def actionsOnEvents(blockResultResponse: BlockResultResponse, currentBlockTimeStamp: RFC3339): Future[Unit] = {
     val slashing = blocksServices.onSlashingEvents(blockResultResponse.result.getSlashingEvents, blockResultResponse.result.height.toInt)
     val missedBlock = blocksServices.onMissedBlockEvents(blockResultResponse.result.getLivenessEvents, blockResultResponse.result.height.toInt)
-    val unbondingCompletion = blocksServices.onUnbondingCompletionEvents(unbondingCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == constants.Blockchain.Event.CompleteUnbonding).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
-    val redelegationCompletion = blocksServices.onRedelegationCompletionEvents(redelegationCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == constants.Blockchain.Event.CompleteRedelegation).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
+    val unbondingCompletion = blocksServices.onUnbondingCompletionEvents(unbondingCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == schema.constants.Event.CompleteUnbonding).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
+    val redelegationCompletion = blocksServices.onRedelegationCompletionEvents(redelegationCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == schema.constants.Event.CompleteRedelegation).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
     val proposal = blocksServices.onProposalEvents(blockResultResponse.result.getActiveInactiveProposalEvents, blockResultResponse.result.txs_results.getOrElse(Seq()))
 
     for {

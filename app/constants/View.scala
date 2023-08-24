@@ -410,15 +410,15 @@ object View {
   val ORDER_CLASSES = "ORDER_CLASSES"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
-    constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
-    constants.Blockchain.Authz.GENERIC_AUTHORIZATION -> "GENERIC_AUTHORIZATION",
-    constants.Blockchain.Authz.STAKE_AUTHORIZATION -> "STAKE_AUTHORIZATION",
+    schema.constants.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
+    schema.constants.Authz.GENERIC_AUTHORIZATION -> "GENERIC_AUTHORIZATION",
+    schema.constants.Authz.STAKE_AUTHORIZATION -> "STAKE_AUTHORIZATION",
   )
 
   val FeeGrantAllowanceMap: Map[String, String] = Map(
-    constants.Blockchain.FeeGrant.BASIC_ALLOWANCE -> "BASIC_ALLOWANCE",
-    constants.Blockchain.FeeGrant.PERIODIC_ALLOWANCE -> "PERIODIC_ALLOWANCE",
-    constants.Blockchain.FeeGrant.ALLOWED_MSG_ALLOWANCE -> "ALLOWED_MSG_ALLOWANCE",
+    schema.constants.FeeGrant.BASIC_ALLOWANCE -> "BASIC_ALLOWANCE",
+    schema.constants.FeeGrant.PERIODIC_ALLOWANCE -> "PERIODIC_ALLOWANCE",
+    schema.constants.FeeGrant.ALLOWED_MSG_ALLOWANCE -> "ALLOWED_MSG_ALLOWANCE",
   )
 
   val TxMessagesMap: Map[String, String] = Map(

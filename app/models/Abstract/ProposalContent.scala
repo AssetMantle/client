@@ -25,23 +25,23 @@ object ProposalContent {
   private implicit val logger: Logger = Logger(this.getClass)
 
   def apply(protoProposalContent: protoAny): ProposalContent = protoProposalContent.getTypeUrl match {
-    case constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE => {
+    case schema.constants.Proposal.CANCEL_SOFTWARE_UPGRADE => {
       val proposalProto = upgradeProto.CancelSoftwareUpgradeProposal.parseFrom(protoProposalContent.getValue)
       CancelSoftwareUpgrade(title = proposalProto.getTitle, description = proposalProto.getDescription)
     }
-    case constants.Blockchain.Proposal.SOFTWARE_UPGRADE => {
+    case schema.constants.Proposal.SOFTWARE_UPGRADE => {
       val proposalProto = upgradeProto.SoftwareUpgradeProposal.parseFrom(protoProposalContent.getValue)
       SoftwareUpgrade(title = proposalProto.getTitle, description = proposalProto.getDescription, plan = Plan(name = proposalProto.getPlan.getName, time = proposalProto.getPlan.getTime.getSeconds, height = proposalProto.getPlan.getHeight.toString, info = proposalProto.getPlan.getInfo))
     }
-    case constants.Blockchain.Proposal.PARAMETER_CHANGE => {
+    case schema.constants.Proposal.PARAMETER_CHANGE => {
       val parameterProto = paramsProto.ParameterChangeProposal.parseFrom(protoProposalContent.getValue)
       ParameterChange(title = parameterProto.getTitle, description = parameterProto.getDescription, changes = parameterProto.getChangesList.asScala.toSeq.map(x => Change.fromProtoAny(x)))
     }
-    case constants.Blockchain.Proposal.TEXT => {
+    case schema.constants.Proposal.TEXT => {
       val parameterProto = govProto.TextProposal.parseFrom(protoProposalContent.getValue)
       Text(title = parameterProto.getTitle, description = parameterProto.getDescription)
     }
-    case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => {
+    case schema.constants.Proposal.COMMUNITY_POOL_SPEND => {
       val parameterProto = distributionProto.CommunityPoolSpendProposal.parseFrom(protoProposalContent.getValue)
       CommunityPoolSpend(title = parameterProto.getTitle, description = parameterProto.getDescription, recipient = parameterProto.getRecipient, amount = parameterProto.getAmountList.asScala.toSeq.map(x => Coin(x)))
     }

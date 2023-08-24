@@ -35,11 +35,11 @@ case class Validator(operatorAddress: String, hexAddress: String, jailed: Boolea
       issuedTokens)
   }
 
-  def isUnbonded: Boolean = status == constants.Blockchain.ValidatorStatus.UNBONDED
+  def isUnbonded: Boolean = status == schema.constants.Validator.Status.UNBONDED
 
-  def isUnbonding: Boolean = status == constants.Blockchain.ValidatorStatus.UNBONDING
+  def isUnbonding: Boolean = status == schema.constants.Validator.Status.UNBONDING
 
-  def isBonded: Boolean = status == constants.Blockchain.ValidatorStatus.BONDED
+  def isBonded: Boolean = status == schema.constants.Validator.Status.BONDED
 
   def isUnbondingMatured(currentTime: RFC3339): Boolean = !unbondingTime.isAfter(currentTime)
 
@@ -150,7 +150,7 @@ class Validators @Inject()(
 
   private def getValidatorsByStatus(status: String): Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.status === status).result)
 
-  private def getAllInactiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filterNot(_.status === constants.Blockchain.ValidatorStatus.BONDED).result)
+  private def getAllInactiveValidators: Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filterNot(_.status === schema.constants.Validator.Status.BONDED).result)
 
   private def getValidatorsByOperatorAddresses(operatorAddresses: Seq[String]): Future[Seq[ValidatorSerialized]] = db.run(validatorTable.filter(_.operatorAddress.inSet(operatorAddresses)).result)
 
@@ -165,7 +165,7 @@ class Validators @Inject()(
     }
   }
 
-  private def getAllVotingPowers: Future[Seq[BigDecimal]] = db.run(validatorTable.filter(_.status === constants.Blockchain.ValidatorStatus.BONDED).map(_.tokens).result)
+  private def getAllVotingPowers: Future[Seq[BigDecimal]] = db.run(validatorTable.filter(_.status === schema.constants.Validator.Status.BONDED).map(_.tokens).result)
 
   private[models] class ValidatorTable(tag: Tag) extends Table[ValidatorSerialized](tag, "Validator") {
 
@@ -231,13 +231,13 @@ class Validators @Inject()(
 
     def getAll: Future[Seq[Validator]] = getAllValidators.map(_.map(_.deserialize))
 
-    def getAllActiveValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.BONDED).map(_.map(_.deserialize))
+    def getAllActiveValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(schema.constants.Validator.Status.BONDED).map(_.map(_.deserialize))
 
     def getAllInactiveValidatorList: Future[Seq[Validator]] = getAllInactiveValidators.map(_.map(_.deserialize))
 
-    def getAllUnbondingValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.UNBONDING).map(_.map(_.deserialize))
+    def getAllUnbondingValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(schema.constants.Validator.Status.UNBONDING).map(_.map(_.deserialize))
 
-    def getAllUnbondedValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(constants.Blockchain.ValidatorStatus.UNBONDED).map(_.map(_.deserialize))
+    def getAllUnbondedValidatorList: Future[Seq[Validator]] = getValidatorsByStatus(schema.constants.Validator.Status.UNBONDED).map(_.map(_.deserialize))
 
     def getByOperatorAddresses(operatorAddresses: Seq[String]): Future[Seq[Validator]] = getValidatorsByOperatorAddresses(operatorAddresses).map(_.map(_.deserialize))
 
@@ -376,8 +376,8 @@ class Validators @Inject()(
 
       def checkAndUpdateUnbondingValidators(unbondingValidators: Seq[Validator]) = utilitiesOperations.traverse(unbondingValidators)(unbondingValidator => {
         if (header.height >= unbondingValidator.unbondingHeight && unbondingValidator.isUnbondingMatured(header.time)) {
-          //          val updateOrDeleteValidator = if (unbondingValidator.delegatorShares == 0) Service.delete(unbondingValidator.operatorAddress) else Service.insertOrUpdate(unbondingValidator.copy(status = constants.Blockchain.ValidatorStatus.UNBONDED))
-          val updateOrDeleteValidator = Service.insertOrUpdate(unbondingValidator.copy(status = constants.Blockchain.ValidatorStatus.UNBONDED))
+          //          val updateOrDeleteValidator = if (unbondingValidator.delegatorShares == 0) Service.delete(unbondingValidator.operatorAddress) else Service.insertOrUpdate(unbondingValidator.copy(status = schema.constants.Validator.Status.UNBONDED))
+          val updateOrDeleteValidator = Service.insertOrUpdate(unbondingValidator.copy(status = schema.constants.Validator.Status.UNBONDED))
           val withdrawValidatorRewards = blockchainWithdrawAddresses.Utility.withdrawRewards(utilities.Crypto.convertOperatorAddressToAccountAddress(unbondingValidator.operatorAddress))
 
           for {

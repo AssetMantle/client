@@ -106,27 +106,27 @@ class Parameters @Inject()(
 
     def tryGet(parameterType: String): Future[Parameter] = tryGetByType(parameterType).map(_.deserialize)
 
-    def tryGetAuthParameter: Future[AuthParameter] = tryGetByType(constants.Blockchain.ParameterType.AUTH).map(_.deserialize).map(_.value.asAuthParameter)
+    def tryGetAuthParameter: Future[AuthParameter] = tryGetByType(schema.constants.Parameter.Type.AUTH).map(_.deserialize).map(_.value.asAuthParameter)
 
-    def tryGetBankParameter: Future[BankParameter] = tryGetByType(constants.Blockchain.ParameterType.BANK).map(_.deserialize).map(_.value.asBankParameter)
+    def tryGetBankParameter: Future[BankParameter] = tryGetByType(schema.constants.Parameter.Type.BANK).map(_.deserialize).map(_.value.asBankParameter)
 
-    def tryGetDistributionParameter: Future[DistributionParameter] = tryGetByType(constants.Blockchain.ParameterType.DISTRIBUTION).map(_.deserialize).map(_.value.asDistributionParameter)
+    def tryGetDistributionParameter: Future[DistributionParameter] = tryGetByType(schema.constants.Parameter.Type.DISTRIBUTION).map(_.deserialize).map(_.value.asDistributionParameter)
 
-    def tryGetGovernanceParameter: Future[GovernanceParameter] = tryGetByType(constants.Blockchain.ParameterType.GOVERNANCE).map(_.deserialize).map(_.value.asGovernanceParameter)
+    def tryGetGovernanceParameter: Future[GovernanceParameter] = tryGetByType(schema.constants.Parameter.Type.GOVERNANCE).map(_.deserialize).map(_.value.asGovernanceParameter)
 
-    def tryGetMintingParameter: Future[MintingParameter] = tryGetByType(constants.Blockchain.ParameterType.MINT).map(_.deserialize).map(_.value.asMintingParameter)
+    def tryGetMintingParameter: Future[MintingParameter] = tryGetByType(schema.constants.Parameter.Type.MINT).map(_.deserialize).map(_.value.asMintingParameter)
 
-    def tryGetSlashingParameter: Future[SlashingParameter] = tryGetByType(constants.Blockchain.ParameterType.SLASHING).map(_.deserialize).map(_.value.asSlashingParameter)
+    def tryGetSlashingParameter: Future[SlashingParameter] = tryGetByType(schema.constants.Parameter.Type.SLASHING).map(_.deserialize).map(_.value.asSlashingParameter)
 
-    def tryGetStakingParameter: Future[StakingParameter] = tryGetByType(constants.Blockchain.ParameterType.STAKING).map(_.deserialize).map(_.value.asStakingParameter)
+    def tryGetStakingParameter: Future[StakingParameter] = tryGetByType(schema.constants.Parameter.Type.STAKING).map(_.deserialize).map(_.value.asStakingParameter)
 
-    def tryGetClassificationParameter: Future[ClassificationParameter] = tryGetByType(constants.Blockchain.ParameterType.CLASSIFICATIONS).map(_.deserialize).map(_.value.asClassificationParameter)
+    def tryGetClassificationParameter: Future[ClassificationParameter] = tryGetByType(schema.constants.Parameter.Type.CLASSIFICATIONS).map(_.deserialize).map(_.value.asClassificationParameter)
 
-    def tryGetIdentityParameter: Future[IdentityParameter] = tryGetByType(constants.Blockchain.ParameterType.IDENTITIES).map(_.deserialize).map(_.value.asIdentityParameter)
+    def tryGetIdentityParameter: Future[IdentityParameter] = tryGetByType(schema.constants.Parameter.Type.IDENTITIES).map(_.deserialize).map(_.value.asIdentityParameter)
 
-    def tryGetOrderParameter: Future[OrderParameter] = tryGetByType(constants.Blockchain.ParameterType.ORDERS).map(_.deserialize).map(_.value.asOrderParameter)
+    def tryGetOrderParameter: Future[OrderParameter] = tryGetByType(schema.constants.Parameter.Type.ORDERS).map(_.deserialize).map(_.value.asOrderParameter)
 
-    def tryGetSplitParameter: Future[SplitParameter] = tryGetByType(constants.Blockchain.ParameterType.SPLITS).map(_.deserialize).map(_.value.asSplitParameter)
+    def tryGetSplitParameter: Future[SplitParameter] = tryGetByType(schema.constants.Parameter.Type.SPLITS).map(_.deserialize).map(_.value.asSplitParameter)
 
     def getAll: Future[Seq[Parameter]] = getAllParameters.map(_.map(_.deserialize))
 
@@ -149,75 +149,75 @@ class Parameters @Inject()(
 
     private def parameterUpdate(parameterType: String) = {
       val parameter: Future[abstractParameter] = parameterType match {
-        case constants.Blockchain.ParameterType.AUTH =>
+        case schema.constants.Parameter.Type.AUTH =>
           val authResponse = getAuthParams.Service.get()
           for {
             authResponse <- authResponse
           } yield authResponse.params.toParameter
-        case constants.Blockchain.ParameterType.BANK =>
+        case schema.constants.Parameter.Type.BANK =>
           val bankResponse = getBankParams.Service.get()
           for {
             bankResponse <- bankResponse
           } yield bankResponse.params.toParameter
-        case constants.Blockchain.ParameterType.DISTRIBUTION =>
+        case schema.constants.Parameter.Type.DISTRIBUTION =>
           val distributionResponse = getDistributionParams.Service.get()
           for {
             distributionResponse <- distributionResponse
           } yield distributionResponse.params.toParameter
-        case constants.Blockchain.ParameterType.GOVERNANCE =>
+        case schema.constants.Parameter.Type.GOVERNANCE =>
           val govResponse = getGovParams.Service.get()
           for {
             govResponse <- govResponse
           } yield govResponse.toParameter
-        case constants.Blockchain.ParameterType.MINT =>
+        case schema.constants.Parameter.Type.MINT =>
           val mintResponse = getMintParams.Service.get()
           for {
             mintResponse <- mintResponse
           } yield mintResponse.params.toParameter
-        case constants.Blockchain.ParameterType.SLASHING =>
+        case schema.constants.Parameter.Type.SLASHING =>
           val slashingResponse = getSlashingParams.Service.get()
           for {
             slashingResponse <- slashingResponse
           } yield slashingResponse.params.toParameter
-        case constants.Blockchain.ParameterType.STAKING =>
+        case schema.constants.Parameter.Type.STAKING =>
           val stakingResponse = getStakingParams.Service.get()
           for {
             stakingResponse <- stakingResponse
           } yield stakingResponse.params.toParameter
-        case constants.Blockchain.ParameterType.CRISIS => Future(CrisisParameter(Coin(denom = "", amount = MicroNumber.zero)))
-        case constants.Blockchain.ParameterType.IBC => Future(IBCParameter(allowedClients = Seq.empty))
-        case constants.Blockchain.ParameterType.TRANSFER => Future(TransferParameter(receiveEnabled = true, sendEnabled = true))
-        case constants.Blockchain.ParameterType.ASSETS =>
+        case schema.constants.Parameter.Type.CRISIS => Future(CrisisParameter(Coin(denom = "", amount = MicroNumber.zero)))
+        case schema.constants.Parameter.Type.IBC => Future(IBCParameter(allowedClients = Seq.empty))
+        case schema.constants.Parameter.Type.TRANSFER => Future(TransferParameter(receiveEnabled = true, sendEnabled = true))
+        case schema.constants.Parameter.Type.ASSETS =>
           val response = getAssetParams.Service.get()
           for {
             response <- response
           } yield response.toParameter
-        case constants.Blockchain.ParameterType.CLASSIFICATIONS =>
+        case schema.constants.Parameter.Type.CLASSIFICATIONS =>
           val response = getClassificationParams.Service.get()
           for {
             response <- response
           } yield response.toParameter
-        case constants.Blockchain.ParameterType.IDENTITIES =>
+        case schema.constants.Parameter.Type.IDENTITIES =>
           val response = getIdentityParams.Service.get()
           for {
             response <- response
           } yield response.toParameter
-        case constants.Blockchain.ParameterType.MAINTAINERS =>
+        case schema.constants.Parameter.Type.MAINTAINERS =>
           val response = getMaintainerParams.Service.get()
           for {
             response <- response
           } yield response.toParameter
-        case constants.Blockchain.ParameterType.METAS =>
+        case schema.constants.Parameter.Type.METAS =>
           val response = getMetaParams.Service.get()
           for {
             response <- response
           } yield response.toParameter
-        case constants.Blockchain.ParameterType.ORDERS =>
+        case schema.constants.Parameter.Type.ORDERS =>
           val response = getOrderParams.Service.get()
           for {
             response <- response
           } yield response.toParameter
-        case constants.Blockchain.ParameterType.SPLITS =>
+        case schema.constants.Parameter.Type.SPLITS =>
           val response = getSplitParams.Service.get()
           for {
             response <- response
@@ -225,7 +225,7 @@ class Parameters @Inject()(
         case _ => constants.Response.PARAMETER_TYPE_NOT_FOUND.throwBaseException()
       }
 
-      def upsertParameter(parameterValue: abstractParameter) = if (parameterValue.parameterType != constants.Blockchain.ParameterType.CRISIS || parameterValue.parameterType != constants.Blockchain.ParameterType.IBC || parameterValue.parameterType != constants.Blockchain.ParameterType.TRANSFER)
+      def upsertParameter(parameterValue: abstractParameter) = if (parameterValue.parameterType != schema.constants.Parameter.Type.CRISIS || parameterValue.parameterType != schema.constants.Parameter.Type.IBC || parameterValue.parameterType != schema.constants.Parameter.Type.TRANSFER)
         Service.insertOrUpdate(Parameter(parameterType = parameterValue.parameterType, value = parameterValue)) else Future(0)
 
       for {

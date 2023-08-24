@@ -26,9 +26,9 @@ case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, 
   // Since Seq in scala is by default immutable and ordering is maintained, we can use these methods directly
   def getSigners: Seq[String] = parsedTx.getAuthInfo.getSignerInfosList.asScala.toSeq.map { signerInfo =>
     signerInfo.getPublicKey.getTypeUrl match {
-      case constants.Blockchain.PublicKey.SINGLE_SECP256K1 => utilities.Crypto.convertAccountPublicKeyToAccountAddress(secp256k1.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray)
-      case constants.Blockchain.PublicKey.SINGLE_SECP256R1 => utilities.Crypto.convertAccountPublicKeyToAccountAddress(secp256r1.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray)
-      case constants.Blockchain.PublicKey.MULTI_SIG => "mantle1qar3lv9amjel2u6f2tam58vyhf5m4f5csjctns"
+      case schema.constants.PublicKey.SINGLE_SECP256K1 => utilities.Crypto.convertAccountPublicKeyToAccountAddress(secp256k1.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray)
+      case schema.constants.PublicKey.SINGLE_SECP256R1 => utilities.Crypto.convertAccountPublicKeyToAccountAddress(secp256r1.PubKey.parseFrom(signerInfo.getPublicKey.getValue).getKey.toByteArray)
+      case schema.constants.PublicKey.MULTI_SIG => "mantle1qar3lv9amjel2u6f2tam58vyhf5m4f5csjctns"
       case _ => "mantle1qar3lv9amjel2u6f2tam58vyhf5m4f5csjctns"
     }
   }
