@@ -7,7 +7,7 @@
 
 @commonTextInfo(constants.View.ALLOWANCE_TYPE, constants.View.FeeGrantAllowanceMap.getOrElse(allowance.getTypeUrl, allowance.getTypeUrl))
 @allowance.getTypeUrl match {
-    case constants.Blockchain.FeeGrant.BASIC_ALLOWANCE => {
+    case schema.constants.FeeGrant.BASIC_ALLOWANCE => {
         @defining(FeeAllowance(allowance).asInstanceOf[BasicAllowance]) { basicAllowance =>
             @commonTextInfo(constants.View.SPEND_LIMITS, basicAllowance.spendLimit.map(_.getAmountWithNormalizedDenom()).mkString(", "))
             @if(basicAllowance.expiration == 0) {
@@ -17,7 +17,7 @@
             }
         }
     }
-    case constants.Blockchain.FeeGrant.PERIODIC_ALLOWANCE => {
+    case schema.constants.FeeGrant.PERIODIC_ALLOWANCE => {
         @defining(FeeAllowance(allowance).asInstanceOf[PeriodicAllowance]) { periodicAllowance =>
             @commonTextInfo(constants.View.SPEND_LIMITS, periodicAllowance.basicAllowance.spendLimit.map(_.getAmountWithNormalizedDenom()).mkString(", "))
             @if(periodicAllowance.basicAllowance.expiration == 0) {
@@ -31,7 +31,7 @@
             @commonEpochInfo(constants.View.PERIOD_RESET, periodicAllowance.periodReset)
         }
     }
-    case constants.Blockchain.FeeGrant.ALLOWED_MSG_ALLOWANCE => {
+    case schema.constants.FeeGrant.ALLOWED_MSG_ALLOWANCE => {
         @defining(FeeAllowance(allowance).asInstanceOf[AllowedMsgAllowance]) { allowedMsgAllowance =>
             @commonTextInfo(constants.View.ALLOWED_MESSAGES, allowedMsgAllowance.allowedMessages.mkString(", "))
             @views.html.component.blockchain.feeGrantAllowance(allowedMsgAllowance.allowance.toProto, index)

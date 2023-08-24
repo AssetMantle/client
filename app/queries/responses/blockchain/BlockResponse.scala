@@ -36,8 +36,8 @@ object BlockResponse {
   implicit val lightClientAttackEvidenceReads: Reads[LightClientAttackEvidence] = Json.reads[LightClientAttackEvidence]
 
   def tendermintEvidenceApply(evidenceType: String, value: JsObject): TendermintEvidence = evidenceType match {
-    case constants.Blockchain.Tendermint.DuplicateVoteEvidence => utilities.JSON.convertJsonStringToObject[DuplicateVoteEvidence](value.toString)
-    case constants.Blockchain.Tendermint.LightClientAttackEvidence => utilities.JSON.convertJsonStringToObject[LightClientAttackEvidence](value.toString)
+    case schema.constants.Tendermint.DuplicateVoteEvidence => utilities.JSON.convertJsonStringToObject[DuplicateVoteEvidence](value.toString)
+    case schema.constants.Tendermint.LightClientAttackEvidence => utilities.JSON.convertJsonStringToObject[LightClientAttackEvidence](value.toString)
     case _ => constants.Response.UNKNOWN_TENDERMINT_EVIDENCE_TYPE.throwBaseException()
   }
 

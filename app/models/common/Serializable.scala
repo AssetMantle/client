@@ -181,7 +181,7 @@ object Serializable {
     }
 
     case class FungibleTokenPacketData(denom: String, amount: MicroNumber, sender: String, receiver: String) extends PacketData {
-      def getType: String = constants.Blockchain.IBC.PacketDataType.FUNGIBLE_TOKEN_PACKET_DATA
+      def getType: String = schema.constants.IBC.PacketDataType.FUNGIBLE_TOKEN_PACKET_DATA
 
       def getAffectedWalletAddresses: Seq[String] = Seq(sender, receiver)
     }
@@ -195,7 +195,7 @@ object Serializable {
 
       def getAffectedWalletAddresses: Seq[String] = Seq()
 
-      def getType: String = constants.Blockchain.IBC.PacketDataType.INTER_CHAIN_ACCOUNT_PACKET_DATA
+      def getType: String = schema.constants.IBC.PacketDataType.INTER_CHAIN_ACCOUNT_PACKET_DATA
     }
 
     implicit val interChainAccountPacketDataReads: Reads[InterChainAccountPacketData] = Json.reads[InterChainAccountPacketData]

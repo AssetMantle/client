@@ -216,7 +216,7 @@ class ComponentViewController @Inject()(
 
         (for {
           allSortedValidators <- allSortedValidators
-        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = ListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == constants.Blockchain.ValidatorStatus.BONDED)): _*), totalActiveValidators = allSortedValidators.count(x => x.status == constants.Blockchain.ValidatorStatus.BONDED), totalValidators = allSortedValidators.length))
+        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = ListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == schema.constants.Validator.Status.BONDED)): _*), totalActiveValidators = allSortedValidators.count(x => x.status == schema.constants.Validator.Status.BONDED), totalValidators = allSortedValidators.length))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }
@@ -529,7 +529,7 @@ class ComponentViewController @Inject()(
           if (transaction.status) {
             val coinArray = utilities.JSON.convertJsonStringToObject[Seq[EventWrapper]](transaction.log.get)
               .find(_.msg_index.getOrElse(0) == msgIndex)
-              .fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.events.find(_.`type` == constants.Blockchain.Event.WithdrawRewards).fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.attributes.find(_.key == constants.Blockchain.Event.Attribute.Amount).fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.value.getOrElse(MicroNumber.zero + constants.Blockchain.StakingDenom))))
+              .fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.events.find(_.`type` == schema.constants.Event.WithdrawRewards).fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.attributes.find(_.key == schema.constants.Event.Attribute.Amount).fold(MicroNumber.zero + constants.Blockchain.StakingDenom)(_.value.getOrElse(MicroNumber.zero + constants.Blockchain.StakingDenom))))
               .split(constants.RegularExpression.NUMERIC_AND_STRING_SEPARATOR).filter(_.nonEmpty).toList
             Ok(Coin(coinArray.tail.head, coinArray.head.toDouble / 1000000).getAmountWithNormalizedDenom())
           } else Ok(Coin(constants.Blockchain.StakingDenom, MicroNumber.zero).getAmountWithNormalizedDenom())
@@ -663,7 +663,7 @@ class ComponentViewController @Inject()(
           validator <- validator
           totalBondedAmount <- totalBondedAmount
           keyBaseValidator <- keyBaseValidator(validator.operatorAddress)
-        } yield Ok(views.html.component.blockchain.validator.validatorDetails(validator, utilities.Crypto.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), constants.Blockchain.ValidatorStatus.BONDED, keyBaseValidator))
+        } yield Ok(views.html.component.blockchain.validator.validatorDetails(validator, utilities.Crypto.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), schema.constants.Validator.Status.BONDED, keyBaseValidator))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

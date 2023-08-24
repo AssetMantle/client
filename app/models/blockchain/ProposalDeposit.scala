@@ -163,11 +163,11 @@ class ProposalDeposits @Inject()(
 
       def actOnProposal(proposal: Proposal): Future[Unit] = if (proposal.isPassed) {
         proposal.content.toProto.getTypeUrl match {
-          case constants.Blockchain.Proposal.PARAMETER_CHANGE => blockchainParameters.Utility.onParameterChange(proposal.content.asInstanceOf[ParameterChange])
-          case constants.Blockchain.Proposal.COMMUNITY_POOL_SPEND => blockchainBalances.Utility.insertOrUpdateBalance(proposal.content.asInstanceOf[CommunityPoolSpend].recipient)
-          case constants.Blockchain.Proposal.SOFTWARE_UPGRADE => Future()
-          case constants.Blockchain.Proposal.CANCEL_SOFTWARE_UPGRADE => Future()
-          case constants.Blockchain.Proposal.TEXT => Future()
+          case schema.constants.Proposal.PARAMETER_CHANGE => blockchainParameters.Utility.onParameterChange(proposal.content.asInstanceOf[ParameterChange])
+          case schema.constants.Proposal.COMMUNITY_POOL_SPEND => blockchainBalances.Utility.insertOrUpdateBalance(proposal.content.asInstanceOf[CommunityPoolSpend].recipient)
+          case schema.constants.Proposal.SOFTWARE_UPGRADE => Future()
+          case schema.constants.Proposal.CANCEL_SOFTWARE_UPGRADE => Future()
+          case schema.constants.Proposal.TEXT => Future()
           case _ => Future()
         }
       } else Future()

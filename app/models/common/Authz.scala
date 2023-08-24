@@ -23,7 +23,7 @@ object Authz {
     }
 
     def toProto: protoAny = protoAny.newBuilder()
-      .setTypeUrl(constants.Blockchain.Authz.SEND_AUTHORIZATION)
+      .setTypeUrl(schema.constants.Authz.SEND_AUTHORIZATION)
       .setValue(com.cosmos.bank.v1beta1.SendAuthorization.newBuilder()
         .addAllSpendLimit(spendLimit.map(_.toProtoCoin).asJava)
         .build()
@@ -39,7 +39,7 @@ object Authz {
     def validate(stdMsg: protoAny): ValidateResponse = ValidateResponse(accept = true, delete = false, updated = None)
 
     def toProto: protoAny = protoAny.newBuilder()
-      .setTypeUrl(constants.Blockchain.Authz.GENERIC_AUTHORIZATION)
+      .setTypeUrl(schema.constants.Authz.GENERIC_AUTHORIZATION)
       .setValue(com.cosmos.authz.v1beta1.GenericAuthorization.newBuilder()
         .setMsg(this.msg)
         .build()
@@ -57,9 +57,9 @@ object Authz {
 
   case class StakeAuthorization(maxTokens: Coin, allowList: StakeAuthorizationValidators, denyList: StakeAuthorizationValidators, authorizationType: String) extends Authorization {
     def getMsgTypeURL: String = authorizationType match {
-      case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_DELEGATE => schema.constants.Messages.DELEGATE
-      case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_UNDELEGATE => schema.constants.Messages.UNDELEGATE
-      case constants.Blockchain.Authz.StakeAuthorization.AUTHORIZATION_TYPE_REDELEGATE => schema.constants.Messages.REDELEGATE
+      case schema.constants.Authz.StakeAuthorization.AUTHORIZATION_TYPE_DELEGATE => schema.constants.Messages.DELEGATE
+      case schema.constants.Authz.StakeAuthorization.AUTHORIZATION_TYPE_UNDELEGATE => schema.constants.Messages.UNDELEGATE
+      case schema.constants.Authz.StakeAuthorization.AUTHORIZATION_TYPE_REDELEGATE => schema.constants.Messages.REDELEGATE
       case _ => com.cosmos.staking.v1beta1.AuthorizationType.AUTHORIZATION_TYPE_UNSPECIFIED.toString
     }
 
@@ -77,7 +77,7 @@ object Authz {
     }
 
     def toProto: protoAny = protoAny.newBuilder()
-      .setTypeUrl(constants.Blockchain.Authz.STAKE_AUTHORIZATION)
+      .setTypeUrl(schema.constants.Authz.STAKE_AUTHORIZATION)
       .setValue(com.cosmos.staking.v1beta1.StakeAuthorization.newBuilder()
         .setMaxTokens(this.maxTokens.toProtoCoin)
         .setAuthorizationType(com.cosmos.staking.v1beta1.AuthorizationType.AUTHORIZATION_TYPE_UNSPECIFIED)
