@@ -1,0 +1,19 @@
+@import views.html.base.cards._
+@import views.html.base.infos._
+
+@(identitiesIssued: Int, namedIdentities: Int, identityClasses: Int,  assetsMinted: Int, assetsClasses: Int, liveOrders: Int, orderClasses: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@commonCard(constants.View.ASSET_MANTLE_STATISTICS) {
+} {
+    @Messages(constants.View.IDENTITIES)
+    @commonIntInfo(constants.View.ISSUED_IDENTITIES, identitiesIssued)
+    @commonIntInfo(constants.View.NAMED_IDENTITIES, namedIdentities)
+    @commonIntInfo(constants.View.IDENTITY_CLASSES, identityClasses)
+
+    @Messages(constants.View.ASSETS)
+    @commonIntInfo(constants.View.ASSETS_MINTED, assetsMinted)
+    @commonIntInfo(constants.View.ASSET_CLASSES, assetsClasses)
+
+    @Messages(constants.View.ORDERS)
+    @commonIntInfo(constants.View.LIVE_ORDERS, liveOrders)
+    @commonIntInfo(constants.View.ORDER_CLASSES, orderClasses)
+}

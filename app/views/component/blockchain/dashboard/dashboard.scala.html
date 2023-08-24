@@ -8,6 +8,11 @@
     </div>
     <div class="cmuk-grid-match" cmuk-grid>
         <div class="cmuk-width-expand@@m">
+            <div id="assetMantleStatistics" class="cardSelectHeader cmuk-card-styles"></div>
+        </div>
+    </div>
+    <div class="cmuk-grid-match" cmuk-grid>
+        <div class="cmuk-width-expand@@m">
             <div id="transactionStatistics" class="cardSelectHeader cmuk-card-styles"></div>
         </div>
     </div>
@@ -18,6 +23,7 @@
     </div>
 </div>
 <script>
+        componentResource('assetMantleStatistics', jsRoutes.controllers.ComponentViewController.assetMantleStatistics());
         componentResource('tokensPrices', jsRoutes.controllers.ComponentViewController.tokensPrices());
         componentResource('transactionStatistics', jsRoutes.controllers.ComponentViewController.transactionStatistics());
         componentResource('transactionMessagesStatistics', jsRoutes.controllers.ComponentViewController.transactionMessagesStatistics());

@@ -48,7 +48,7 @@ case class Identity(id: Array[Byte], idString: String, classificationID: Array[B
     NumberData((if (value.isDefined) MetaProperty(value.get.getProtoBytes) else schema.constants.Properties.BondAmountProperty).getData.getProtoBytes)
   }
 
-  def getAuthenticationAddress: Seq[String] = this.getAuthentication.getAnyDataList.map(x => Data(x).viewString)
+  def getAuthenticationAddress: Seq[String] = this.getAuthentication.getAnyDataList.map(x => Data(x).asInstanceOf[AccAddressData].toBech32Address)
 
   def mutate(properties: Seq[Property]): Identity = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
 
@@ -56,6 +56,7 @@ case class Identity(id: Array[Byte], idString: String, classificationID: Array[B
 
   def unprovision(accAddressData: AccAddressData): Identity = this.mutate(Seq(MetaProperty(id = schema.constants.Properties.AuthenticationProperty.getID, data = this.getAuthentication.remove(accAddressData))))
 
+  def getDocumentType: String = constants.Document.Type.IDENTITY
 }
 
 private[blockchain] object Identities {
@@ -125,6 +126,9 @@ class Identities @Inject()(
 
     def update(identity: Identity): Future[Unit] = updateById(identity)
 
+    def countAll: Future[Int] = countTotal()
+
+    def namedIdentities: Future[Int] = filterAndCount(_.classificationID === schema.document.NameIdentity.DocumentClassificationID.getBytes)
 
   }
 
@@ -133,7 +137,7 @@ class Identities @Inject()(
     def onDefine(msg: identityTransactions.define.Message): Future[String] = {
       val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).add(Seq(schema.constants.Properties.AuthenticationProperty)).properties))
-      val add = blockchainClassifications.Utility.defineAuxiliary(msg.getFrom, mutables, immutables)
+      val add = blockchainClassifications.Utility.defineAuxiliary(msg.getFrom, mutables, immutables, constants.Document.ClassificationType.IDENTITY)
 
       def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables, schema.utilities.Permissions.getIdentitiesPermissions(true, true))
 

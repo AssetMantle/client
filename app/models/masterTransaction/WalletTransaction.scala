@@ -20,6 +20,7 @@ import com.ibc.core.client.{v1 => clientTx}
 import com.ibc.core.connection.{v1 => connectionTx}
 import exceptions.BaseException
 import models.archive
+import models.common.Serializable.IBC
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
@@ -186,10 +187,17 @@ class WalletTransactions @Inject()(
             case schema.constants.Messages.CHANNEL_CLOSE_INIT => Seq(channelTx.MsgChannelCloseInit.parseFrom(stdMsg.getValue).getSigner)
             case schema.constants.Messages.CHANNEL_CLOSE_CONFIRM => Seq(channelTx.MsgChannelCloseConfirm.parseFrom(stdMsg.getValue).getSigner)
             case schema.constants.Messages.RECV_PACKET => val msg = channelTx.MsgRecvPacket.parseFrom(stdMsg.getValue)
-              Seq(msg.getSigner, com.ibc.applications.transfer.v2.FungibleTokenPacketData.parseFrom(msg.getPacket.getData).getReceiver).distinct
-            case schema.constants.Messages.TIMEOUT => Seq(channelTx.MsgTimeout.parseFrom(stdMsg.getValue).getSigner)
-            case schema.constants.Messages.TIMEOUT_ON_CLOSE => Seq(channelTx.MsgTimeoutOnClose.parseFrom(stdMsg.getValue).getSigner)
-            case schema.constants.Messages.ACKNOWLEDGEMENT => Seq(channelTx.MsgAcknowledgement.parseFrom(stdMsg.getValue).getSigner)
+              val affectedAddresses = utilities.JSON.convertJsonStringToObject[IBC.PacketData](msg.getPacket.getData.toStringUtf8).getAffectedWalletAddresses.filter(_.matches(constants.Blockchain.AccountRegexString))
+              (affectedAddresses :+ msg.getSigner).distinct
+            case schema.constants.Messages.TIMEOUT => val msg = channelTx.MsgTimeout.parseFrom(stdMsg.getValue)
+              val affectedAddresses = utilities.JSON.convertJsonStringToObject[IBC.PacketData](msg.getPacket.getData.toStringUtf8).getAffectedWalletAddresses.filter(_.matches(constants.Blockchain.AccountRegexString))
+              (affectedAddresses :+ msg.getSigner).distinct
+            case schema.constants.Messages.TIMEOUT_ON_CLOSE => val msg = channelTx.MsgTimeoutOnClose.parseFrom(stdMsg.getValue)
+              val affectedAddresses = utilities.JSON.convertJsonStringToObject[IBC.PacketData](msg.getPacket.getData.toStringUtf8).getAffectedWalletAddresses.filter(_.matches(constants.Blockchain.AccountRegexString))
+              (affectedAddresses :+ msg.getSigner).distinct
+            case schema.constants.Messages.ACKNOWLEDGEMENT => val msg = channelTx.MsgAcknowledgement.parseFrom(stdMsg.getValue)
+              val affectedAddresses = utilities.JSON.convertJsonStringToObject[IBC.PacketData](msg.getPacket.getData.toStringUtf8).getAffectedWalletAddresses.filter(_.matches(constants.Blockchain.AccountRegexString))
+              (affectedAddresses :+ msg.getSigner).distinct
             //ibc-transfer
             case schema.constants.Messages.TRANSFER => Seq(transferTx.MsgTransfer.parseFrom(stdMsg.getValue).getSender)
             //assets

@@ -73,6 +73,8 @@ case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte
   }
 
   def mutate(properties: Seq[Property]): Order = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
+
+  def getDocumentType: String = constants.Document.Type.ORDER
 }
 
 private[blockchain] object Orders {
@@ -139,6 +141,8 @@ class Orders @Inject()(
 
     def delete(orderID: OrderID): Future[Int] = deleteById(orderID.getBytes)
 
+    def countAll: Future[Int] = countTotal()
+
   }
 
   object Utility {
@@ -158,7 +162,7 @@ class Orders @Inject()(
           .add(Seq(
             schema.constants.Properties.ExpiryHeightProperty,
             schema.constants.Properties.MakerSplitProperty)).getProperties))
-      val add = blockchainClassifications.Utility.defineAuxiliary(msg.getFrom, mutables, immutables)
+      val add = blockchainClassifications.Utility.defineAuxiliary(msg.getFrom, mutables, immutables, constants.Document.ClassificationType.ORDER)
 
       def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables, schema.utilities.Permissions.getOrdersPermissions(true, true))
 

@@ -42,8 +42,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
         if (query == "") Future(Unauthorized(views.html.index(failures = Seq(constants.Response.EMPTY_QUERY))))
-        else if (query.matches(constants.Blockchain.AccountPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex)) Future(Redirect(routes.ComponentViewController.wallet(query)))
-        else if (query.matches(constants.Blockchain.ValidatorPrefix + constants.RegularExpression.ADDRESS_SUFFIX.regex) || utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ComponentViewController.validator(query)))
+        else if (query.matches(constants.Blockchain.AccountRegexString)) Future(Redirect(routes.ComponentViewController.wallet(query)))
+        else if (query.matches(constants.Blockchain.ValidatorRegexString) || utilities.Validator.isHexAddress(query)) Future(Redirect(routes.ComponentViewController.validator(query)))
         else if (query.matches(constants.RegularExpression.TRANSACTION_HASH.regex)) Future(Redirect(routes.ComponentViewController.transaction(query)))
         else if (Try(query.toInt).isSuccess) Future(Redirect(routes.ComponentViewController.block(query.toInt)))
         else Future(Redirect(routes.ComponentViewController.document(query)))
