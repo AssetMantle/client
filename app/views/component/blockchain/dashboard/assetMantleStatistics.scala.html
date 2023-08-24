@@ -4,16 +4,37 @@
 @(identitiesIssued: Int, namedIdentities: Int, identityClasses: Int,  assetsMinted: Int, assetsClasses: Int, liveOrders: Int, orderClasses: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @commonCard(constants.View.ASSET_MANTLE_STATISTICS) {
 } {
-    @Messages(constants.View.IDENTITIES)
-    @commonIntInfo(constants.View.ISSUED_IDENTITIES, identitiesIssued)
-    @commonIntInfo(constants.View.NAMED_IDENTITIES, namedIdentities)
-    @commonIntInfo(constants.View.IDENTITY_CLASSES, identityClasses)
-
-    @Messages(constants.View.ASSETS)
-    @commonIntInfo(constants.View.ASSETS_MINTED, assetsMinted)
-    @commonIntInfo(constants.View.ASSET_CLASSES, assetsClasses)
-
-    @Messages(constants.View.ORDERS)
-    @commonIntInfo(constants.View.LIVE_ORDERS, liveOrders)
-    @commonIntInfo(constants.View.ORDER_CLASSES, orderClasses)
+    @commonTable(id = "assetMantleStatistic", tableType = "cmuk-table-divider") {
+    } {
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.IDENTITIES):</div>
+                    <div class="tableFieldValue">
+                        @commonIntInfo(constants.View.ISSUED_IDENTITIES, identitiesIssued)
+                        @commonIntInfo(constants.View.NAMED_IDENTITIES, namedIdentities)
+                        @commonIntInfo(constants.View.IDENTITY_CLASSES, identityClasses)
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.ASSETS):</div>
+                    <div class="tableFieldValue">
+                        @commonIntInfo(constants.View.ASSETS_MINTED, assetsMinted)
+                        @commonIntInfo(constants.View.ASSET_CLASSES, assetsClasses)
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.ORDERS):</div>
+                    <div class="tableFieldValue">
+                        @commonIntInfo(constants.View.LIVE_ORDERS, liveOrders)
+                        @commonIntInfo(constants.View.ORDER_CLASSES, orderClasses)
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
 }
