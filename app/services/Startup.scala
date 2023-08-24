@@ -1,6 +1,6 @@
 package services
 
-import akka.actor.Cancellable
+import constants.Scheduler
 import exceptions.BaseException
 import models.Abstract.Parameter
 import models.blockchain.{Token, Validator, Transaction => blockchainTransaction}
@@ -22,7 +22,7 @@ import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.{Duration, DurationInt}
+import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.{Source => ScalaSource}
 
@@ -296,8 +296,12 @@ class Startup @Inject()(
     } yield ()
   }
 
-  private val explorerRunnable = new Runnable {
-    def run(): Unit = if (!utilities.Scheduler.getSignalReceived) {
+  val explorerScheduler: Scheduler = new Scheduler {
+    val name: String = module
+    val initialDelay: FiniteDuration = explorerInitialDelay
+    val fixedDelay: FiniteDuration = explorerFixedDelay
+
+    def runner(): Unit = {
       //TODO Bug Source: Continuously emits sometimes when app starts - queries.blockchain.GetABCIInfo in application-akka.actor.default-dispatcher-66  - LOG.ILLEGAL_STATE_EXCEPTION
       //TODO java.lang.IllegalStateException: Closed
       //TODO (Runtime Exception) Explorer keeps on working fine
@@ -352,10 +356,6 @@ class Startup @Inject()(
       }
       //This Await ensures next app doesn't starts updating next block without completing the current one.
       Await.result(forComplete, Duration.Inf)
-    } else utilities.Scheduler.shutdownThread()
+    }
   }
-
-  //Needs to be called via function otherwise as soon as Startup gets injected, this runs (when without function) and probably INSERT_OR_UPDATE_TRIGGER doesnt work.
-  def start(): Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = explorerInitialDelay, delay = explorerFixedDelay)(explorerRunnable)(schedulerExecutionContext)
-
 }

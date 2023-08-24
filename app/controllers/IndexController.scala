@@ -3,12 +3,11 @@ package controllers
 import akka.actor.CoordinatedShutdown
 import constants.AppConfig._
 import controllers.actions._
-import models.blockchain
+import models.campaign._
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, EssentialAction, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import queries.blockchain._
 import services.Startup
 
 import javax.inject.{Inject, Singleton}
@@ -19,10 +18,7 @@ import scala.util.Try
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents,
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup,
-                                getBlockResults: GetBlockResults,
-                                getProposalDeposit: GetProposalDeposit,
-                                blockchainBlocks: blockchain.Blocks,
-                                blockchainProposals: blockchain.Proposals,
+                                claimNames: ClaimNames,
                                 cached: Cached,
                                 coordinatedShutdown: CoordinatedShutdown,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -50,6 +46,10 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     }
   }
 
+  utilities.Scheduler.startSchedulers(
+    startup.explorerScheduler,
+    claimNames.Utility.scheduler
+  )
+
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
-  utilities.Scheduler.setShutdownCancellable(startup.start())
 }
