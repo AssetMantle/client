@@ -8,6 +8,8 @@ import schema.property.Property
 
 case class MetaProperty(id: PropertyID, data: Data) extends Property {
 
+  require(this.id.typeID.value == this.data.getType.value, "META_PROPERTY_TYPE_ID_AND_DATA_TYPE_MISMATCH")
+
   def getID: PropertyID = this.id
 
   def getBondedWeight: Int = this.getData.getBondWeight
