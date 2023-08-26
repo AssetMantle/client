@@ -1,8 +1,10 @@
 package models.blockchain
 
+import exceptions.BaseException
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import queries.responses.common.Header
 import schema.data.Data
 import schema.id.base.DataID
 import slick.jdbc.H2Profile.api._
@@ -76,12 +78,15 @@ class Metas @Inject()(
 
   object Utility {
 
-    def onRevealMeta(msg: com.assetmantle.modules.metas.transactions.reveal.Message): Future[String] = {
+    def onRevealMeta(msg: com.assetmantle.modules.metas.transactions.reveal.Message)(implicit header: Header): Future[String] = {
       val add = Service.add(Data(msg.getData))
 
-      for {
+      (for {
         _ <- add
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.META_REVEAL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
   }

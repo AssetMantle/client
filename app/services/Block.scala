@@ -440,10 +440,10 @@ class Block @Inject()(
     val processSubmitProposal = utilitiesOperations.traverse(txResults.filter(_.status)) { txResult =>
       val proposalIDs = txResult.getSubmitProposalIDs
       val addProposals = utilitiesOperations.traverse(proposalIDs) { proposalID => blockchainProposals.Utility.insertOrUpdateProposal(proposalID) }
-      val proposers = txResult.getProposalSubmitters
-      val addProposerDeposits = {
+
+      def addProposerDeposits() = {
         utilitiesOperations.traverse(proposalIDs) { proposalID =>
-          utilitiesOperations.traverse(proposers) { proposer =>
+          utilitiesOperations.traverse(txResult.getProposalSubmitters) { proposer =>
             blockchainProposalDeposits.Utility.onNewProposalEvent(proposalID, proposer)
           }
         }
@@ -451,7 +451,7 @@ class Block @Inject()(
 
       for {
         _ <- addProposals
-        _ <- addProposerDeposits
+        _ <- addProposerDeposits()
       } yield ()
     }
 

@@ -1,6 +1,7 @@
 package models.blockchain
 
 import com.assetmantle.modules.orders.{transactions => ordersTransactions}
+import exceptions.BaseException
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -67,9 +68,14 @@ case class Order(id: Array[Byte], idString: String, classificationID: Array[Byte
     if (property.isDefined && property.get.isMeta) HeightData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value.value else -1
   }
 
-  def getMakerOwnableSplit: BigInt = {
+  def getMakerSplit: BigInt = {
     val property = this.getProperty(schema.constants.Properties.MakerSplitProperty.getID)
-    if (property.isDefined && property.get.isMeta) NumberData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value else BigInt(1)
+    if (property.isDefined && property.get.isMeta) NumberData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value else BigInt(0)
+  }
+
+  def getTakerSplit: BigInt = {
+    val property = this.getProperty(schema.constants.Properties.TakerSplitProperty.getID)
+    if (property.isDefined && property.get.isMeta) NumberData(MetaProperty(property.get.getProtoBytes).getData.getProtoBytes).value else BigInt(0)
   }
 
   def mutate(properties: Seq[Property]): Order = this.copy(mutables = this.getMutables.mutate(properties).getProtoBytes)
@@ -147,7 +153,7 @@ class Orders @Inject()(
 
   object Utility {
 
-    def onDefine(msg: ordersTransactions.define.Message): Future[String] = {
+    def onDefine(msg: ordersTransactions.define.Message)(implicit header: Header): Future[String] = {
       val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties)
         .add(PropertyList(msg.getImmutableProperties).properties)
         .add(Seq(
@@ -166,10 +172,13 @@ class Orders @Inject()(
 
       def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables, schema.utilities.Permissions.getOrdersPermissions(true, true))
 
-      for {
+      (for {
         classificationID <- add
         _ <- addMaintainer(classificationID)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ORDER_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
     def onMake(msg: ordersTransactions.make.Message)(implicit header: Header): Future[String] = {
@@ -198,11 +207,14 @@ class Orders @Inject()(
       val transfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = OrderModuleIdentityID, assetID = AssetID(msg.getMakerAssetID), value = makerOwnableSplit)
       val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom, classificationID, order.getBondAmount)
 
-      for {
+      (for {
         _ <- add
         _ <- transfer
         _ <- bond
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ORDER_MAKE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
     def onModify(msg: ordersTransactions.modify.Message)(implicit header: Header): Future[String] = {
@@ -217,7 +229,7 @@ class Orders @Inject()(
       val order = Service.tryGet(orderID)
 
       def transfer(order: Order) = {
-        val transferMakerOwnableSplit = makerOwnableSplit - order.getMakerOwnableSplit
+        val transferMakerOwnableSplit = makerOwnableSplit - order.getMakerSplit
         if (transferMakerOwnableSplit < 0) {
           blockchainSplits.Utility.transfer(fromID = OrderModuleIdentityID, toID = IdentityID(msg.getFromID), assetID = order.getMakerAssetID, value = transferMakerOwnableSplit.abs)
         } else if (transferMakerOwnableSplit > 0) {
@@ -227,18 +239,21 @@ class Orders @Inject()(
 
       def update(order: Order) = Service.update(order.mutate(mutables.getProperties))
 
-      for {
+      (for {
         order <- order
         _ <- transfer(order)
         _ <- update(order)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ORDER_MODIFY + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
     def onCancel(msg: ordersTransactions.cancel.Message)(implicit header: Header): Future[String] = {
       val orderID = OrderID(msg.getOrderID)
       val order = Service.tryGet(orderID)
 
-      def transfer(order: Order) = blockchainSplits.Utility.transfer(fromID = OrderModuleIdentityID, toID = IdentityID(msg.getFromID), assetID = order.getMakerAssetID, value = order.getMakerOwnableSplit)
+      def transfer(order: Order) = blockchainSplits.Utility.transfer(fromID = OrderModuleIdentityID, toID = IdentityID(msg.getFromID), assetID = order.getMakerAssetID, value = order.getMakerSplit)
 
       def updateUnbondAndDelete(order: Order) = {
         val delete = Service.delete(order.getID)
@@ -249,11 +264,14 @@ class Orders @Inject()(
         } yield ()
       }
 
-      for {
+      (for {
         order <- order
         _ <- transfer(order)
         _ <- updateUnbondAndDelete(order)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ORDER_CANCEL + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
     def onTake(msg: ordersTransactions.take.Message)(implicit header: Header): Future[String] = {
@@ -263,14 +281,14 @@ class Orders @Inject()(
       def update(order: Order) = {
         val burn = blockchainClassifications.Utility.burnAuxiliary(order.getClassificationID, order.getBondAmount)
         val takerOwnableSplit = BigInt(msg.getTakerSplit)
-        var makerReceiveTakerOwnableSplit = DecData(order.getMakerOwnableSplit.toString()).multiplyTruncate(DecData(order.getExchangeRate)).getValue.toBigInt
+        var makerReceiveTakerOwnableSplit = DecData(order.getMakerSplit.toString()).multiplyTruncate(DecData(order.getExchangeRate)).getValue.toBigInt
         var takerReceiveMakerOwnableSplit = DecData(msg.getTakerSplit).quotientTruncate(DecData(order.getExchangeRate)).getValue.toBigInt
 
-        val updatedMakerOwnableSplit = order.getMakerOwnableSplit - takerReceiveMakerOwnableSplit
+        val updatedMakerOwnableSplit = order.getMakerSplit - takerReceiveMakerOwnableSplit
         val updateOrDelete = if (updatedMakerOwnableSplit == 0) {
           Service.delete(orderID)
         } else if (updatedMakerOwnableSplit < 0) {
-          takerReceiveMakerOwnableSplit = order.getMakerOwnableSplit
+          takerReceiveMakerOwnableSplit = order.getMakerSplit
           Service.delete(orderID)
         } else {
           makerReceiveTakerOwnableSplit = BigInt(msg.getTakerSplit)
@@ -288,29 +306,75 @@ class Orders @Inject()(
         } yield ()
       }
 
-      for {
+      (for {
         order <- order
         _ <- update(order)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ORDER_TAKE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onRevoke(msg: ordersTransactions.revoke.Message): Future[String] = {
-      val deputize = blockchainMaintainers.Utility.revokeAuxiliary(fromID = IdentityID(msg.getFromID), toID = IdentityID(msg.getToID), maintainedClassificationID = ClassificationID(msg.getClassificationID))
-      for {
-        _ <- deputize
-      } yield msg.getFrom
+    def onRevoke(msg: ordersTransactions.revoke.Message)(implicit header: Header): Future[String] = {
+      val revoke = blockchainMaintainers.Utility.revokeAuxiliary(fromID = IdentityID(msg.getFromID), toID = IdentityID(msg.getToID), maintainedClassificationID = ClassificationID(msg.getClassificationID))
+      (for {
+        _ <- revoke
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ORDER_REVOKE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onDeputize(msg: ordersTransactions.deputize.Message): Future[String] = {
+    def onDeputize(msg: ordersTransactions.deputize.Message)(implicit header: Header): Future[String] = {
       val deputize = blockchainMaintainers.Utility.deputizeAuxiliary(fromID = IdentityID(msg.getFromID), toID = IdentityID(msg.getToID), maintainedClassificationID = ClassificationID(msg.getClassificationID), maintainedProperties = PropertyList(msg.getMaintainedProperties), permissionIDs = schema.utilities.Permissions.getOrdersPermissions(canMake = msg.getCanMakeOrder, canCancel = msg.getCanCancelOrder), canAddMaintainer = msg.getCanAddMaintainer, canRemoveMaintainer = msg.getCanRemoveMaintainer, canMutateMaintainer = msg.getCanMutateMaintainer)
-      for {
+      (for {
         _ <- deputize
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ORDER_DEPUTIZE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onPut(msg: ordersTransactions.put.Message)(implicit header: Header): Future[String] = Future(msg.getFrom)
+    def onPut(msg: ordersTransactions.put.Message)(implicit header: Header): Future[String] = {
+      val document = schema.document.PutOrder.getPutOrderDocument(
+        makerID = IdentityID(msg.getFromID),
+        makerAssetID = AssetID(msg.getMakerAssetID),
+        takerAssetID = AssetID(msg.getTakerAssetID),
+        makerSplit = NumberData(BigInt(msg.getMakerSplit)),
+        takerSplit = NumberData(BigInt(msg.getTakerSplit)),
+        expiryHeight = HeightData(Height(msg.getExpiryHeight))
+      )
+      val addOrder = Service.add(utilities.Document.getOrder(document))
+      val makerTransfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = OrderModuleIdentityID, assetID = AssetID(msg.getMakerAssetID), value = BigInt(msg.getMakerSplit))
+      (for {
+        _ <- addOrder
+        _ <- makerTransfer
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ORDER_PUT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
+    }
 
-    def onGet(msg: ordersTransactions.get.Message)(implicit header: Header): Future[String] = Future(msg.getFrom)
+    def onGet(msg: ordersTransactions.get.Message)(implicit header: Header): Future[String] = {
+      val order = Service.tryGet(OrderID(msg.getOrderID))
+
+      def transfer(order: Order) = {
+        val makerTransfer = blockchainSplits.Utility.transfer(fromID = IdentityID(msg.getFromID), toID = order.getMakerID, assetID = order.getTakerAssetID, value = order.getTakerSplit)
+        val takerTransfer = blockchainSplits.Utility.transfer(fromID = OrderModuleIdentityID, toID = IdentityID(msg.getFromID), assetID = order.getMakerAssetID, value = order.getMakerSplit)
+        for {
+          _ <- makerTransfer
+          _ <- takerTransfer
+        } yield ()
+      }
+
+      (for {
+        order <- order
+        _ <- transfer(order)
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ORDER_GET + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
+    }
 
     def onNewBlock(header: Header): Future[Unit] = {
       val allOrders = Service.fetchAll
@@ -318,7 +382,7 @@ class Orders @Inject()(
       def filterAndDelete(orders: Seq[Order]) = utilitiesOperations.traverse(orders) { order =>
         if (header.height.toLong >= order.getExpiryHeight) {
           val delete = Service.delete(order.getID)
-          val transferAux = blockchainSplits.Utility.transfer(fromID = OrderModuleIdentityID, toID = order.getMakerID, assetID = order.getMakerAssetID, value = order.getMakerOwnableSplit)
+          val transferAux = blockchainSplits.Utility.transfer(fromID = OrderModuleIdentityID, toID = order.getMakerID, assetID = order.getMakerAssetID, value = order.getMakerSplit)
           for {
             _ <- delete
             _ <- transferAux

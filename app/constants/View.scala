@@ -485,7 +485,6 @@ object View {
     schema.constants.Messages.IDENTITY_DEFINE -> "MESSAGE_IDENTITY_DEFINE",
     schema.constants.Messages.IDENTITY_DEPUTIZE -> "MESSAGE_IDENTITY_DEPUTIZE",
     schema.constants.Messages.IDENTITY_ISSUE -> "MESSAGE_IDENTITY_ISSUE",
-    schema.constants.Messages.IDENTITY_MUTATE -> "MESSAGE_IDENTITY_MUTATE",
     schema.constants.Messages.IDENTITY_NAME -> "MESSAGE_IDENTITY_NAME",
     schema.constants.Messages.IDENTITY_PROVISION -> "MESSAGE_IDENTITY_PROVISION",
     schema.constants.Messages.IDENTITY_QUASH -> "MESSAGE_IDENTITY_QUASH",

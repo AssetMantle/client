@@ -1,9 +1,11 @@
 package models.blockchain
 
 import com.assetmantle.modules.identities.{transactions => identityTransactions}
+import exceptions.BaseException
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import queries.responses.common.Header
 import schema.data.Data
 import schema.data.base.{AccAddressData, IDData, ListData, NumberData}
 import schema.document.Document
@@ -134,20 +136,23 @@ class Identities @Inject()(
 
   object Utility {
 
-    def onDefine(msg: identityTransactions.define.Message): Future[String] = {
+    def onDefine(msg: identityTransactions.define.Message)(implicit header: Header): Future[String] = {
       val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).add(Seq(schema.constants.Properties.AuthenticationProperty)).properties))
       val add = blockchainClassifications.Utility.defineAuxiliary(msg.getFrom, mutables, immutables, constants.Document.ClassificationType.IDENTITY)
 
       def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables, schema.utilities.Permissions.getIdentitiesPermissions(true, true))
 
-      for {
+      (for {
         classificationID <- add
         _ <- addMaintainer(classificationID)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.IDENTITY_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onDeputize(msg: identityTransactions.deputize.Message): Future[String] = {
+    def onDeputize(msg: identityTransactions.deputize.Message)(implicit header: Header): Future[String] = {
       val deputize = blockchainMaintainers.Utility.deputizeAuxiliary(
         fromID = IdentityID(msg.getFromID),
         toID = IdentityID(msg.getToID),
@@ -155,13 +160,15 @@ class Identities @Inject()(
         maintainedProperties = PropertyList(msg.getMaintainedProperties),
         permissionIDs = schema.utilities.Permissions.getIdentitiesPermissions(canIssue = msg.getCanIssueIdentity, canQuash = msg.getCanQuashIdentity),
         canAddMaintainer = msg.getCanAddMaintainer, canRemoveMaintainer = msg.getCanRemoveMaintainer, canMutateMaintainer = msg.getCanMutateMaintainer)
-      for {
+      (for {
         _ <- deputize
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.IDENTITY_DEPUTIZE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-
-    def onIssue(msg: identityTransactions.issue.Message): Future[String] = {
+    def onIssue(msg: identityTransactions.issue.Message)(implicit header: Header): Future[String] = {
       val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val classificationID = ClassificationID(msg.getClassificationID)
       val identityID = schema.utilities.ID.getIdentityID(classificationID = classificationID, immutables = immutables)
@@ -170,49 +177,61 @@ class Identities @Inject()(
       val bond = blockchainClassifications.Utility.bondAuxiliary(msg.getFrom, classificationID, identity.getBondAmount)
       val add = Service.add(identity)
 
-      for {
+      (for {
         _ <- add
         _ <- bond
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.IDENTITY_ISSUE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onUpdate(msg: identityTransactions.update.Message): Future[String] = {
+    def onUpdate(msg: identityTransactions.update.Message)(implicit header: Header): Future[String] = {
       val identityID = IdentityID(msg.getIdentityID)
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
       val identity = Service.tryGet(identityID)
 
       def update(identity: Identity) = Service.update(identity.mutate(mutables.getProperties))
 
-      for {
+      (for {
         identity <- identity
         _ <- update(identity)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.IDENTITY_UPDATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onName(msg: identityTransactions.name.Message): Future[String] = {
+    def onName(msg: identityTransactions.name.Message)(implicit header: Header): Future[String] = {
       val immutables = Immutables(PropertyList(Seq(schema.constants.Properties.NameProperty.mutate(IDData(StringID(msg.getName))))))
       val mutables = Mutables(PropertyList(Seq(schema.constants.Properties.AuthenticationProperty.mutate(ListData(Seq(AccAddressData(msg.getFrom)))))))
       val identityID = schema.utilities.ID.getIdentityID(classificationID = schema.document.NameIdentity.DocumentClassificationID, immutables = immutables)
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = schema.document.NameIdentity.DocumentClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
       val add = Service.add(identity)
 
-      for {
+      (for {
         _ <- add
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.IDENTITY_NAME + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onProvision(msg: identityTransactions.provision.Message): Future[String] = {
+    def onProvision(msg: identityTransactions.provision.Message)(implicit header: Header): Future[String] = {
       val identity = Service.tryGet(IdentityID(msg.getIdentityID))
 
       def update(identity: Identity) = Service.insertOrUpdate(identity.provision(AccAddressData(msg.getTo)))
 
-      for {
+      (for {
         identity <- identity
         _ <- update(identity)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.IDENTITY_PROVISION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onQuash(msg: identityTransactions.quash.Message): Future[String] = {
+    def onQuash(msg: identityTransactions.quash.Message)(implicit header: Header): Future[String] = {
       val identity = Service.tryGet(IdentityID(msg.getIdentityID))
 
       def updateUnbondAndDelete(identity: Identity) = {
@@ -224,35 +243,37 @@ class Identities @Inject()(
         } yield ()
       }
 
-      for {
+      (for {
         identity <- identity
         _ <- updateUnbondAndDelete(identity)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.IDENTITY_QUASH + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onRevoke(msg: identityTransactions.revoke.Message): Future[String] = {
+    def onRevoke(msg: identityTransactions.revoke.Message)(implicit header: Header): Future[String] = {
       val revoke = blockchainMaintainers.Utility.revokeAuxiliary(fromID = IdentityID(msg.getFromID), toID = IdentityID(msg.getToID), maintainedClassificationID = ClassificationID(msg.getClassificationID))
-      for {
+      (for {
         _ <- revoke
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.IDENTITY_REVOKE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onUnprovision(msg: identityTransactions.unprovision.Message): Future[String] = {
+    def onUnprovision(msg: identityTransactions.unprovision.Message)(implicit header: Header): Future[String] = {
       val identity = Service.tryGet(IdentityID(msg.getIdentityID))
 
       def update(identity: Identity) = Service.insertOrUpdate(identity.unprovision(AccAddressData(msg.getTo)))
 
-      for {
+      (for {
         identity <- identity
         _ <- update(identity)
-      } yield msg.getFrom
-    }
-
-    def beforeRun: Future[Int] = {
-      val identities = Seq("assets", "classifications", "identities", "maintainers", "metas", "orders", "splits").map(x =>
-        Identity(id = schema.document.ModuleIdentity.getModuleIdentityID(x).getBytes, idString = schema.document.ModuleIdentity.getModuleIdentityID(x).asString, classificationID = schema.document.ModuleIdentity.DocumentClassificationID.getBytes, immutables = schema.document.ModuleIdentity.getModuleIdentityImmutables(x).getProtoBytes, mutables = schema.document.ModuleIdentity.getModuleIdentityMutables.getProtoBytes)
-      )
-      Service.insertOrUpdate(identities)
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.IDENTITY_UNPROVISION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
   }

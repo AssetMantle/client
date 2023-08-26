@@ -7,6 +7,8 @@ import schema.property.Property
 
 case class MesaProperty(id: PropertyID, dataID: DataID) extends Property {
 
+  require(this.id.typeID.value == this.dataID.typeID.value, "MESA_PROPERTY_TYPE_ID_AND_DATA_ID_TYPE_MISMATCH")
+
   def getID: PropertyID = this.id
 
   def getDataID: DataID = this.dataID
