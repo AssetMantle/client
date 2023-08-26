@@ -9,14 +9,13 @@ import slick.jdbc.H2Profile.api._
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-case class Split(ownerID: Array[Byte], ownableID: Array[Byte], protoOwnableID: Array[Byte], ownerIDString: String, ownableIDString: String, value: BigInt, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+case class Split(ownerID: Array[Byte], assetID: Array[Byte], ownerIDString: String, assetIDString: String, value: BigInt, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
   def serialize: SplitSerialized = SplitSerialized(
     ownerID = this.ownerID,
-    ownableID = this.ownableID,
-    protoOwnableID = this.protoOwnableID,
+    assetID = this.assetID,
     ownerIDString = this.ownerIDString,
-    ownableIDString = this.ownableIDString,
+    assetIDString = this.assetIDString,
     value = BigDecimal(this.value),
     createdBy = this.createdBy,
     createdOnMillisEpoch = this.createdOnMillisEpoch,
@@ -24,18 +23,17 @@ case class Split(ownerID: Array[Byte], ownableID: Array[Byte], protoOwnableID: A
     updatedOnMillisEpoch = this.updatedOnMillisEpoch)
 }
 
-case class SplitSerialized(ownerID: Array[Byte], ownableID: Array[Byte], protoOwnableID: Array[Byte], ownerIDString: String, ownableIDString: String, value: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[Array[Byte], Array[Byte]] {
+case class SplitSerialized(ownerID: Array[Byte], assetID: Array[Byte], ownerIDString: String, assetIDString: String, value: BigDecimal, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity2[Array[Byte], Array[Byte]] {
 
   def id1: Array[Byte] = this.ownerID
 
-  def id2: Array[Byte] = this.ownableID
+  def id2: Array[Byte] = this.assetID
 
   def deserialize: Split = Split(
     ownerID = this.ownerID,
-    ownableID = this.ownableID,
-    protoOwnableID = this.protoOwnableID,
+    assetID = this.assetID,
     ownerIDString = this.ownerIDString,
-    ownableIDString = this.ownableIDString,
+    assetIDString = this.assetIDString,
     value = this.value.toBigInt,
     createdBy = this.createdBy,
     createdOnMillisEpoch = this.createdOnMillisEpoch,
@@ -48,17 +46,15 @@ private[blockchain] object Splits {
 
   class SplitTable(tag: Tag) extends Table[SplitSerialized](tag, "Split") with ModelTable2[Array[Byte], Array[Byte]] {
 
-    def * = (ownerID, ownableID, protoOwnableID, ownerIDString, ownableIDString, value, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SplitSerialized.tupled, SplitSerialized.unapply)
+    def * = (ownerID, assetID, ownerIDString, assetIDString, value, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (SplitSerialized.tupled, SplitSerialized.unapply)
 
     def ownerID = column[Array[Byte]]("ownerID", O.PrimaryKey)
 
-    def ownableID = column[Array[Byte]]("ownableID", O.PrimaryKey)
-
-    def protoOwnableID = column[Array[Byte]]("protoOwnableID")
+    def assetID = column[Array[Byte]]("assetID", O.PrimaryKey)
 
     def ownerIDString = column[String]("ownerIDString")
 
-    def ownableIDString = column[String]("ownableIDString")
+    def assetIDString = column[String]("assetIDString")
 
     def value = column[BigDecimal]("value")
 
@@ -72,7 +68,7 @@ private[blockchain] object Splits {
 
     def id1 = ownerID
 
-    def id2 = ownableID
+    def id2 = assetID
 
   }
 }
@@ -97,15 +93,15 @@ class Splits @Inject()(
 
     def getByOwnerID(ownerId: IdentityID): Future[Seq[Split]] = filter(_.ownerID === ownerId.getBytes).map(_.map(_.deserialize))
 
-    def getByOwnableID(ownableID: AssetID): Future[Seq[Split]] = filter(_.ownableID === ownableID.getBytes).map(_.map(_.deserialize))
+    def getByOwnableID(assetID: AssetID): Future[Seq[Split]] = filter(_.assetID === assetID.getBytes).map(_.map(_.deserialize))
 
-    def getTotalSupply(ownableID: AssetID): Future[BigInt] = filter(_.ownableID === ownableID.getBytes).map(_.map(_.deserialize.value).sum)
+    def getTotalSupply(assetID: AssetID): Future[BigInt] = filter(_.assetID === assetID.getBytes).map(_.map(_.deserialize.value).sum)
 
-    def getByOwnerIDAndOwnableID(ownerId: IdentityID, ownableID: AssetID): Future[Option[Split]] = filter(x => x.ownerID === ownerId.getBytes && x.ownableID === ownableID.getBytes).map(_.headOption.map(_.deserialize))
+    def getByOwnerIDAndOwnableID(ownerId: IdentityID, assetID: AssetID): Future[Option[Split]] = filter(x => x.ownerID === ownerId.getBytes && x.assetID === assetID.getBytes).map(_.headOption.map(_.deserialize))
 
-    def tryGetByOwnerIDAndOwnableID(ownerId: IdentityID, ownableID: AssetID): Future[Split] = tryGetById1AndId2(id1 = ownerId.getBytes, id2 = ownableID.getBytes).map(_.deserialize)
+    def tryGetByOwnerIDAndOwnableID(ownerId: IdentityID, assetID: AssetID): Future[Split] = tryGetById1AndId2(id1 = ownerId.getBytes, id2 = assetID.getBytes).map(_.deserialize)
 
-    def deleteByOwnerIDAndOwnableID(ownerId: IdentityID, ownableID: AssetID): Future[Int] = deleteById1AndId2(id1 = ownerId.getBytes, id2 = ownableID.getBytes)
+    def deleteByOwnerIDAndOwnableID(ownerId: IdentityID, assetID: AssetID): Future[Int] = deleteById1AndId2(id1 = ownerId.getBytes, id2 = assetID.getBytes)
 
   }
 
@@ -140,11 +136,11 @@ class Splits @Inject()(
     }
 
     def addSplit(ownerId: IdentityID, assetID: AssetID, value: BigInt): Future[Unit] = {
-      val ownedSplit = Service.getByOwnerIDAndOwnableID(ownerId = ownerId, ownableID = assetID)
+      val ownedSplit = Service.getByOwnerIDAndOwnableID(ownerId = ownerId, assetID = assetID)
 
       def addOrUpdate(ownedSplit: Option[Split]) = {
         val split = if (ownedSplit.isDefined) ownedSplit.get.copy(value = ownedSplit.get.value + value)
-        else Split(ownerID = ownerId.getBytes, ownableID = assetID.getBytes, protoOwnableID = assetID.getProtoBytes, ownerIDString = ownerId.asString, ownableIDString = assetID.asString, value = value)
+        else Split(ownerID = ownerId.getBytes, assetID = assetID.getBytes, ownerIDString = ownerId.asString, assetIDString = assetID.asString, value = value)
         Service.insertOrUpdate(split)
       }
 
@@ -155,11 +151,11 @@ class Splits @Inject()(
     }
 
     def subtractSplit(ownerId: IdentityID, assetID: AssetID, value: BigInt): Future[Unit] = {
-      val ownedSplit = Service.tryGetByOwnerIDAndOwnableID(ownerId = ownerId, ownableID = assetID)
+      val ownedSplit = Service.tryGetByOwnerIDAndOwnableID(ownerId = ownerId, assetID = assetID)
 
       def deleteOrUpdate(ownedSplit: Split) = {
         val split = ownedSplit.copy(value = ownedSplit.value - value)
-        if (split.value == 0) Service.deleteByOwnerIDAndOwnableID(ownerId = ownerId, ownableID = assetID)
+        if (split.value == 0) Service.deleteByOwnerIDAndOwnableID(ownerId = ownerId, assetID = assetID)
         else Service.insertOrUpdate(split)
       }
 

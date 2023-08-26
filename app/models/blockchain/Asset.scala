@@ -1,10 +1,12 @@
 package models.blockchain
 
 import com.assetmantle.modules.assets.{transactions => assetsTransactions}
+import exceptions.BaseException
 import models.common.Serializable.Coin
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import queries.responses.common.Header
 import schema.data.base.{HeightData, NumberData}
 import schema.document.Document
 import schema.id.base._
@@ -136,21 +138,24 @@ class Assets @Inject()(
 
   object Utility {
 
-    def onDefine(msg: assetsTransactions.define.Message): Future[String] = {
+    def onDefine(msg: assetsTransactions.define.Message)(implicit header: Header): Future[String] = {
       val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
       val add = blockchainClassifications.Utility.defineAuxiliary(msg.getFrom, mutables, immutables, constants.Document.ClassificationType.ASSET)
 
       def addMaintainer(classificationID: ClassificationID): Future[String] = blockchainMaintainers.Utility.superAuxiliary(classificationID, IdentityID(msg.getFromID), mutables, schema.utilities.Permissions.getAssetsPermissions(true, true, true))
 
-      for {
+      (for {
         classificationID <- add
         _ <- addMaintainer(classificationID)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ASSET_DEFINE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
 
-    def onMint(msg: assetsTransactions.mint.Message): Future[String] = {
+    def onMint(msg: assetsTransactions.mint.Message)(implicit header: Header): Future[String] = {
       val immutables = Immutables(PropertyList(msg.getImmutableMetaProperties).add(PropertyList(msg.getImmutableProperties).properties))
       val classificationID = ClassificationID(msg.getClassificationID)
       val assetID = schema.utilities.ID.getAssetID(classificationID = classificationID, immutables = immutables)
@@ -162,53 +167,68 @@ class Assets @Inject()(
 
       def mint() = blockchainSplits.Utility.mint(ownerID = IdentityID(msg.getToID), assetID = assetID, value = asset.getSupply.value)
 
-      for {
+      (for {
         _ <- add
         _ <- bond
         _ <- mint()
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ASSET_MINT + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onMutate(msg: assetsTransactions.mutate.Message): Future[String] = {
+    def onMutate(msg: assetsTransactions.mutate.Message)(implicit header: Header): Future[String] = {
       val assetID = AssetID(msg.getAssetID)
       val mutables = Mutables(PropertyList(msg.getMutableMetaProperties).add(PropertyList(msg.getMutableProperties).properties))
       val asset = Service.tryGet(assetID)
 
       def updateAsset(asset: Asset) = Service.update(asset.mutate(mutables.getProperties))
 
-      for {
+      (for {
         asset <- asset
         _ <- updateAsset(asset)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ASSET_MUTATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onRevoke(msg: assetsTransactions.revoke.Message): Future[String] = {
+    def onRevoke(msg: assetsTransactions.revoke.Message)(implicit header: Header): Future[String] = {
       val revoke = blockchainMaintainers.Utility.revokeAuxiliary(fromID = IdentityID(msg.getFromID), toID = IdentityID(msg.getToID), maintainedClassificationID = ClassificationID(msg.getClassificationID))
-      for {
+      (for {
         _ <- revoke
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ASSET_REVOKE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onRenumerate(msg: assetsTransactions.renumerate.Message): Future[String] = {
+    def onRenumerate(msg: assetsTransactions.renumerate.Message)(implicit header: Header): Future[String] = {
       val assetID = AssetID(msg.getAssetID)
       val asset = Service.tryGet(assetID)
 
       def updateSupply(asset: Asset) = blockchainSplits.Utility.renumerate(IdentityID(msg.getFromID), assetID, asset.getSupply.value)
 
-      for {
+      (for {
         asset <- asset
         _ <- updateSupply(asset)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ASSET_RENUMERATE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onDeputize(msg: assetsTransactions.deputize.Message): Future[String] = {
+    def onDeputize(msg: assetsTransactions.deputize.Message)(implicit header: Header): Future[String] = {
       val deputize = blockchainMaintainers.Utility.deputizeAuxiliary(fromID = IdentityID(msg.getFromID), toID = IdentityID(msg.getToID), maintainedClassificationID = ClassificationID(msg.getClassificationID), maintainedProperties = PropertyList(msg.getMaintainedProperties), permissionIDs = schema.utilities.Permissions.getAssetsPermissions(canMint = msg.getCanMintAsset, canBurn = msg.getCanBurnAsset, canRenumerate = msg.getCanRenumerateAsset), canAddMaintainer = msg.getCanAddMaintainer, canRemoveMaintainer = msg.getCanRemoveMaintainer, canMutateMaintainer = msg.getCanMutateMaintainer)
-      for {
+      (for {
         _ <- deputize
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ASSET_DEPUTIZE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onBurn(msg: assetsTransactions.burn.Message): Future[String] = {
+    def onBurn(msg: assetsTransactions.burn.Message)(implicit header: Header): Future[String] = {
       val assetID = AssetID(msg.getAssetID)
       val renumerate = blockchainSplits.Utility.renumerate(ownerID = IdentityID(msg.getFromID), assetID = assetID, value = 0)
       val asset = Service.tryGet(assetID)
@@ -223,25 +243,31 @@ class Assets @Inject()(
         } yield ()
       }
 
-      for {
+      (for {
         _ <- renumerate
         asset <- asset
         _ <- updateUnbondAndDelete(asset)
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ASSET_BURN + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onSend(msg: assetsTransactions.send.Message): Future[String] = {
+    def onSend(msg: assetsTransactions.send.Message)(implicit header: Header): Future[String] = {
       val add = blockchainSplits.Utility.addSplit(ownerId = IdentityID(msg.getToID), assetID = AssetID(msg.getAssetID), value = BigInt(msg.getValue))
       val subtract = blockchainSplits.Utility.subtractSplit(ownerId = IdentityID(msg.getFromID), assetID = AssetID(msg.getAssetID), value = BigInt(msg.getValue))
-      for {
+      (for {
         _ <- add
         _ <- subtract
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ASSET_SEND + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onWrap(msg: assetsTransactions.wrap.Message): Future[String] = {
+    def onWrap(msg: assetsTransactions.wrap.Message)(implicit header: Header): Future[String] = {
       val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(msg.getFrom)
-      val add = utilitiesOperations.traverse(msg.getCoinsList.asScala.toSeq.map(x => Coin(x))) { coin => {
+      val add = utilitiesOperations.traverse(msg.getCoinsList.asScala.toSeq.map(x => Coin(x))) { coin =>
         val document = schema.document.CoinAsset.getCoinAssetDocument(coin.denom)
         val addAsset = Service.insertOrUpdate(Asset(id = schema.document.CoinAsset.getCoinAssetID(coin.denom).getBytes, idString = schema.document.CoinAsset.getCoinAssetID(coin.denom).asString, classificationID = schema.document.CoinAsset.DocumentClassificationID.getBytes, immutables = document.immutables.getProtoBytes, mutables = document.mutables.getProtoBytes))
         val split = blockchainSplits.Utility.addSplit(ownerId = IdentityID(msg.getFromID), assetID = schema.document.CoinAsset.getCoinAssetID(coin.denom), value = coin.amount.value)
@@ -251,23 +277,27 @@ class Assets @Inject()(
           _ <- split
         } yield ()
       }
-      }
-      for {
+      (for {
         _ <- updateBalance
         _ <- add
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ASSET_WRAP + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
 
-    def onUnwrap(msg: assetsTransactions.unwrap.Message): Future[String] = {
+    def onUnwrap(msg: assetsTransactions.unwrap.Message)(implicit header: Header): Future[String] = {
       val updateBalance = blockchainBalances.Utility.insertOrUpdateBalance(msg.getFrom)
       val subtract = utilitiesOperations.traverse(msg.getCoinsList.asScala.toSeq.map(x => Coin(x))) { coin =>
         blockchainSplits.Utility.subtractSplit(ownerId = IdentityID(msg.getFromID), assetID = schema.document.CoinAsset.getCoinAssetID(coin.denom), value = coin.amount.value)
       }
-      for {
+      (for {
         _ <- updateBalance
         _ <- subtract
-      } yield msg.getFrom
+      } yield msg.getFrom).recover {
+        case _: BaseException => logger.error(schema.constants.Messages.ASSET_UNWRAP + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
+          msg.getFrom
+      }
     }
-
   }
 }
