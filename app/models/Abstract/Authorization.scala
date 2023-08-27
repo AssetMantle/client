@@ -12,15 +12,14 @@ abstract class Authorization {
 
   def validate(stdMsg: protoAny): ValidateResponse
 
-  def toProto: protoAny
+  def toAnyProto: protoAny
 
 }
 
 object Authorization {
   def apply(authzAny: protoAny): Authorization = authzAny.getTypeUrl match {
     case schema.constants.Authz.SEND_AUTHORIZATION => {
-      val protoSend = com.cosmos.bank.v1beta1.SendAuthorization.parseFrom(authzAny.getValue)
-      SendAuthorization(spendLimit = protoSend.getSpendLimitList.asScala.toSeq.map(x => Coin(x)))
+      SendAuthorization(spendLimit = com.cosmos.bank.v1beta1.SendAuthorization.parseFrom(authzAny.getValue).getSpendLimitList.asScala.toSeq.map(x => Coin(x)))
     }
     case schema.constants.Authz.GENERIC_AUTHORIZATION => {
       GenericAuthorization(com.cosmos.authz.v1beta1.GenericAuthorization.parseFrom(authzAny.getValue).getMsg)
