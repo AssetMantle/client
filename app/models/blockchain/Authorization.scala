@@ -80,6 +80,8 @@ class Authorizations @Inject()(
     }
   }
 
+  private def findByGranterAndGrantee(granter: String, grantee: String): Future[Seq[Authorization]] = db.run(authorizationTable.filter(x => x.granter === granter && x.grantee === grantee).result)
+
   private def findByGranterGranteeAndMsgType(granter: String, grantee: String, msgTypeURL: String): Future[Authorization] = db.run(authorizationTable.filter(x => x.granter === granter && x.grantee === grantee && x.msgTypeURL === msgTypeURL).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -132,6 +134,8 @@ class Authorizations @Inject()(
 
     def getListByGrantee(address: String): Future[Seq[Authorization]] = getByGrantee(address)
 
+    def get(granter: String, grantee: String) = findByGranterAndGrantee(granter = granter, grantee = grantee)
+
     def delete(granter: String, grantee: String, msgTypeURL: String): Future[Int] = deleteByGranterGranteeAndMsgType(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL)
 
     def delete(granter: String, grantee: String): Future[Int] = deleteByGranterAndGrantee(granter = granter, grantee = grantee)
@@ -140,7 +144,7 @@ class Authorizations @Inject()(
   object Utility {
 
     def onGrantAuthorization(grantAuthorization: authzTx.MsgGrant)(implicit header: Header): Future[String] = {
-      val insertOrUpdate = Service.insertOrUpdate(Authorization(granter = grantAuthorization.getGranter, grantee = grantAuthorization.getGrantee, msgTypeURL = grantAuthorization.getGrant.getAuthorization.getTypeUrl, grantedAuthorization = grantAuthorization.getGrant.getAuthorization.toByteString.toByteArray, expiration = grantAuthorization.getGrant.getExpiration.getSeconds))
+      val insertOrUpdate = Service.insertOrUpdate(Authorization(granter = grantAuthorization.getGranter, grantee = grantAuthorization.getGrantee, msgTypeURL = AbstractAuthorization(grantAuthorization.getGrant.getAuthorization).getMsgTypeURL, grantedAuthorization = grantAuthorization.getGrant.getAuthorization.toByteString.toByteArray, expiration = grantAuthorization.getGrant.getExpiration.getSeconds))
       (for {
         _ <- insertOrUpdate
       } yield grantAuthorization.getGranter).recover {
@@ -163,7 +167,8 @@ class Authorizations @Inject()(
       val execute = if (granter != executeAuthorization.getGrantee) {
         utilitiesOperations.traverse(executeAuthorization.getMsgsList.asScala.toSeq) { msg =>
 
-          //          val authorization = Service.get(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = msg.getTypeUrl)
+          val authorizations = getAuthorizations.Service.get(granter = granter, grantee = executeAuthorization.getGrantee)
+          val delete = Service.delete(granter = granter, grantee = executeAuthorization.getGrantee)
 
           //          def updateOrDelete(optionalAuthorization: Option[Authorization]) = optionalAuthorization.fold {
 
@@ -177,15 +182,15 @@ class Authorizations @Inject()(
           //            } yield ()
           //          }
 
-          val authorizations = getAuthorizations.Service.get(granter = granter, grantee = executeAuthorization.getGrantee)
-
           def upsert(authorizationResponse: queries.responses.blockchain.AuthorizationsResponse.Response) = {
-            if (authorizationResponse.grants.nonEmpty) Service.insertOrUpdate(authorizationResponse.grants.map(x => Authorization(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = x.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = x.authorization.toSerializable.toProto.toByteString.toByteArray, expiration = x.expiration.epoch)))
-            else Service.delete(granter = granter, grantee = executeAuthorization.getGrantee)
+            if (authorizationResponse.grants.nonEmpty)
+              Service.insertOrUpdate(authorizationResponse.grants.map(x => Authorization(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = x.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = x.authorization.toSerializable.toAnyProto.toByteString.toByteArray, expiration = x.expiration.epoch)))
+            else Future()
           }
 
           for {
             authorizations <- authorizations
+            _ <- delete
             _ <- upsert(authorizations)
           } yield ()
         }

@@ -1,7 +1,8 @@
 package models.common
 
-import com.google.protobuf.{Any => protoAny}
+import com.cosmos.staking.v1beta1.AuthorizationType
 import com.cosmos.staking.{v1beta1 => stakingTx}
+import com.google.protobuf.{Any => protoAny}
 import models.Abstract.Authorization
 import models.common.Serializable.Coin
 import utilities.Blockchain.Authz.ValidateResponse
@@ -22,13 +23,14 @@ object Authz {
       else ValidateResponse(accept = true, delete = false, updated = Option(SendAuthorization(spendLimit = limitLeft)))
     }
 
-    def toProto: protoAny = protoAny.newBuilder()
+    def toProto: com.cosmos.bank.v1beta1.SendAuthorization = com.cosmos.bank.v1beta1.SendAuthorization.newBuilder()
+      .addAllSpendLimit(spendLimit.map(_.toProtoCoin).asJava)
+      .build()
+
+    def toAnyProto: protoAny = protoAny.newBuilder()
       .setTypeUrl(schema.constants.Authz.SEND_AUTHORIZATION)
-      .setValue(com.cosmos.bank.v1beta1.SendAuthorization.newBuilder()
-        .addAllSpendLimit(spendLimit.map(_.toProtoCoin).asJava)
-        .build()
-        .toByteString
-      ).build()
+      .setValue(this.toProto.toByteString)
+      .build()
 
   }
 
@@ -38,21 +40,26 @@ object Authz {
 
     def validate(stdMsg: protoAny): ValidateResponse = ValidateResponse(accept = true, delete = false, updated = None)
 
-    def toProto: protoAny = protoAny.newBuilder()
+    def toProto: com.cosmos.authz.v1beta1.GenericAuthorization = com.cosmos.authz.v1beta1.GenericAuthorization.newBuilder()
+      .setMsg(this.msg)
+      .build()
+
+    def toAnyProto: protoAny = protoAny.newBuilder()
       .setTypeUrl(schema.constants.Authz.GENERIC_AUTHORIZATION)
-      .setValue(com.cosmos.authz.v1beta1.GenericAuthorization.newBuilder()
-        .setMsg(this.msg)
-        .build()
-        .toByteString
-      ).build()
+      .setValue(this.toProto.toByteString)
+      .build()
 
   }
 
   //staking
-  case class StakeAuthorizationValidators(address: Seq[String])
+  case class StakeAuthorizationValidators(address: Seq[String]) {
+
+    def toProto: com.cosmos.staking.v1beta1.StakeAuthorization.Validators = com.cosmos.staking.v1beta1.StakeAuthorization.Validators.newBuilder().addAllAddress(this.address.asJava).build()
+
+  }
 
   object StakeAuthorizationValidators {
-    def fromProtoAny(protoValidators: com.cosmos.staking.v1beta1.StakeAuthorization.Validators): StakeAuthorizationValidators = StakeAuthorizationValidators(protoValidators.getAddressList.asScala.toSeq)
+    def fromProto(protoValidators: com.cosmos.staking.v1beta1.StakeAuthorization.Validators): StakeAuthorizationValidators = StakeAuthorizationValidators(protoValidators.getAddressList.asScala.toSeq)
   }
 
   case class StakeAuthorization(maxTokens: Coin, allowList: StakeAuthorizationValidators, denyList: StakeAuthorizationValidators, authorizationType: String) extends Authorization {
@@ -76,14 +83,24 @@ object Authz {
       else ValidateResponse(accept = true, delete = false, updated = Option(this.copy(maxTokens = limitLeft)))
     }
 
-    def toProto: protoAny = protoAny.newBuilder()
+    private def getProtoStakeAuthorizationType: AuthorizationType = this.getMsgTypeURL match {
+      case schema.constants.Messages.DELEGATE => com.cosmos.staking.v1beta1.AuthorizationType.AUTHORIZATION_TYPE_DELEGATE
+      case schema.constants.Messages.UNDELEGATE => com.cosmos.staking.v1beta1.AuthorizationType.AUTHORIZATION_TYPE_UNDELEGATE
+      case schema.constants.Messages.REDELEGATE => com.cosmos.staking.v1beta1.AuthorizationType.AUTHORIZATION_TYPE_REDELEGATE
+      case _ => com.cosmos.staking.v1beta1.AuthorizationType.AUTHORIZATION_TYPE_UNSPECIFIED
+    }
+
+    def toProto: com.cosmos.staking.v1beta1.StakeAuthorization = com.cosmos.staking.v1beta1.StakeAuthorization.newBuilder()
+      .setAllowList(this.allowList.toProto)
+      .setDenyList(this.denyList.toProto)
+      .setMaxTokens(this.maxTokens.toProtoCoin)
+      .setAuthorizationType(this.getProtoStakeAuthorizationType)
+      .build()
+
+    def toAnyProto: protoAny = protoAny.newBuilder()
       .setTypeUrl(schema.constants.Authz.STAKE_AUTHORIZATION)
-      .setValue(com.cosmos.staking.v1beta1.StakeAuthorization.newBuilder()
-        .setMaxTokens(this.maxTokens.toProtoCoin)
-        .setAuthorizationType(com.cosmos.staking.v1beta1.AuthorizationType.AUTHORIZATION_TYPE_UNSPECIFIED)
-        .build()
-        .toByteString
-      ).build()
+      .setValue(this.toProto.toByteString)
+      .build()
 
   }
 
