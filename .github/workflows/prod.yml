@@ -1,0 +1,52 @@
+name: Explorer - Production
+
+on:
+  push:
+    branches:
+      - explorer/master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Tools
+        uses: actions/setup-java@v3
+        with:
+          java-version: "11"
+          distribution: "adopt"
+      - uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.CLIENT_TOOLS_PRIV_KEY }}
+            ${{ secrets.AM_EXPLORER_MAINNET_PROD_PRIV_KEY }}
+      - name: Run Build
+        run: sbt dist
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: client.zip
+          path: target/universal/assetmantle-1.0.zip
+      - name: Copy file via ssh password
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.AM_EXPLORER_MAINNET_PROD_HOST }}
+          username: ${{ secrets.AM_EXPLORER_MAINNET_PROD_USER }}
+          port: ${{ secrets.AM_EXPLORER_MAINNET_PROD_SSH_PORT }}
+          source: target/universal/assetmantle-1.0.zip
+          target: /home/admin/assetmantle-next.zip
+      - name: Deploy new explore
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.AM_EXPLORER_MAINNET_PROD_HOST }}
+          username: ${{ secrets.AM_EXPLORER_MAINNET_PROD_USER }}
+          port: ${{ secrets.AM_EXPLORER_MAINNET_PROD_SSH_PORT }}
+          script: |
+            cd /home/admin
+            mv assetmantle-next.zip assetmantle-1.0.zip
+            # rm -rf assetmantle-next.zip
+            # sudo systemctl stop explorer
+            # unzip assetmantle-1.0.zip
+            # rm -rf explorer
+            # mv assetmantle-1.0 explorer
+            # sudo systemctl start explorer

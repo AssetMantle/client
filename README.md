@@ -110,3 +110,60 @@ This project implements explorer and other web2 applications for persistence eco
   9. Restart sshd to apply changes: `sudo systemctl restart sshd`
   10. Login from user as..
       `sftp -i “private_key_of_authorized_public_key” username@ip`
+
+## Container
+
+### Local testnet explorer
+
+> Building container image with docker in macos will be slower as there is no native docker support
+
+* Install docker on your machine
+
+  * Macos: [Orbstack](https://orbstack.dev/)
+
+  * Linux
+
+  ```shell
+  curl -sL get.docker.com | sudo bash
+  docker version
+  ```
+
+* Setup keystore named `mantlekeystore` in root of the repository
+
+* Run postgres, testnet and explorer containers
+
+```shell
+# enable buildx
+export COMPOSE_DOCKER_CLI_BUILD=1
+export DOCKER_BUILDKIT=1
+
+# spin up postgres
+docker-compose up -d postgres
+# spin up testnet
+docker-compose up -d testnet
+# spin up explorer
+docker-compose up -d explorer
+```
+
+#### Stop the stack, remove the data
+
+```shell
+# Stop postgres, testnet and explorer containers
+docker-compose down
+
+# Remove testnet data
+docker volume client_testnet-data
+# Remove postgres data
+docker volume client_explorer-postgresql-data
+```
+
+### Generate dist
+
+> Only docker with buildx required
+
+```shell
+docker buildx build \
+  --output=type=local,dest=./ \
+  --secret=id=git,src=$HOME/.ssh/id_rsa \ # For clienttools
+  --build-arg=APP_VERSION=$(git rev-parse --short HEAD) \.
+```
