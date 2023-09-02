@@ -1,12 +1,15 @@
-@import views.html.base.infos._
-@import schema.property.base.MesaProperty
-@import com.assetmantle.schema.lists.base.{PropertyList => protoPropertyList}
+@import com.assetmantle.schema.lists.base.{ PropertyList => protoPropertyList }
 @import schema.list.PropertyList
+@import schema.property.base.MesaProperty
+@import views.html.base.infos._
 
-@(protoPropertyList: protoPropertyList)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(key: String, protoPropertyList: protoPropertyList)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@defining(PropertyList(protoPropertyList).getProperties.map(x => x.asInstanceOf[MesaProperty])){properties =>
-    @properties.map{property =>
-        @commonTextInfo(s"${property.id.keyID.asString} (${property.id.typeID.asString})", property.dataID.asString)
+@defining(PropertyList(protoPropertyList).getProperties.map(x => x.asInstanceOf[MesaProperty])) { properties =>
+    @if(properties.nonEmpty) {
+        <span class="headerFontSize">@Messages(key):</span>
+        @properties.map { property =>
+            @commonTextInfo(s"${property.id.keyID.asString} [${property.id.typeID.asString}]", property.dataID.asString)
+        }
     }
 }

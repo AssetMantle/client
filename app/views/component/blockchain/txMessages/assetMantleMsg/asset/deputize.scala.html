@@ -10,8 +10,7 @@
 @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
 @commonHtmlInfo(constants.View.TO_ID, commonJavascriptLink(IdentityID(msg.getToID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getToID).asString}'))")))
 @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonJavascriptLink(ClassificationID(msg.getClassificationID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${ClassificationID(msg.getClassificationID).asString}'))")))
-<span class="headerFontSize">@Messages(constants.View.MAINTAINED_PROPERTIES):</span>
-@mesaProperties(msg.getMaintainedProperties)
+@mesaProperties(constants.View.MAINTAINED_PROPERTIES, msg.getMaintainedProperties)
 @commonBooleanInfo(constants.View.MINT, Option(msg.getCanMintAsset))
 @commonBooleanInfo(constants.View.BURN, Option(msg.getCanBurnAsset))
 @commonBooleanInfo(constants.View.ADD_MAINTAINER, Option(msg.getCanAddMaintainer))

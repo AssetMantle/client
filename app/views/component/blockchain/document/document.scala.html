@@ -34,20 +34,16 @@
                         </tr>
                     }
                     @if(document.get.immutables.getProperties.exists(_.isMeta)) {
-                        <span class="headerFontSize">@Messages(constants.View.IMMUTABLE_META_PROPERTIES):</span>
-                        @metaProperties(PropertyList(document.get.immutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
+                        @metaProperties(constants.View.IMMUTABLE_META_PROPERTIES, PropertyList(document.get.immutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
                     }
                     @if(!document.get.immutables.getProperties.forall(_.isMeta)) {
-                        <span class="headerFontSize">@Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):</span>
-                        @mesaProperties(PropertyList(document.get.immutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
+                        @mesaProperties(constants.View.IMMUTABLE_MESA_PROPERTIES, PropertyList(document.get.immutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
                     }
                     @if(document.get.mutables.getProperties.exists(_.isMeta)) {
-                        <span class="headerFontSize">@Messages(constants.View.MUTABLE_META_PROPERTIES):</span>
-                        @metaProperties(PropertyList(document.get.mutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
+                        @metaProperties(constants.View.MUTABLE_META_PROPERTIES, PropertyList(document.get.mutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
                     }
                     @if(!document.get.mutables.getProperties.forall(_.isMeta)) {
-                        <span class="headerFontSize">@Messages(constants.View.MUTABLE_MESA_PROPERTIES):</span>
-                        @mesaProperties(PropertyList(document.get.mutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
+                        @mesaProperties(constants.View.MUTABLE_MESA_PROPERTIES, PropertyList(document.get.mutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
                     }
                 } else {
                     @Messages(constants.View.DOCUMENT_NOT_FOUND)
