@@ -5256,3 +5256,8 @@ figure .block:hover {
 #documentSubProperties .cmuk-card-body{
     margin: 0px 16px 16px 16px;
 }
+
+.navigationBarLogo{
+    width: 185px !important;
+    height: 33px !important;
+}
