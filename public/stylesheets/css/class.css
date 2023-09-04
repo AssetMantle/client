@@ -4713,6 +4713,7 @@ figure .block:hover {
 }
 
 #validatorsList .cmuk-subnav {
+    margin-top: -58px;
     margin-left: 0px !important;
     justify-content: end;
 }
