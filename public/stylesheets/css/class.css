@@ -5257,6 +5257,17 @@ figure .block:hover {
     margin: 0px 16px 16px 16px;
 }
 
+#assetMantleStatistics .cmuk-table{
+    background-color: var(--card-color);
+    border-radius: 10px;
+}
+#assetMantleStatistics .productTable{
+    padding: 16px;
+}
+#assetMantleStatistics .cmuk-table td{
+    padding: 16px;
+}
+
 .navigationBarLogo{
     width: 185px !important;
     height: 33px !important;
