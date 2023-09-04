@@ -1174,6 +1174,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .textOverflowCopy {
     display: flex;
+    justify-content: center;
 }
 
 .textOverflowCopy .cmuk-icon-button {
