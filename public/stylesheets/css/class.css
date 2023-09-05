@@ -725,9 +725,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .headerFontSize {
     font-family: var(--font-type-1);
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 24px;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 120%;
     text-transform: capitalize;
     color: var(--dark);
 }
@@ -1174,6 +1174,7 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .textOverflowCopy {
     display: flex;
+    justify-content: center;
 }
 
 .textOverflowCopy .cmuk-icon-button {
@@ -4405,9 +4406,9 @@ figure .block:hover {
 #validatorsList .leftText,
 .proposals .leftText {
     font-family: var(--font-type-1);
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 24px;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 120%;
     text-transform: capitalize;
     color: var(--dark);
 }
@@ -4712,6 +4713,7 @@ figure .block:hover {
 }
 
 #validatorsList .cmuk-subnav {
+    margin-top: -58px;
     margin-left: 0px !important;
     justify-content: end;
 }
@@ -5255,4 +5257,20 @@ figure .block:hover {
 #documentDetails .cmuk-card-body.cmuk-height-medium,
 #documentSubProperties .cmuk-card-body{
     margin: 0px 16px 16px 16px;
+}
+
+#assetMantleStatistics .cmuk-table{
+    background-color: var(--card-color);
+    border-radius: 10px;
+}
+#assetMantleStatistics .productTable{
+    padding: 16px;
+}
+#assetMantleStatistics .cmuk-table td{
+    padding: 16px;
+}
+
+.navigationBarLogo{
+    width: 185px !important;
+    height: 33px !important;
 }
