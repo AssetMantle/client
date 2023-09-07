@@ -19,7 +19,6 @@ case class ProposalVote(proposalID: Int, voter: String, option: String, weight: 
 class ProposalVotes @Inject()(
                                protected val databaseConfigProvider: DatabaseConfigProvider,
                                blockchainValidators: Validators,
-                               blockchainProposals: Proposals,
                                utilitiesOperations: utilities.Operations
                              )(implicit executionContext: ExecutionContext) {
 
