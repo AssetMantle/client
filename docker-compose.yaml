@@ -1,0 +1,123 @@
+version: "3.7"
+services:
+  explorer:
+    container_name: explorer
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: [9000:9000]
+    entrypoint: /bin/bash
+    command:
+      - -cx
+      - |
+        apt update
+        apt install -y postgresql-client
+        PGPASSWORD=postgres psql "host=postgres user=postgres" </explorer/conf/evolutions/default/0.sql || true
+        apt remove -y postgresql-client
+        /explorer/bin/assetmantle
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PASSWORD=assetMantle
+      - POSTGRES_DB=assetMantle
+      - POSTGRES_USER=assetMantle
+      - ASCENDEX_URL=https://ascendex.com/api/pro/v1
+      - BAND_CHAIN_URL=guanyu-devnet.bandchain.org
+      - BLOCKCHAIN_RPC_URL=http://testnet:26657
+      - BLOCKCHAIN_REST_URL=http://testnet:1317
+      - CHAIN_ID=mantle-1
+      - DOCU_SIGN_BASE_PATH=https://demo.docusign.net/restapi
+      - DOCU_SIGN_OAUTH_BASE_PATH=https://account-d.docusign.com/oauth/token
+      - GENESIS_FILE_PATH=/genesis/.mantleNode/config/genesis.json
+      - KEY_STORE_FILE_PATH=/keystore/mantlekeystore
+      - KEY_STORE_PASSWORD=123123123
+      - MAILGUN_PASSWORD=dsfkjbsdkjfbksjdbfsbdkjfbsdjkfbkjsdbfkjbsdjkfbkjsdbfs
+      - MAILGUN_USER=postmaster@dev.comdex.sg
+      - MEMBER_CHECK_URL=https://demo.membercheck.com
+      - PLAY_HTTP_SECRET=d7oJaPFAnguWe8OU8aeST964GeR_XJ5TS[ho@_];VBq8sQ0kNBM@v/psglncUr&amp;gt;x
+      - ROOT_FILE_PATH=/
+      - STAKING_DENOM=umntl
+      - TRULIOO_URL=https://api.globalgateway.io
+      - WEB_APP_URL=http://localhost:9092
+      - COINGECKO_URL=https://api.coingecko.com/api/v3
+      - BLOCKCHAIN_ACCOUNT_PREFIX=mantle
+      ## START migrate 0.slq
+      - DB_MIGRATION=true
+      - POSTGRES_ROOT_USERNAME=postgres
+      - POSTGRES_ROOT_PASSWORD=postgres
+      ## END migrate 0.slq
+    volumes:
+      - testnet-data:/genesis/
+      - ./mantlekeystore:/keystore/mantlekeystore
+    depends_on: [testnet, postgres]
+
+  testnet:
+    image: assetmantle/mantlenode
+    container_name: testnet
+    user: root
+    # ports: [26657:26657, 1317:1317]
+    entrypoint: [/bin/bash]
+    command:
+      - -cx
+      - |
+        mantleNode init test-node --chain-id mantle-1
+        mantleNode keys add test-node --keyring-backend test
+        mantleNode add-genesis-account $$(mantleNode keys show test-node -a --keyring-backend test) "299999000000000umantle"
+        sed -i 's/stake/umantle/g' /assetmantle/.mantleNode/config/genesis.json
+        mantleNode gentx test-node "100000000000000umantle" \
+          --chain-id mantle-1 \
+          --moniker="test-node-1" \
+          --commission-rate="0.02" \
+          --commission-max-rate="0.5" \
+          --commission-max-change-rate="0.02" \
+          --keyring-backend test
+        mantleNode validate-genesis
+        mantleNode collect-gentxs
+        mantleNode validate-genesis
+        if [[ -z "$$(grep '\[api\]' -A 5 $${APP_TOML} | grep true)" ]]; then
+          sed -i '1,/enable = false/{s/enable = false/enable = true/g}' $${APP_TOML}
+        fi
+        sed -i 's/cors_allowed_origins.*/cors_allowed_origins = ["*"]/g' $${CONFIG_TOML}
+        sed -i 's/cors_allowed_methods.*/cors_allowed_methods = ["*"]/g' $${CONFIG_TOML}
+        sed -i 's/cors_allowed_headers.*/cors_allowed_headers = ["*"]/g' $${CONFIG_TOML}
+        mantleNode start \
+          --pruning=custom \
+          --pruning-keep-every=0 \
+          --pruning-interval=100 \
+          --pruning-keep-recent=1000 \
+          --rpc.laddr=tcp://0.0.0.0:26657 \
+          --x-crisis-skip-assert-invariants
+    volumes:
+      - testnet-data:/assetmantle/
+    environment:
+      - CONFIG_TOML=/assetmantle/.mantleNode/config/config.toml
+      - APP_TOML=/assetmantle/.mantleNode/config/app.toml
+    healthcheck:
+      test: ["CMD", "curl", "-L", "--fail", "testnet:26657/status?"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: bitnami/postgresql:14
+    restart: always
+    container_name: postgres
+    # ports: [5432:5432]
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_DATABASE=postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "postgres", "-U", "postgres"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - explorer-postgresql-data:/bitnami/postgresql
+
+volumes:
+  explorer-postgresql-data:
+    driver: local
+  testnet-data:
+    driver: local

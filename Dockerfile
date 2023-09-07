@@ -1,37 +1,65 @@
-FROM openjdk:11
-WORKDIR /opt/docker
-COPY target/docker/stage/opt /opt
-ARG POSTGRES_HOST
-ARG POSTGRES_USER
-ARG POSTGRES_PASSWORD
-ARG POSTGRES_DB
-ARG WEB_APP_URL
-ARG BLOCKCHAIN_HOST
-ARG BLOCKCHAIN_REST_PORT
-ARG BLOCKCHAIN_ABCI_PORT
-ARG ASCENDEX_URL
-ARG BAND_CHAIN_URL
-ARG MAILGUN_USER
-ARG MAILGUN_PASSWORD
-ARG KEY_STORE_FILE_PATH
-ARG KEY_STORE_PASSWORD
-ENV ROOT_FILE_PATH = /opt/docker
-ENV PLAY_SECRET=${PLAY_SECRET}
-ENV ASCENDEX_URL="${ASCENDEX_URL}"
-ENV BAND_CHAIN_URL="${BAND_CHAIN_URL}"
-ENV APPLICATION_FILE=${APPLICATION_FILE}
-ENV POSTGRES_HOST="${POSTGRES_HOST}"
-ENV POSTGRES_USER="${POSTGRES_USER}"
-ENV POSTGRES_PASSWORD="${POSTGRES_PASSWORD}"
-ENV POSTGRES_DB="${POSTGRES_DB}"
-ENV WEB_APP_URL="${WEB_APP_URL}"
-ENV GENESIS_FILE_PATH=/opt/docker/genesis.json
-ENV BLOCKCHAIN_HOST="${BLOCKCHAIN_HOST}"
-ENV BLOCKCHAIN_REST_PORT="${BLOCKCHAIN_REST_PORT}"
-ENV BLOCKCHAIN_ABCI_PORT="${BLOCKCHAIN_ABCI_PORT}"
-ENV MAILGUN_USER="${MAILGUN_USER}"
-ENV MAILGUN_PASSWORD="${MAILGUN_PASSWORD}"
-ENV KEY_STORE_FILE_PATH=${KEY_STORE_FILE_PATH}
-ENV KEY_STORE_PASSWORD="${KEY_STORE_PASSWORD}"
-ENTRYPOINT ["/opt/docker/bin/persistenceclient","-Dplay.http.secret.key=${PLAY_SECRET}"]
-CMD []
+# syntax=docker/dockerfile:latest
+ARG BUILD_IMAGE=adoptopenjdk:11-jdk-hotspot
+ARG JRE_IMAGE=adoptopenjdk:11-jre-hotspot
+
+FROM ${BUILD_IMAGE} as build
+SHELL [ "/bin/bash", "-cx" ]
+WORKDIR /tmp
+RUN apt update; apt install -yqq git curl wget ssh; \
+  mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+# COPY ./project/build.properties ./
+# COPY <<EOF /root/.ssh/id_rsa
+# PRIV KEY TO FETCH THE REPO
+# EOF
+RUN --mount=type=secret,id=git,target=/root/.ssh/id_rsa \
+  SBT_VERSION=$(grep 'sbt.version' build.properties | cut -d'=' -f2); \
+  curl -sLo - https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz | tar -xvzf -; \
+  mv sbt/bin/* /usr/local/bin/; \
+  chmod 0400 -cR /root/.ssh/id_rsa; \
+  rm -rf /tmp/*
+
+WORKDIR /app
+ENV JAVA_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
+ENV JVM_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
+ENV SBT_OPTS="-Xms4G -Xmx8G -Xss6M -XX:ReservedCodeCacheSize=256M -XX:+CMSClassUnloadingEnabled -XX:+UseG1GC"
+ARG APP_VERSION
+ENV APP_VERSION=$APP_VERSION
+COPY . .
+RUN --mount=type=cache,target=/root/.sbt \
+  --mount=type=cache,target=/root/.cache \
+  --mount=type=cache,target=/root/.ivy2 \
+  sbt dist; \
+  echo $APP_VERSION
+
+FROM ${JRE_IMAGE} as extract
+SHELL [ "/bin/bash", "-cx" ]
+WORKDIR /app
+RUN --mount=type=cache,target=/var/lib/apt/cache \
+  --mount=type=cache,target=/var/lib/cache \
+  apt update; \
+  apt install unzip -y
+COPY --from=build /app/target/universal/ /app
+RUN cp *.zip assetmantle.zip; \
+  ls -alt; \
+  unzip assetmantle.zip; \
+  ls -alt; \
+  rm *.zip; \
+  ls -alt; \
+  mv assetmantle* assetmantle; \
+  ls -alt
+
+FROM scratch as dist
+WORKDIR /
+COPY --from=build /app/target/universal/assetmantle*.zip /assetmantle.zip
+
+FROM ${JRE_IMAGE}
+ARG APP_VERSION
+ENV APP_VERSION=$APP_VERSION
+LABEL org.opencontainers.image.title=explorer
+LABEL org.opencontainers.image.base.name=${JRE_IMAGE}
+LABEL org.opencontainers.image.description=explorer
+LABEL org.opencontainers.image.source=https://github.com/assetmantle/client
+LABEL org.opencontainers.image.documentation=https://github.com/assetmantle/client
+WORKDIR /
+COPY --from=extract /app/assetmantle /explorer
+CMD [ "/explorer/bin/assetmantle" ]
