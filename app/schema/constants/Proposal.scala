@@ -6,6 +6,7 @@ object Proposal {
   val COMMUNITY_POOL_SPEND = "/cosmos.distribution.v1beta1.CommunityPoolSpendProposal"
   val SOFTWARE_UPGRADE = "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal"
   val CANCEL_SOFTWARE_UPGRADE = "/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal"
+  val IBC_CLIENT_UPDATE = "/ibc.core.client.v1.ClientUpdateProposal"
 
   object Status {
     val UNSPECIFIED = "PROPOSAL_STATUS_UNSPECIFIED"

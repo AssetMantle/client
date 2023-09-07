@@ -20,6 +20,8 @@ import scala.util.{Failure, Success}
 
 case class Proposal(id: Int, content: ProposalContent, status: String, finalTallyResult: FinalTallyResult, submitTime: RFC3339, depositEndTime: RFC3339, totalDeposit: Seq[Coin], votingStartTime: RFC3339, votingEndTime: RFC3339, createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
 
+  def getProposalType: String = this.content.getType
+
   def addDeposit(depositCoins: Seq[Coin]): Proposal = Proposal(
     id = id, content = content, status = status, finalTallyResult = finalTallyResult, submitTime = submitTime, depositEndTime = depositEndTime,
     totalDeposit = utilities.Blockchain.addCoins(totalDeposit, depositCoins),

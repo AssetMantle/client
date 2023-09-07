@@ -1,10 +1,11 @@
 package models.Abstract
 
-import com.google.protobuf.{Any => protoAny}
 import com.cosmos.distribution.{v1beta1 => distributionProto}
 import com.cosmos.gov.{v1beta1 => govProto}
 import com.cosmos.params.{v1beta1 => paramsProto}
 import com.cosmos.upgrade.{v1beta1 => upgradeProto}
+import com.google.protobuf.{Any => protoAny}
+import com.ibc.core.client.v1.ClientUpdateProposal
 import models.common.ProposalContents._
 import models.common.Serializable.Coin
 import play.api.Logger
@@ -14,6 +15,8 @@ import scala.jdk.CollectionConverters.CollectionHasAsScala
 abstract class ProposalContent {
   val title: String
   val description: String
+
+  def getType: String
 
   def toProto: protoAny
 }
@@ -44,6 +47,10 @@ object ProposalContent {
     case schema.constants.Proposal.COMMUNITY_POOL_SPEND => {
       val parameterProto = distributionProto.CommunityPoolSpendProposal.parseFrom(protoProposalContent.getValue)
       CommunityPoolSpend(title = parameterProto.getTitle, description = parameterProto.getDescription, recipient = parameterProto.getRecipient, amount = parameterProto.getAmountList.asScala.toSeq.map(x => Coin(x)))
+    }
+    case schema.constants.Proposal.IBC_CLIENT_UPDATE => {
+      val parameterProto = ClientUpdateProposal.parseFrom(protoProposalContent.getValue)
+      IBCClientUpdate(title = parameterProto.getTitle, description = parameterProto.getDescription, subjectClientId = parameterProto.getSubjectClientId, substituteClientId = parameterProto.getSubstituteClientId)
     }
   }
 }

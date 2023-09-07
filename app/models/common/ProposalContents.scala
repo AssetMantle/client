@@ -5,6 +5,7 @@ import com.cosmos.gov.{v1beta1 => govProto}
 import com.cosmos.params.{v1beta1 => paramsProto}
 import com.cosmos.upgrade.{v1beta1 => upgradeProto}
 import com.google.protobuf.{Any => protoAny, Timestamp => protoTimestamp}
+import com.ibc.core.client.v1.ClientUpdateProposal
 import models.Abstract.ProposalContent
 import models.common.Serializable.Coin
 
@@ -15,6 +16,8 @@ object ProposalContents {
   case class Plan(name: String, time: Long, height: String, info: String)
 
   case class SoftwareUpgrade(title: String, description: String, plan: Plan) extends ProposalContent {
+
+    def getType: String = constants.View.CHAIN_UPGRADE
 
     def toProto: protoAny = protoAny.newBuilder()
       .setTypeUrl(schema.constants.Proposal.SOFTWARE_UPGRADE)
@@ -41,6 +44,9 @@ object ProposalContents {
   }
 
   case class ParameterChange(title: String, description: String, changes: Seq[Change]) extends ProposalContent {
+
+    def getType: String = constants.View.CHANGE_PARAMETER
+
     def toProto: protoAny = protoAny.newBuilder()
       .setTypeUrl(schema.constants.Proposal.PARAMETER_CHANGE)
       .setValue(
@@ -54,6 +60,9 @@ object ProposalContents {
   }
 
   case class Text(title: String, description: String) extends ProposalContent {
+
+    def getType: String = constants.View.TEXT
+
     def toProto: protoAny = protoAny.newBuilder()
       .setTypeUrl(schema.constants.Proposal.TEXT)
       .setValue(
@@ -66,6 +75,9 @@ object ProposalContents {
   }
 
   case class CommunityPoolSpend(title: String, description: String, recipient: String, amount: Seq[Coin]) extends ProposalContent {
+
+    def getType: String = constants.View.SPEND_COMMUNITY_POOL
+
     def toProto: protoAny = protoAny.newBuilder()
       .setTypeUrl(schema.constants.Proposal.COMMUNITY_POOL_SPEND)
       .setValue(
@@ -80,12 +92,32 @@ object ProposalContents {
   }
 
   case class CancelSoftwareUpgrade(title: String, description: String) extends ProposalContent {
+
+    def getType: String = constants.View.CANCEL_CHAIN_UPGRADE
+
     def toProto: protoAny = protoAny.newBuilder()
       .setTypeUrl(schema.constants.Proposal.CANCEL_SOFTWARE_UPGRADE)
       .setValue(
         upgradeProto.CancelSoftwareUpgradeProposal.newBuilder()
           .setTitle(this.title)
           .setDescription(this.description)
+          .build().toByteString
+      )
+      .build()
+  }
+
+  case class IBCClientUpdate(title: String, description: String, subjectClientId: String, substituteClientId: String) extends ProposalContent {
+
+    def getType: String = constants.View.IBC_CLIENT_UPDATE
+
+    def toProto: protoAny = protoAny.newBuilder()
+      .setTypeUrl(schema.constants.Proposal.IBC_CLIENT_UPDATE)
+      .setValue(
+        ClientUpdateProposal.newBuilder()
+          .setTitle(this.title)
+          .setDescription(this.description)
+          .setSubjectClientId(this.subjectClientId)
+          .setSubstituteClientId(this.substituteClientId)
           .build().toByteString
       )
       .build()

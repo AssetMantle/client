@@ -63,12 +63,21 @@ object ProposalContents {
 
   implicit val cancelSoftwareUpgradeReads: Reads[CancelSoftwareUpgrade] = Json.reads[CancelSoftwareUpgrade]
 
+  case class IBCClientUpdate(title: String, description: String, subject_client_id: String, substitute_client_id: String) extends ProposalContent {
+    val proposalContentType: String = schema.constants.Proposal.IBC_CLIENT_UPDATE
+
+    def toSerializableProposalContent: SerializableProposalContents.IBCClientUpdate = SerializableProposalContents.IBCClientUpdate(title = title, description = description, subjectClientId = this.subject_client_id, substituteClientId = this.substitute_client_id)
+  }
+
+  implicit val ibcClientUpdateReads: Reads[IBCClientUpdate] = Json.reads[IBCClientUpdate]
+
   def proposalContentApply(proposalContentType: String, value: JsObject): ProposalContent = proposalContentType match {
     case schema.constants.Proposal.CANCEL_SOFTWARE_UPGRADE => utilities.JSON.convertJsonStringToObject[CancelSoftwareUpgrade](value.toString)
     case schema.constants.Proposal.SOFTWARE_UPGRADE => utilities.JSON.convertJsonStringToObject[SoftwareUpgrade](value.toString)
     case schema.constants.Proposal.PARAMETER_CHANGE => utilities.JSON.convertJsonStringToObject[ParameterChange](value.toString)
     case schema.constants.Proposal.TEXT => utilities.JSON.convertJsonStringToObject[Text](value.toString)
     case schema.constants.Proposal.COMMUNITY_POOL_SPEND => utilities.JSON.convertJsonStringToObject[CommunityPoolSpend](value.toString)
+    case schema.constants.Proposal.IBC_CLIENT_UPDATE => utilities.JSON.convertJsonStringToObject[IBCClientUpdate](value.toString)
     case _ => constants.Response.NO_SUCH_PROPOSAL_CONTENT_TYPE.throwBaseException()
   }
 
