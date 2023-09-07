@@ -3,9 +3,9 @@
 name: Explorer - Production
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - explorer/master
+    tags: ["*"]
 
 jobs:
   build-and-deploy:
