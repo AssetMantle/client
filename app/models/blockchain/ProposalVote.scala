@@ -19,6 +19,7 @@ case class ProposalVote(proposalID: Int, voter: String, option: String, weight: 
 class ProposalVotes @Inject()(
                                protected val databaseConfigProvider: DatabaseConfigProvider,
                                blockchainValidators: Validators,
+                               blockchainProposals: Proposals,
                                utilitiesOperations: utilities.Operations
                              )(implicit executionContext: ExecutionContext) {
 
@@ -101,12 +102,15 @@ class ProposalVotes @Inject()(
 
     def onVote(vote: govTx.MsgVote)(implicit header: Header): Future[String] = {
       val delete = Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt)
+      val isValidator = blockchainValidators.Service.exists(utilities.Crypto.convertAccountAddressToOperatorAddress(vote.getVoter))
 
-      def add = Service.add(ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = vote.getOption.toString, weight = 1))
+      def add(isValidator: Boolean) = if (isValidator) Service.add(ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = vote.getOption.toString, weight = 1))
+      else Future(0)
 
       (for {
         _ <- delete
-        _ <- add
+        isValidator <- isValidator
+        _ <- add(isValidator)
       } yield vote.getVoter).recover {
         case _: BaseException => logger.error(schema.constants.Messages.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           vote.getVoter
@@ -115,13 +119,15 @@ class ProposalVotes @Inject()(
 
     def onWeightedVote(vote: govTx.MsgVoteWeighted)(implicit header: Header): Future[String] = {
       val delete = Service.deleteAllVotesForProposal(address = vote.getVoter, proposalID = vote.getProposalId.toInt)
+      val isValidator = blockchainValidators.Service.exists(utilities.Crypto.convertAccountAddressToOperatorAddress(vote.getVoter))
       val proposalVotes = vote.getOptionsList.asScala.toSeq.map(x => ProposalVote(proposalID = vote.getProposalId.toInt, voter = vote.getVoter, option = x.getOption.toString, weight = BigDecimal(x.getWeight)))
 
-      def add = Service.add(proposalVotes)
+      def add(isValidator: Boolean) = if (isValidator) Service.add(proposalVotes) else Future()
 
       (for {
         _ <- delete
-        _ <- add
+        isValidator <- isValidator
+        _ <- add(isValidator)
       } yield vote.getVoter).recover {
         case _: BaseException => logger.error(schema.constants.Messages.VOTE + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           vote.getVoter

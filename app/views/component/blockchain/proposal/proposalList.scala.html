@@ -22,7 +22,7 @@
                     <tr>
                         <td>@commonJavascriptLink(proposal.id.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposal(${proposal.id}))"))</td>
                         <td>@proposal.content.title</td>
-                        <td>@proposal.getProposalType</td>
+                        <td>@Messages(proposal.getProposalType)</td>
                         <td>@Messages(proposal.status)</td>
                     </tr>
                 }
