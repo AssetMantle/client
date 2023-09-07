@@ -86,7 +86,7 @@ body .block {
 }
 
 #tokensPrices .cmuk-card-body .chartContainer {
-    padding: 16px;
+    /*padding: 16px;*/
     /*background-color: var(--card-color);*/
     border-radius: 10px;
 }
@@ -4286,7 +4286,7 @@ figure.zoom img {
 }
 
 #transactionStatistics .cmuk-card-body .chartContainer {
-    padding: 16px;
+    /*padding: 16px;*/
     /*background-color: var(--card-color);*/
     border-radius: 10px;
 }
@@ -4300,7 +4300,7 @@ figure.zoom img {
 }
 
 #transactionMessagesStatistics .cmuk-card-body .chartContainer {
-    padding: 16px;
+    /*padding: 16px;*/
     /*background-color: var(--card-color);*/
     border-radius: 10px;
     min-height: 204px;
@@ -5200,7 +5200,7 @@ figure .block:hover {
 }
 
 #walletDetails .walletDetailsContent .QRContainer {
-    padding: 8px;
+    /*padding: 8px;*/
     /*background-color: var(--card-color);*/
     border-radius: 10px;
 }
