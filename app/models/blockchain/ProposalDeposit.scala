@@ -168,6 +168,7 @@ class ProposalDeposits @Inject()(
           case schema.constants.Proposal.SOFTWARE_UPGRADE => Future()
           case schema.constants.Proposal.CANCEL_SOFTWARE_UPGRADE => Future()
           case schema.constants.Proposal.TEXT => Future()
+          case schema.constants.Proposal.IBC_CLIENT_UPDATE => Future()
           case _ => Future()
         }
       } else Future()

@@ -37,7 +37,7 @@
             <td>
                 <div class="tableField">
                     <div class="tableFieldTitle">@Messages(constants.View.TYPE)</div>
-                    <div class="tableFieldValue">@proposal.content.toProto.getTypeUrl</div>
+                    <div class="tableFieldValue">@proposal.getProposalType</div>
                 </div>
             </td>
         </tr>
@@ -143,7 +143,11 @@
                     @views.html.component.blockchain.proposal.govParamterChanges(parameterChange)
                 }
             }
-            case schema.constants.Proposal.TEXT => {}
+            case schema.constants.Proposal.TEXT => {
+                @defining(proposal.content.asInstanceOf[Text]) { textProposal =>
+                    @views.html.component.blockchain.proposal.textProposal(textProposal)
+                }
+            }
             case schema.constants.Proposal.COMMUNITY_POOL_SPEND => {
                 @defining(proposal.content.asInstanceOf[CommunityPoolSpend]) { communityPoolSpend =>
                     @views.html.component.blockchain.proposal.communityPoolSpend(communityPoolSpend)
@@ -154,7 +158,16 @@
                     @views.html.component.blockchain.proposal.softwareUpgrade(softwareUpgrade)
                 }
             }
-            case schema.constants.Proposal.CANCEL_SOFTWARE_UPGRADE => {}
+            case schema.constants.Proposal.CANCEL_SOFTWARE_UPGRADE => {
+                @defining(proposal.content.asInstanceOf[CancelSoftwareUpgrade]) { cancelSoftwareUpgrade =>
+                    @views.html.component.blockchain.proposal.cancelSoftwareUpgrade(cancelSoftwareUpgrade)
+                }
+            }
+            case schema.constants.Proposal.IBC_CLIENT_UPDATE => {
+                @defining(proposal.content.asInstanceOf[IBCClientUpdate]) { ibcClientUpdate =>
+                    @views.html.component.blockchain.proposal.ibcClientUpdate(ibcClientUpdate)
+                }
+            }
             case _ => {}
         }
     }
