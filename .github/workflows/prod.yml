@@ -76,7 +76,8 @@ jobs:
             EOT
             unzip -q -d /home/admin/assetmantle-next /home/admin/assetmantle-next/target/universal/assetmantle-1.0.zip
             sudo systemctl stop explorer
-            mv /home/admin/assetmantle-next/assetmantle-1.0/ /home/admin/explorer
+            rm -rf /home/admin/explorer/*
+            cp -r /home/admin/assetmantle-next/assetmantle-1.0/* /home/admin/explorer/
             sudo systemctl start explorer
 
             cat <<EOT
