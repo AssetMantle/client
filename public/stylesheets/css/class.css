@@ -86,8 +86,8 @@ body .block {
 }
 
 #tokensPrices .cmuk-card-body .chartContainer {
-    padding: 16px;
-    background-color: var(--card-color);
+    /*padding: 16px;*/
+    /*background-color: var(--card-color);*/
     border-radius: 10px;
 }
 
@@ -725,9 +725,9 @@ html, body, .comdex .cmuk-overflow-auto, .modal .modalContent .modalBody form .f
 
 .headerFontSize {
     font-family: var(--font-type-1);
-    font-weight: 400;
-    font-size: 22px;
-    line-height: 120%;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
     text-transform: capitalize;
     color: var(--dark);
 }
@@ -4286,8 +4286,8 @@ figure.zoom img {
 }
 
 #transactionStatistics .cmuk-card-body .chartContainer {
-    padding: 16px;
-    background-color: var(--card-color);
+    /*padding: 16px;*/
+    /*background-color: var(--card-color);*/
     border-radius: 10px;
 }
 
@@ -4300,8 +4300,8 @@ figure.zoom img {
 }
 
 #transactionMessagesStatistics .cmuk-card-body .chartContainer {
-    padding: 16px;
-    background-color: var(--card-color);
+    /*padding: 16px;*/
+    /*background-color: var(--card-color);*/
     border-radius: 10px;
     min-height: 204px;
     height: 100%;
@@ -4406,9 +4406,9 @@ figure .block:hover {
 #validatorsList .leftText,
 .proposals .leftText {
     font-family: var(--font-type-1);
-    font-weight: 400;
-    font-size: 22px;
-    line-height: 120%;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
     text-transform: capitalize;
     color: var(--dark);
 }
@@ -5200,8 +5200,8 @@ figure .block:hover {
 }
 
 #walletDetails .walletDetailsContent .QRContainer {
-    padding: 8px;
-    background-color: var(--card-color);
+    /*padding: 8px;*/
+    /*background-color: var(--card-color);*/
     border-radius: 10px;
 }
 
@@ -5260,7 +5260,7 @@ figure .block:hover {
 }
 
 #assetMantleStatistics .cmuk-table{
-    background-color: var(--card-color);
+    /*background-color: var(--card-color);*/
     border-radius: 10px;
 }
 #assetMantleStatistics .productTable{
@@ -5271,6 +5271,5 @@ figure .block:hover {
 }
 
 .navigationBarLogo{
-    width: 185px !important;
-    height: 33px !important;
+    width: 160px !important;
 }

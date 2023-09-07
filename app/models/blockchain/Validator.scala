@@ -245,16 +245,16 @@ class Validators @Inject()(
 
     def jailValidator(operatorAddress: String): Future[Int] = updateJailedStatus(operatorAddress = operatorAddress, jailed = true)
 
-//    def delete(operatorAddress: String): Future[Unit] = {
-//      val deleteKeyBaseAccount = keyBaseValidatorAccounts.Service.delete(operatorAddress)
-//
-//      def deleteValidator() = deleteByOperatorAddress(operatorAddress)
-//
-//      for {
-//        _ <- deleteKeyBaseAccount
-//        _ <- deleteValidator()
-//      } yield ()
-//    }
+    //    def delete(operatorAddress: String): Future[Unit] = {
+    //      val deleteKeyBaseAccount = keyBaseValidatorAccounts.Service.delete(operatorAddress)
+    //
+    //      def deleteValidator() = deleteByOperatorAddress(operatorAddress)
+    //
+    //      for {
+    //        _ <- deleteKeyBaseAccount
+    //        _ <- deleteValidator()
+    //      } yield ()
+    //    }
 
     def getTotalVotingPower: Future[MicroNumber] = getAllVotingPowers.map(_.map(x => new MicroNumber(x)).sum)
   }
