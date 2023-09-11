@@ -134,7 +134,7 @@ class Authorizations @Inject()(
 
     def getListByGrantee(address: String): Future[Seq[Authorization]] = getByGrantee(address)
 
-    def get(granter: String, grantee: String) = findByGranterAndGrantee(granter = granter, grantee = grantee)
+    def get(granter: String, grantee: String): Future[Seq[Authorization]] = findByGranterAndGrantee(granter = granter, grantee = grantee)
 
     def delete(granter: String, grantee: String, msgTypeURL: String): Future[Int] = deleteByGranterGranteeAndMsgType(granter = granter, grantee = grantee, msgTypeURL = msgTypeURL)
 
@@ -163,38 +163,35 @@ class Authorizations @Inject()(
       }
     }
 
-    def onExecuteAuthorization(executeAuthorization: authzTx.MsgExec, granter: String)(implicit header: Header): Future[String] = {
-      val execute = if (granter != executeAuthorization.getGrantee) {
+    def onExecuteAuthorization(executeAuthorization: authzTx.MsgExec, granters: Seq[String])(implicit header: Header): Future[String] = {
+
+      val execute = utilitiesOperations.traverse(granters) { granter =>
         utilitiesOperations.traverse(executeAuthorization.getMsgsList.asScala.toSeq) { msg =>
 
-          val authorizations = getAuthorizations.Service.get(granter = granter, grantee = executeAuthorization.getGrantee)
-          val delete = Service.delete(granter = granter, grantee = executeAuthorization.getGrantee)
+          val bcAuthz = Service.get(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = msg.getTypeUrl)
 
-          //          def updateOrDelete(optionalAuthorization: Option[Authorization]) = optionalAuthorization.fold {
+          def updateOrDelete(optionalAuthorization: Option[Authorization]) = optionalAuthorization.fold {
+            insertOrUpdateAuthorization(granter = granter, grantee = executeAuthorization.getGrantee)
+          } { authorization =>
+            val response = authorization.getAuthorization.validate(msg)
+            val deleteOrUpdate = if (response.delete) Service.delete(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = msg.getTypeUrl)
+            else if (response.updated.nonEmpty) Service.insertOrUpdate(authorization.copy(grantedAuthorization = response.updated.fold(constants.Response.GRANT_AUTHORIZATION_NOT_FOUND.throwBaseException())(x => x.toAnyProto.toByteString.toByteArray)))
+            else Future(0)
 
-          //            val response = authorization.getAuthorization.validate(msg)
-          //            val deleteOrUpdate = if (response.delete) Service.delete(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = msg.getTypeUrl)
-          //            else if (response.updated.nonEmpty) Service.insertOrUpdate(authorization.copy(grantedAuthorization = response.updated.fold(throw new BaseException(constants.Response.GRANT_AUTHORIZATION_NOT_FOUND))(x => x.toProto.toByteString.toByteArray)))
-          //            else Future(0)
-          //
-          //            for {
-          //              _ <- deleteOrUpdate
-          //            } yield ()
-          //          }
-
-          def upsert(authorizationResponse: queries.responses.blockchain.AuthorizationsResponse.Response) = {
-            if (authorizationResponse.grants.nonEmpty)
-              Service.insertOrUpdate(authorizationResponse.grants.map(x => Authorization(granter = granter, grantee = executeAuthorization.getGrantee, msgTypeURL = x.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = x.authorization.toSerializable.toAnyProto.toByteString.toByteArray, expiration = x.expiration.epoch)))
-            else Future()
+            (for {
+              _ <- deleteOrUpdate
+            } yield ()
+              ).recover {
+              case _: BaseException => insertOrUpdateAuthorization(granter = granter, grantee = executeAuthorization.getGrantee)
+            }
           }
 
           for {
-            authorizations <- authorizations
-            _ <- delete
-            _ <- upsert(authorizations)
+            bcAuthz <- bcAuthz
+            _ <- updateOrDelete(bcAuthz)
           } yield ()
         }
-      } else Future(Seq())
+      }
 
       (for {
         _ <- execute
@@ -202,6 +199,23 @@ class Authorizations @Inject()(
         case _: BaseException => logger.error(schema.constants.Messages.EXECUTE_AUTHORIZATION + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           executeAuthorization.getGrantee
       }
+    }
+
+    private def insertOrUpdateAuthorization(granter: String, grantee: String) = {
+      val authorizations = getAuthorizations.Service.get(granter = granter, grantee = grantee)
+      val delete = Service.delete(granter = granter, grantee = grantee)
+
+      def upsert(authorizationResponse: queries.responses.blockchain.AuthorizationsResponse.Response) = {
+        if (authorizationResponse.grants.nonEmpty)
+          Service.insertOrUpdate(authorizationResponse.grants.map(x => Authorization(granter = granter, grantee = grantee, msgTypeURL = x.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = x.authorization.toSerializable.toAnyProto.toByteString.toByteArray, expiration = x.expiration.epoch)))
+        else Future()
+      }
+
+      for {
+        authorizations <- authorizations
+        _ <- delete
+        _ <- upsert(authorizations)
+      } yield ()
     }
 
   }
