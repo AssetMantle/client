@@ -4,7 +4,7 @@
 
 @(key: String, fungibleTokenPacketData: IBC.FungibleTokenPacketData)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@Messages(key):
+<div class="headerFontSize headerSpace">@Messages(key):</div>
 <div>
     @commonTextInfo(constants.View.DENOM, fungibleTokenPacketData.denom)
     @commonTextInfo(constants.View.AMOUNT, utilities.NumericOperation.formatNumber(fungibleTokenPacketData.amount, normalize = false))

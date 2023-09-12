@@ -5,7 +5,7 @@
 @import views.html.component.blockchain.txMessages.ibcMsg
 
 @(key: String, packet: Packet)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<div class="cmuk-text-left title">@Messages(key):</div>
+<div class="headerFontSize headerSpace">@Messages(key):</div>
 <div>
     @commonTextInfo(constants.View.SEQUENCE, packet.getSequence.toString)
     @commonTextInfo(constants.View.SOURCE_PORT, packet.getSourcePort)
