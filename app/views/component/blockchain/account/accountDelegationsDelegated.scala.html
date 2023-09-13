@@ -3,6 +3,7 @@
 @import scala.collection.immutable.ListMap
 @import utilities.MicroNumber
 @import views.html.base.cards._
+@import views.html.base.infos.commonHtmlToHtmlInfo
 
 @(delegations: ListMap[String, MicroNumber], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="pieChartContainer tableCard">
@@ -11,16 +12,17 @@
             <div class="delegationInfo">
                 @commonTable(id = "accountDelegationsDetail", tableType = "cmuk-table-divider") {
                 } {
-                    @delegations.map { case (validatorAddress, amount) =>
                     <tr>
                         <td>
                             <div class="tableField">
-                                <div class="tableFieldTitle">@commonJavascriptLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))"""))</div>
-                                <div class="tableFieldValue">@Html(utilities.NumericOperation.formatNumber(amount))</div>
+                                <div class="tableFieldValue">
+                                @delegations.map { case (validatorAddress, amount) =>
+                                    @commonHtmlToHtmlInfo(key = commonJavascriptLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")), value = Html(utilities.NumericOperation.formatNumber(amount)))
+                                }
+                                </div>
                             </div>
                         </td>
                     </tr>
-                    }
                 }
             </div>
             @commonPieChart("accountDelegationsDelegatedChart", ListMap(delegations.map{case (operator, amount) => validatorsMoniker.getOrElse(operator, operator) -> amount.toDouble}.toList: _*), showLegend = true)
