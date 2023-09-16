@@ -19,6 +19,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
                                 withoutLoginActionAsync: WithoutLoginActionAsync,
                                 startup: Startup,
                                 claimNames: ClaimNames,
+                                revertClaimNames: RevertClaimNames,
                                 cached: Cached,
                                 coordinatedShutdown: CoordinatedShutdown,
                                )(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -48,7 +49,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   utilities.Scheduler.startSchedulers(
     startup.explorerScheduler,
-    claimNames.Utility.scheduler
+    claimNames.Utility.scheduler,
+    revertClaimNames.Utility.scheduler
   )
 
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())

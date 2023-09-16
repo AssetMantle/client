@@ -1,7 +1,5 @@
 package constants
 
-import com.google.common.collect
-import com.google.common.collect.ImmutableList
 import org.bitcoinj.crypto.ChildNumber
 import play.api.Configuration
 
@@ -17,7 +15,7 @@ object Blockchain {
   val ChainID: String = AppConfig.configuration.get[String]("blockchain.chainID")
   val StakingDenom: String = AppConfig.configuration.get[String]("blockchain.stakingDenom")
   val CoinType = 118
-  val DefaultHDPath: ImmutableList[ChildNumber] = collect.ImmutableList.of(
+  val DefaultHDPath: Seq[ChildNumber] = Seq(
     new ChildNumber(44, true),
     new ChildNumber(CoinType, true),
     new ChildNumber(0, true),

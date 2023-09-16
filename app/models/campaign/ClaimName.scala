@@ -95,7 +95,7 @@ class ClaimNames @Inject()(
 
   object Utility {
 
-    private def onTransaction(tx: Transaction): Future[Unit] = {
+    private def onTransaction(tx: Transaction): Future[Unit] = if (tx.status) {
       val sendCoinMsg = tx.getMessages.filter(_.getTypeUrl == schema.constants.Messages.SEND_COIN)
         .map(x => bankTx.MsgSend.parseFrom(x.getValue))
         .find(_.getToAddress == CampaignAddress)
@@ -103,17 +103,17 @@ class ClaimNames @Inject()(
         val checkAlreadyTaken = Service.checkExistsByName(tx.getMemo)
 
         def checkAndAdd(checkAlreadyTaken: Boolean) = if (!checkAlreadyTaken) Service.add(ClaimName(claimTxHash = tx.hash, name = tx.getMemo, fromAddress = sendCoinMsg.get.getFromAddress, transferTxHash = None, transferStatus = None))
-        else Future("")
+        else revertSendCoin()
 
         for {
           checkAlreadyTaken <- checkAlreadyTaken
           _ <- checkAndAdd(checkAlreadyTaken)
         } yield ()
       } else Future()
-    }
+    } else Future()
 
     def onTransactions(txs: Seq[Transaction]): Future[Unit] = {
-      val process = utilitiesOperations.traverse(txs.filter(_.status))(tx => onTransaction(tx))
+      val process = utilitiesOperations.traverse(txs)(tx => onTransaction(tx))
       val markSuccess = Service.markTransferTxStatusSuccess(txs.filter(_.status).map(_.hash))
       val markFailed = Service.markTransferTxStatusFailed(txs.filter(!_.status).map(_.hash))
 
@@ -132,6 +132,10 @@ class ClaimNames @Inject()(
     }
 
     private def transferIdentity(): Future[Unit] = {
+      Future()
+    }
+
+    private def revertSendCoin(): Future[Unit] = {
       Future()
     }
 

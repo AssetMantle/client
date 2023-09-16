@@ -152,6 +152,7 @@ object Response {
   val PARAMETER_NOT_FOUND = new Failure("PARAMETER_NOT_FOUND")
   val PARAMETER_TYPE_NOT_FOUND = new Failure("PARAMETER_TYPE_NOT_FOUND")
   val EMPTY_QUERY = new Failure("EMPTY_QUERY")
+  val SIGNING_FAILED = new Failure("SIGNING_FAILED")
 
   class Failure(private val response: String) {
     val message: String = PREFIX + FAILURE_PREFIX + response
