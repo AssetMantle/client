@@ -34,20 +34,16 @@
                         </tr>
                     }
                     @if(document.get.immutables.getProperties.exists(_.isMeta)) {
-                        <span class="headerFontSize">@Messages(constants.View.IMMUTABLE_META_PROPERTIES):</span>
-                        @metaProperties(PropertyList(document.get.immutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
+                        @metaProperties(constants.View.IMMUTABLE_META_PROPERTIES, PropertyList(document.get.immutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
                     }
                     @if(!document.get.immutables.getProperties.forall(_.isMeta)) {
-                        <span class="headerFontSize">@Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):</span>
-                        @mesaProperties(PropertyList(document.get.immutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
+                        @mesaProperties(constants.View.IMMUTABLE_MESA_PROPERTIES, PropertyList(document.get.immutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
                     }
                     @if(document.get.mutables.getProperties.exists(_.isMeta)) {
-                        <span class="headerFontSize">@Messages(constants.View.MUTABLE_META_PROPERTIES):</span>
-                        @metaProperties(PropertyList(document.get.mutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
+                        @metaProperties(constants.View.MUTABLE_META_PROPERTIES, PropertyList(document.get.mutables.getProperties.filter(_.isMeta)).asProtoPropertyList)
                     }
                     @if(!document.get.mutables.getProperties.forall(_.isMeta)) {
-                        <span class="headerFontSize">@Messages(constants.View.MUTABLE_MESA_PROPERTIES):</span>
-                        @mesaProperties(PropertyList(document.get.mutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
+                        @mesaProperties(constants.View.MUTABLE_MESA_PROPERTIES, PropertyList(document.get.mutables.getProperties.filterNot(_.isMeta)).asProtoPropertyList)
                     }
                 } else {
                     @Messages(constants.View.DOCUMENT_NOT_FOUND)
@@ -60,12 +56,20 @@
     @if(documentType == constants.Document.Type.IDENTITY && document.isDefined) {
         <div class="cmuk-grid-match" cmuk-grid>
             <div class="cmuk-width-expand@@m">
-                <div id="documentSubProperties" class="cardSelectHeader cmuk-card-styles">
+                <div id="documentSubProperties" class="cardSelectHeader">
                 @commonCard(constants.View.AUTHENTICATED_ADDRESSES) {
                 } {
+                    <table class="productTable">
                     @utilities.Document.getIdentity(document.get).getAuthenticationAddress.map { address =>
-                        @commonJavascriptLink(address, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${address}'))")) <br>
+                        <tr>
+                            <td>
+                                <div class="tableField">
+                                    <div class="tableFieldValue">@commonJavascriptLink(address, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.wallet('${address}'))")) </div>
+                                </div>
+                            </td>
+                        </tr>
                     }
+                    </table>
                 }
                 </div>
             </div>

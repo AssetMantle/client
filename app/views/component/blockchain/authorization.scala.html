@@ -7,17 +7,17 @@
 
 @commonTextInfo(constants.View.AUTHORIZATION_TYPE, constants.View.AuthzAuthorizationMap.getOrElse(authorization.getTypeUrl, authorization.getTypeUrl))
 @authorization.getTypeUrl match {
-    case constants.Blockchain.Authz.SEND_AUTHORIZATION => {
+    case schema.constants.Authz.SEND_AUTHORIZATION => {
         @defining(Authorization(authorization).asInstanceOf[SendAuthorization]) { sendAuthorization =>
             @commonTextInfo(constants.View.SPEND_LIMITS, sendAuthorization.spendLimit.map(_.getAmountWithNormalizedDenom()).mkString(", "))
         }
     }
-    case constants.Blockchain.Authz.GENERIC_AUTHORIZATION => {
+    case schema.constants.Authz.GENERIC_AUTHORIZATION => {
         @defining(Authorization(authorization).asInstanceOf[GenericAuthorization]) { genericAuthorization =>
             @commonTextInfo(constants.View.MESSAGE, genericAuthorization.msg)
         }
     }
-    case constants.Blockchain.Authz.STAKE_AUTHORIZATION => {
+    case schema.constants.Authz.STAKE_AUTHORIZATION => {
         @defining(Authorization(authorization).asInstanceOf[StakeAuthorization]) { stakeAuthorization =>
             @commonTextInfo(constants.View.MAX_TOKENS, stakeAuthorization.maxTokens.getAmountWithNormalizedDenom())
             @if(stakeAuthorization.allowList.address.nonEmpty) {

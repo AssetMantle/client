@@ -353,18 +353,18 @@ class Block @Inject()(
     val slashing = blockchainTokens.Utility.onSlashing
 
     def update(blockResponse: BlockResponse, slashingParameter: SlashingParameter): Future[Map[String, String]] = {
-      val validatorReasons = utilitiesOperations.traverse(slashingEvents.filter(_.attributes.exists(_.key == constants.Blockchain.Event.Attribute.Reason))) { slashingEvent =>
-        slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Reason).fold(Future("", ""))(slashingReasonAttribute => {
+      val validatorReasons = utilitiesOperations.traverse(slashingEvents.filter(_.attributes.exists(_.key == schema.constants.Event.Attribute.Reason))) { slashingEvent =>
+        slashingEvent.attributes.find(_.key == schema.constants.Event.Attribute.Reason).fold(Future("", ""))(slashingReasonAttribute => {
           val slashingReason = slashingReasonAttribute.value.getOrElse(constants.Response.SLASHING_EVENT_REASON_ATTRIBUTE_VALUE_NOT_FOUND.throwBaseException())
-          val hexAddress = utilities.Crypto.convertConsensusAddressToHexAddress(slashingEvent.attributes.find(_.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse("")))
+          val hexAddress = utilities.Crypto.convertConsensusAddressToHexAddress(slashingEvent.attributes.find(_.key == schema.constants.Event.Attribute.Address).fold("")(_.value.getOrElse("")))
           val operatorAddress = if (hexAddress != "") blockchainValidators.Service.tryGetOperatorAddress(hexAddress) else constants.Response.SLASHING_EVENT_ADDRESS_NOT_FOUND.throwBaseException()
 
           // Shouldn't throw exception because even with light client attack reason double signing and validator address is present
-          val distributionHeight = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) height - 2
+          val distributionHeight = if (slashingReason == schema.constants.Event.Attribute.MissingSignature) height - 2
           else blockResponse.result.block.evidence.evidence.flatMap(_.getSlashingEvidences).find(_.validatorHexAddress == hexAddress).getOrElse(constants.Response.TENDERMINT_EVIDENCE_NOT_FOUND.throwBaseException()).height - 1
 
           def slashing(operatorAddress: String, slashingReason: String, distributionHeight: Int) = {
-            val slashingFraction = if (slashingReason == constants.Blockchain.Event.Attribute.MissingSignature) slashingParameter.slashFractionDowntime else slashingParameter.slashFractionDoubleSign
+            val slashingFraction = if (slashingReason == schema.constants.Event.Attribute.MissingSignature) slashingParameter.slashFractionDowntime else slashingParameter.slashFractionDoubleSign
 
             slash(validatorAddress = operatorAddress, infractionHeight = distributionHeight, currentBlockHeight = height, currentBlockTIme = blockResponse.result.block.header.time, slashingFraction: BigDecimal)
           }
@@ -420,8 +420,8 @@ class Block @Inject()(
     }
 
     def update(slashingParameter: SlashingParameter) = utilitiesOperations.traverse(livenessEvents) { event =>
-      val consensusAddress = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.Address).fold("")(_.value.getOrElse(""))
-      val missedBlocks = event.attributes.find(x => x.key == constants.Blockchain.Event.Attribute.MissedBlocks).fold(0)(_.value.getOrElse("0").toInt)
+      val consensusAddress = event.attributes.find(x => x.key == schema.constants.Event.Attribute.Address).fold("")(_.value.getOrElse(""))
+      val missedBlocks = event.attributes.find(x => x.key == schema.constants.Event.Attribute.MissedBlocks).fold(0)(_.value.getOrElse("0").toInt)
       val validator = if (consensusAddress != "") blockchainValidators.Service.tryGetByHexAddress(utilities.Crypto.convertConsensusAddressToHexAddress(consensusAddress)) else constants.Response.LIVENESS_EVENT_CONSENSUS_ADDRESS_NOT_FOUND.throwBaseException()
 
       for {
@@ -440,10 +440,10 @@ class Block @Inject()(
     val processSubmitProposal = utilitiesOperations.traverse(txResults.filter(_.status)) { txResult =>
       val proposalIDs = txResult.getSubmitProposalIDs
       val addProposals = utilitiesOperations.traverse(proposalIDs) { proposalID => blockchainProposals.Utility.insertOrUpdateProposal(proposalID) }
-      val proposers = txResult.getProposalSubmitters
-      val addProposerDeposits = {
+
+      def addProposerDeposits() = {
         utilitiesOperations.traverse(proposalIDs) { proposalID =>
-          utilitiesOperations.traverse(proposers) { proposer =>
+          utilitiesOperations.traverse(txResult.getProposalSubmitters) { proposer =>
             blockchainProposalDeposits.Utility.onNewProposalEvent(proposalID, proposer)
           }
         }
@@ -451,18 +451,18 @@ class Block @Inject()(
 
       for {
         _ <- addProposals
-        _ <- addProposerDeposits
+        _ <- addProposerDeposits()
       } yield ()
     }
 
     val activeInactiveEvents = utilitiesOperations.traverse(proposalEvents)(event => {
-      val processInactiveProposal = if (event.`type` == constants.Blockchain.Event.InactiveProposal) {
-        val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.getOrElse("0").toInt)
+      val processInactiveProposal = if (event.`type` == schema.constants.Event.InactiveProposal) {
+        val proposalID = event.attributes.find(_.key == schema.constants.Event.Attribute.ProposalID).fold(0)(_.value.getOrElse("0").toInt)
         if (proposalID != 0) blockchainProposalDeposits.Utility.onInactiveProposalEvent(proposalID) else Future()
       } else Future()
 
-      val processActiveProposal = if (event.`type` == constants.Blockchain.Event.ActiveProposal) {
-        val proposalID = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.ProposalID).fold(0)(_.value.getOrElse("0").toInt)
+      val processActiveProposal = if (event.`type` == schema.constants.Event.ActiveProposal) {
+        val proposalID = event.attributes.find(_.key == schema.constants.Event.Attribute.ProposalID).fold(0)(_.value.getOrElse("0").toInt)
         if (proposalID != 0) blockchainProposalDeposits.Utility.onActiveProposalEvent(proposalID) else Future()
       } else Future()
 
@@ -479,8 +479,8 @@ class Block @Inject()(
   }
 
   def onUnbondingCompletionEvents(unbondingCompletionEvents: Seq[Event], currentBlockTimeStamp: RFC3339): Future[Seq[Unit]] = utilitiesOperations.traverse(unbondingCompletionEvents)(event => {
-    val validator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Validator).fold("")(_.value.getOrElse(""))
-    val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
+    val validator = event.attributes.find(_.key == schema.constants.Event.Attribute.Validator).fold("")(_.value.getOrElse(""))
+    val delegator = event.attributes.find(_.key == schema.constants.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
     val process = if (validator != "" && delegator != "") blockchainUndelegations.Utility.onUnbondingCompletionEvent(delegatorAddress = delegator, validatorAddress = validator, currentBlockTimeStamp = currentBlockTimeStamp) else constants.Response.INVALID_UNBONDING_COMPLETION_EVENT.throwBaseException()
 
     for {
@@ -489,9 +489,9 @@ class Block @Inject()(
   })
 
   def onRedelegationCompletionEvents(redelegationCompletionEvents: Seq[Event], currentBlockTimeStamp: RFC3339): Future[Seq[Unit]] = utilitiesOperations.traverse(redelegationCompletionEvents)(event => {
-    val srcValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.SrcValidator).fold("")(_.value.getOrElse(""))
-    val dstValidator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.DstValidator).fold("")(_.value.getOrElse(""))
-    val delegator = event.attributes.find(_.key == constants.Blockchain.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
+    val srcValidator = event.attributes.find(_.key == schema.constants.Event.Attribute.SrcValidator).fold("")(_.value.getOrElse(""))
+    val dstValidator = event.attributes.find(_.key == schema.constants.Event.Attribute.DstValidator).fold("")(_.value.getOrElse(""))
+    val delegator = event.attributes.find(_.key == schema.constants.Event.Attribute.Delegator).fold("")(_.value.getOrElse(""))
     val process = if (srcValidator != "" && dstValidator != "" && delegator != "") blockchainRedelegations.Utility.onRedelegationCompletionEvent(delegator = delegator, srcValidator = srcValidator, dstValidator = dstValidator, currentBlockTimeStamp = currentBlockTimeStamp) else constants.Response.INVALID_REDELEGATION_COMPLETION_EVENT.throwBaseException()
 
     for {

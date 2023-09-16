@@ -1,0 +1,104 @@
+## Notes:
+## Using SHA of actions instead of tag because of security concerns
+name: Explorer - Production
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["*"]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Tools
+        uses: actions/setup-java@v3
+        with:
+          java-version: "11"
+          distribution: "adopt"
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.sbt
+            ~/.cache
+            ~/.ivy2
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt
+
+      - name: Public IP
+        id: ip
+        uses: haythem/public-ip@bdddd92c198b0955f0b494a8ebeac529754262ff
+
+      - name: Whitelist runner ip
+        run: aws ec2 modify-security-group-rules --group-id ${{ secrets.AM_EXPLORER_MAINNET_PROD_SG_ID }} --security-group-rules SecurityGroupRuleId=${{ secrets.AM_EXPLORER_MAINNET_PROD_SG_RULE_ID }},SecurityGroupRule='{IpProtocol=-1,CidrIpv4=${{ steps.ip.outputs.ipv4 }}/32}'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AM_EXPLORER_MAINNET_PROD_REGION }}
+
+      - run: sbt dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: client.zip
+          path: target/universal/assetmantle-1.0.zip
+
+      - name: Copy file via ssh password
+        uses: appleboy/scp-action@3710327b67602586de2a7681d53fb1c009105c5d
+        with:
+          host: ${{ secrets.AM_EXPLORER_MAINNET_PROD_HOST }}
+          username: ${{ secrets.AM_EXPLORER_MAINNET_PROD_USER }}
+          port: ${{ secrets.AM_EXPLORER_MAINNET_PROD_SSH_PORT }}
+          overwrite: true
+          key: |
+            ${{ secrets.AM_EXPLORER_MAINNET_PROD_PRIV_KEY }}
+          source: target/universal/assetmantle-1.0.zip
+          target: /home/admin/assetmantle-next
+
+      - name: Deploy new explore
+        uses: appleboy/ssh-action@4330a1ea489ced98a6778fb35bb6bfed8b61fca5
+        with:
+          host: ${{ secrets.AM_EXPLORER_MAINNET_PROD_HOST }}
+          username: ${{ secrets.AM_EXPLORER_MAINNET_PROD_USER }}
+          port: ${{ secrets.AM_EXPLORER_MAINNET_PROD_SSH_PORT }}
+          debug: true
+          key: ${{ secrets.AM_EXPLORER_MAINNET_PROD_PRIV_KEY }}
+          script: |
+            cat <<EOT
+            echo "#################"
+            echo "Stopping explorer"
+            echo "#################"
+            EOT
+            unzip -q -d /home/admin/assetmantle-next /home/admin/assetmantle-next/target/universal/assetmantle-1.0.zip
+            sudo systemctl stop explorer
+            rm -rf /home/admin/explorer/*
+            cp -r /home/admin/assetmantle-next/assetmantle-1.0/* /home/admin/explorer/
+            sudo systemctl start explorer
+
+            cat <<EOT
+            echo "###############"
+            echo "Creating backup"
+            echo "###############"
+            EOT
+            rm -rf /home/admin/assetmantle-backup.zip
+            cp -r /home/admin/assetmantle-next/target/universal/assetmantle-1.0.zip /home/admin/assetmantle-backup.zip
+
+            cat <<EOT
+            echo "###############"
+            echo "Cleaning up"
+            echo "###############"
+            EOT
+            rm -rf /home/admin/assetmantle-next || true
+
+      - name: Remove runner ip from whitelist
+        run: aws ec2 modify-security-group-rules --group-id ${{ secrets.AM_EXPLORER_MAINNET_PROD_SG_ID }} --security-group-rules SecurityGroupRuleId=${{ secrets.AM_EXPLORER_MAINNET_PROD_SG_RULE_ID }},SecurityGroupRule='{IpProtocol=-1,CidrIpv4=127.0.0.1/32}'
+        if: ${{ always() }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AM_EXPLORER_MAINNET_PROD_REGION }}

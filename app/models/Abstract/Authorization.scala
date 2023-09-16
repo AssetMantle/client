@@ -12,20 +12,19 @@ abstract class Authorization {
 
   def validate(stdMsg: protoAny): ValidateResponse
 
-  def toProto: protoAny
+  def toAnyProto: protoAny
 
 }
 
 object Authorization {
   def apply(authzAny: protoAny): Authorization = authzAny.getTypeUrl match {
-    case constants.Blockchain.Authz.SEND_AUTHORIZATION => {
-      val protoSend = com.cosmos.bank.v1beta1.SendAuthorization.parseFrom(authzAny.getValue)
-      SendAuthorization(spendLimit = protoSend.getSpendLimitList.asScala.toSeq.map(x => Coin(x)))
+    case schema.constants.Authz.SEND_AUTHORIZATION => {
+      SendAuthorization(spendLimit = com.cosmos.bank.v1beta1.SendAuthorization.parseFrom(authzAny.getValue).getSpendLimitList.asScala.toSeq.map(x => Coin(x)))
     }
-    case constants.Blockchain.Authz.GENERIC_AUTHORIZATION => {
+    case schema.constants.Authz.GENERIC_AUTHORIZATION => {
       GenericAuthorization(com.cosmos.authz.v1beta1.GenericAuthorization.parseFrom(authzAny.getValue).getMsg)
     }
-    case constants.Blockchain.Authz.STAKE_AUTHORIZATION => {
+    case schema.constants.Authz.STAKE_AUTHORIZATION => {
       val protoStakeAuthorization = com.cosmos.staking.v1beta1.StakeAuthorization.parseFrom(authzAny.getValue)
       StakeAuthorization(
         maxTokens = Coin(protoStakeAuthorization.getMaxTokens),

@@ -408,17 +408,25 @@ object View {
   val ORDERS = "ORDERS"
   val LIVE_ORDERS = "LIVE_ORDERS"
   val ORDER_CLASSES = "ORDER_CLASSES"
+  val SUBJECT_CLIENT_ID = "SUBJECT_CLIENT_ID"
+  val SUBSTITUTE_CLIENT_ID = "SUBSTITUTE_CLIENT_ID"
+  val CHAIN_UPGRADE = "CHAIN_UPGRADE"
+  val CHANGE_PARAMETER = "CHANGE_PARAMETER"
+  val TEXT = "TEXT"
+  val SPEND_COMMUNITY_POOL = "SPEND_COMMUNITY_POOL"
+  val CANCEL_CHAIN_UPGRADE = "CANCEL_CHAIN_UPGRADE"
+  val IBC_CLIENT_UPDATE = "IBC_CLIENT_UPDATE"
 
   val AuthzAuthorizationMap: Map[String, String] = Map(
-    constants.Blockchain.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
-    constants.Blockchain.Authz.GENERIC_AUTHORIZATION -> "GENERIC_AUTHORIZATION",
-    constants.Blockchain.Authz.STAKE_AUTHORIZATION -> "STAKE_AUTHORIZATION",
+    schema.constants.Authz.SEND_AUTHORIZATION -> "SEND_AUTHORIZATION",
+    schema.constants.Authz.GENERIC_AUTHORIZATION -> "GENERIC_AUTHORIZATION",
+    schema.constants.Authz.STAKE_AUTHORIZATION -> "STAKE_AUTHORIZATION",
   )
 
   val FeeGrantAllowanceMap: Map[String, String] = Map(
-    constants.Blockchain.FeeGrant.BASIC_ALLOWANCE -> "BASIC_ALLOWANCE",
-    constants.Blockchain.FeeGrant.PERIODIC_ALLOWANCE -> "PERIODIC_ALLOWANCE",
-    constants.Blockchain.FeeGrant.ALLOWED_MSG_ALLOWANCE -> "ALLOWED_MSG_ALLOWANCE",
+    schema.constants.FeeGrant.BASIC_ALLOWANCE -> "BASIC_ALLOWANCE",
+    schema.constants.FeeGrant.PERIODIC_ALLOWANCE -> "PERIODIC_ALLOWANCE",
+    schema.constants.FeeGrant.ALLOWED_MSG_ALLOWANCE -> "ALLOWED_MSG_ALLOWANCE",
   )
 
   val TxMessagesMap: Map[String, String] = Map(
@@ -485,7 +493,6 @@ object View {
     schema.constants.Messages.IDENTITY_DEFINE -> "MESSAGE_IDENTITY_DEFINE",
     schema.constants.Messages.IDENTITY_DEPUTIZE -> "MESSAGE_IDENTITY_DEPUTIZE",
     schema.constants.Messages.IDENTITY_ISSUE -> "MESSAGE_IDENTITY_ISSUE",
-    schema.constants.Messages.IDENTITY_MUTATE -> "MESSAGE_IDENTITY_MUTATE",
     schema.constants.Messages.IDENTITY_NAME -> "MESSAGE_IDENTITY_NAME",
     schema.constants.Messages.IDENTITY_PROVISION -> "MESSAGE_IDENTITY_PROVISION",
     schema.constants.Messages.IDENTITY_QUASH -> "MESSAGE_IDENTITY_QUASH",

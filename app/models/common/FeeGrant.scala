@@ -33,7 +33,7 @@ object FeeGrant {
     def toProto: protoAny = {
       val protoFeeGrantValue = this.toProtoBasicAllowance
       protoAny.newBuilder()
-        .setTypeUrl(constants.Blockchain.FeeGrant.BASIC_ALLOWANCE)
+        .setTypeUrl(schema.constants.FeeGrant.BASIC_ALLOWANCE)
         .setValue(protoFeeGrantValue.toByteString)
         .build()
     }
@@ -75,7 +75,7 @@ object FeeGrant {
         .setPeriod(protoDuration.newBuilder().setSeconds(this.period))
         .build()
       protoAny.newBuilder()
-        .setTypeUrl(constants.Blockchain.FeeGrant.PERIODIC_ALLOWANCE)
+        .setTypeUrl(schema.constants.FeeGrant.PERIODIC_ALLOWANCE)
         .setValue(protoFeeGrantValue.toByteString)
         .build()
     }
@@ -89,7 +89,7 @@ object FeeGrant {
         .setAllowance(this.allowance.toProto)
         .build()
       protoAny.newBuilder()
-        .setTypeUrl(constants.Blockchain.FeeGrant.ALLOWED_MSG_ALLOWANCE)
+        .setTypeUrl(schema.constants.FeeGrant.ALLOWED_MSG_ALLOWANCE)
         .setValue(protoFeeGrantValue.toByteString)
         .build()
     }

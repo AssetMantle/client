@@ -14,10 +14,10 @@
     @commonTextInfo(constants.View.DESTINATION_CHANNEL, packet.getDestinationChannel)
     @defining(utilities.JSON.convertJsonStringToObject[IBC.PacketData](packet.getData.toStringUtf8)("commonPacket", Logger("commonPacket"), IBC.packetDataReads)) { packetData =>
         @packetData.getType match {
-            case constants.Blockchain.IBC.PacketDataType.FUNGIBLE_TOKEN_PACKET_DATA => {
+            case schema.constants.IBC.PacketDataType.FUNGIBLE_TOKEN_PACKET_DATA => {
                 @ibcMsg.packetData.fungibleTokenPacketData(packetData.getType, packetData.asInstanceOf[IBC.FungibleTokenPacketData])
             }
-            case constants.Blockchain.IBC.PacketDataType.INTER_CHAIN_ACCOUNT_PACKET_DATA => {
+            case schema.constants.IBC.PacketDataType.INTER_CHAIN_ACCOUNT_PACKET_DATA => {
                 @ibcMsg.packetData.interChainAccountPacketData(packetData.getType, packetData.asInstanceOf[IBC.InterChainAccountPacketData])
             }
             case _ => {

@@ -229,7 +229,7 @@ class Startup @Inject()(
   }
 
   def insertAuthorizationsOnStart(authorizations: Seq[Authz.Authorization]): Future[Seq[Unit]] = utilitiesOperations.traverse(authorizations)(authorization => {
-    val insert = blockchainAuthorizations.Service.insertOrUpdate(blockchain.Authorization(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = authorization.authorization.toSerializable.toProto.toByteString.toByteArray, expiration = authorization.expiration.epoch))
+    val insert = blockchainAuthorizations.Service.insertOrUpdate(blockchain.Authorization(granter = authorization.granter, grantee = authorization.grantee, msgTypeURL = authorization.authorization.value.toSerializable.getMsgTypeURL, grantedAuthorization = authorization.authorization.toSerializable.toAnyProto.toByteString.toByteArray, expiration = authorization.expiration.epoch))
 
     for {
       _ <- insert
@@ -283,8 +283,8 @@ class Startup @Inject()(
   private def actionsOnEvents(blockResultResponse: BlockResultResponse, currentBlockTimeStamp: RFC3339): Future[Unit] = {
     val slashing = blocksServices.onSlashingEvents(blockResultResponse.result.getSlashingEvents, blockResultResponse.result.height.toInt)
     val missedBlock = blocksServices.onMissedBlockEvents(blockResultResponse.result.getLivenessEvents, blockResultResponse.result.height.toInt)
-    val unbondingCompletion = blocksServices.onUnbondingCompletionEvents(unbondingCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == constants.Blockchain.Event.CompleteUnbonding).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
-    val redelegationCompletion = blocksServices.onRedelegationCompletionEvents(redelegationCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == constants.Blockchain.Event.CompleteRedelegation).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
+    val unbondingCompletion = blocksServices.onUnbondingCompletionEvents(unbondingCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == schema.constants.Event.CompleteUnbonding).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
+    val redelegationCompletion = blocksServices.onRedelegationCompletionEvents(redelegationCompletionEvents = blockResultResponse.result.end_block_events.getOrElse(Seq()).filter(_.`type` == schema.constants.Event.CompleteRedelegation).map(_.decode), currentBlockTimeStamp = currentBlockTimeStamp)
     val proposal = blocksServices.onProposalEvents(blockResultResponse.result.getActiveInactiveProposalEvents, blockResultResponse.result.txs_results.getOrElse(Seq()))
 
     for {

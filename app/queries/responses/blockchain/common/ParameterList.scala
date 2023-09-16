@@ -12,8 +12,8 @@ case class ParameterList(parameters: Seq[Parameter]) {
     burnEnabled = baseSchemaData.BooleanData(this.getMetaProperty(schema.constants.Properties.BurnEnabledProperty.getID.keyID.value).getData.getProtoBytes).value,
     mintEnabled = baseSchemaData.BooleanData(this.getMetaProperty(schema.constants.Properties.MintEnabledProperty.getID.keyID.value).getData.getProtoBytes).value,
     renumerateEnabled = baseSchemaData.BooleanData(this.getMetaProperty(schema.constants.Properties.RenumerateEnabledProperty.getID.keyID.value).getData.getProtoBytes).value,
-    wrapAllowedCoins = baseSchemaData.ListData(this.getMetaProperty(schema.constants.Properties.WrapAllowedCoinsProperty.getID.keyID.value).getData.getProtoBytes).getListableDataList.map(x => baseSchemaData.IDData(x.getProtoBytes).getID.asString),
-    unwrapAllowedCoins = baseSchemaData.ListData(this.getMetaProperty(schema.constants.Properties.UnwrapAllowedCoinsProperty.getID.keyID.value).getData.getProtoBytes).getListableDataList.map(x => baseSchemaData.IDData(x.getProtoBytes).getID.asString))
+    wrapAllowedCoins = baseSchemaData.ListData(this.getMetaProperty(schema.constants.Properties.WrapAllowedCoinsProperty.getID.keyID.value).getData.getProtoBytes).getListableDataList.map(x => baseSchemaData.StringData(x.getProtoBytes).value),
+    unwrapAllowedCoins = baseSchemaData.ListData(this.getMetaProperty(schema.constants.Properties.UnwrapAllowedCoinsProperty.getID.keyID.value).getData.getProtoBytes).getListableDataList.map(x => baseSchemaData.StringData(x.getProtoBytes).value))
 
   def getClassificationParameter: ClassificationParameter = ClassificationParameter(
     bondRate = baseSchemaData.NumberData(this.getMetaProperty(schema.constants.Properties.BondRateProperty.getID.keyID.value).getData.getProtoBytes).value,

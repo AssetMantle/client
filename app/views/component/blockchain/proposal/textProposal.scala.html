@@ -1,0 +1,20 @@
+@import models.common.ProposalContents._
+
+@(text: Text)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<tr>
+    <td>
+        <div class="tableField">
+            <div class="tableFieldTitle">@Messages(constants.View.TITLE)</div>
+            <div class="tableFieldValue">@text.title</div>
+        </div>
+    </td>
+</tr>
+<tr>
+    <td>
+        <div class="tableField">
+            <div class="tableFieldTitle">@Messages(constants.View.DESCRIPTION)</div>
+            <div class="tableFieldValue">@text.description</div>
+        </div>
+    </td>
+</tr>

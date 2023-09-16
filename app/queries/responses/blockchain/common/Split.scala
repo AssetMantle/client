@@ -5,7 +5,7 @@ import queries.responses.blockchain.common.ID._
 
 case class Split(asset_i_d: AssetID, owner_i_d: IdentityID, value: String) {
   def toSplit: models.blockchain.Split = {
-    models.blockchain.Split(ownerID = this.owner_i_d.toIdentityID.getBytes, ownableID = this.asset_i_d.toAssetID.getBytes, protoOwnableID = this.asset_i_d.toAssetID.getProtoBytes, ownerIDString = this.owner_i_d.toIdentityID.asString, ownableIDString = this.asset_i_d.toAssetID.asString, value = BigInt(value))
+    models.blockchain.Split(ownerID = this.owner_i_d.toIdentityID.getBytes, assetID = this.asset_i_d.toAssetID.getBytes, ownerIDString = this.owner_i_d.toIdentityID.asString, assetIDString = this.asset_i_d.toAssetID.asString, value = BigInt(value))
   }
 }
 

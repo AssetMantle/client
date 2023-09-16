@@ -10,11 +10,7 @@
 @commonHtmlInfo(constants.View.FROM_ID, commonJavascriptLink(IdentityID(msg.getFromID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getFromID).asString}'))")))
 @commonHtmlInfo(constants.View.TO_ID, commonJavascriptLink(IdentityID(msg.getToID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${IdentityID(msg.getToID).asString}'))")))
 @commonHtmlInfo(constants.View.CLASSIFICATION_ID, commonJavascriptLink(ClassificationID(msg.getClassificationID).asString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ViewController.document('${ClassificationID(msg.getClassificationID).asString}'))")))
-<span class="headerFontSize">@Messages(constants.View.IMMUTABLE_META_PROPERTIES):</span>
-@metaProperties(msg.getImmutableMetaProperties)
-<span class="headerFontSize">@Messages(constants.View.IMMUTABLE_MESA_PROPERTIES):</span>
-@mesaProperties(msg.getImmutableProperties)
-<span class="headerFontSize">@Messages(constants.View.MUTABLE_META_PROPERTIES):</span>
-@metaProperties(msg.getMutableMetaProperties)
-<span class="headerFontSize">@Messages(constants.View.MUTABLE_MESA_PROPERTIES):</span>
-@mesaProperties(msg.getMutableProperties)
+@metaProperties(constants.View.IMMUTABLE_META_PROPERTIES, msg.getImmutableMetaProperties)
+@mesaProperties(constants.View.IMMUTABLE_MESA_PROPERTIES, msg.getImmutableProperties)
+@metaProperties(constants.View.MUTABLE_META_PROPERTIES, msg.getMutableMetaProperties)
+@mesaProperties(constants.View.MUTABLE_MESA_PROPERTIES, msg.getMutableProperties)

@@ -13,6 +13,7 @@
                     <tr>
                         <th>@Messages(constants.View.ID)</th>
                         <th>@Messages(constants.View.TITLE)</th>
+                        <th>@Messages(constants.View.TYPE)</th>
                         <th>@Messages(constants.View.STATUS)</th>
                     </tr>
                 </thead>
@@ -21,6 +22,7 @@
                     <tr>
                         <td>@commonJavascriptLink(proposal.id.toString, JavaScript(s"componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposal(${proposal.id}))"))</td>
                         <td>@proposal.content.title</td>
+                        <td>@Messages(proposal.getProposalType)</td>
                         <td>@Messages(proposal.status)</td>
                     </tr>
                 }

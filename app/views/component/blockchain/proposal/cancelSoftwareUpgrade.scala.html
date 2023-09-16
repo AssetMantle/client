@@ -1,0 +1,20 @@
+@import models.common.ProposalContents._
+
+@(cancelSoftwareUpgrade: CancelSoftwareUpgrade)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+<tr>
+    <td>
+        <div class="tableField">
+            <div class="tableFieldTitle">@Messages(constants.View.TITLE)</div>
+            <div class="tableFieldValue">@cancelSoftwareUpgrade.title</div>
+        </div>
+    </td>
+</tr>
+<tr>
+    <td>
+        <div class="tableField">
+            <div class="tableFieldTitle">@Messages(constants.View.DESCRIPTION)</div>
+            <div class="tableFieldValue">@cancelSoftwareUpgrade.description</div>
+        </div>
+    </td>
+</tr>

@@ -74,7 +74,6 @@ object Messages {
   val IDENTITY_DEFINE = "/assetmantle.modules.identities.transactions.define.Message"
   val IDENTITY_DEPUTIZE = "/assetmantle.modules.identities.transactions.deputize.Message"
   val IDENTITY_ISSUE = "/assetmantle.modules.identities.transactions.issue.Message"
-  val IDENTITY_MUTATE = "/assetmantle.modules.identities.transactions.mutate.Message"
   val IDENTITY_NAME = "/assetmantle.modules.identities.transactions.name.Message"
   val IDENTITY_PROVISION = "/assetmantle.modules.identities.transactions.provision.Message"
   val IDENTITY_QUASH = "/assetmantle.modules.identities.transactions.quash.Message"

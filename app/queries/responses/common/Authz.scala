@@ -48,9 +48,9 @@ object Authz {
 
   def authorizationApply(authorizationType: String, value: JsObject): Authorization = try {
     authorizationType match {
-      case constants.Blockchain.Authz.SEND_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[SendAuthorization](value.toString))
-      case constants.Blockchain.Authz.GENERIC_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[GenericAuthorization](value.toString))
-      case constants.Blockchain.Authz.STAKE_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[StakeAuthorization](value.toString))
+      case schema.constants.Authz.SEND_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[SendAuthorization](value.toString))
+      case schema.constants.Authz.GENERIC_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[GenericAuthorization](value.toString))
+      case schema.constants.Authz.STAKE_AUTHORIZATION => Authorization(authorizationType, utilities.JSON.convertJsonStringToObject[StakeAuthorization](value.toString))
       case _ => constants.Response.UNKNOWN_GRANT_AUTHORIZATION_RESPONSE_STRUCTURE.throwBaseException()
     }
   } catch {
