@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS CAMPAIGN."ClaimName"
 (
     "claimTxHash"          VARCHAR NOT NULL,
     "name"                 VARCHAR NOT NULL UNIQUE,
-    "fromAddress"          VARCHAR NOT NULL,
+    "height"               INTEGER NOT NULL,
+    "address"              VARCHAR NOT NULL,
     "transferTxHash"       VARCHAR,
     "transferStatus"       BOOLEAN,
     "createdBy"            VARCHAR,
@@ -20,7 +21,9 @@ CREATE TABLE IF NOT EXISTS CAMPAIGN."ClaimName"
 CREATE TABLE IF NOT EXISTS CAMPAIGN."RevertClaimName"
 (
     "claimTxHash"          VARCHAR NOT NULL,
-    "fromAddress"          VARCHAR NOT NULL,
+    "height"               INTEGER NOT NULL,
+    "address"              VARCHAR NOT NULL,
+    "coins"                VARCHAR NOT NULL,
     "returnTxHash"         VARCHAR,
     "returnStatus"         BOOLEAN,
     "createdBy"            VARCHAR,

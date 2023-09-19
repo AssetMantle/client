@@ -59,4 +59,29 @@ object JSON {
         constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
     }
   }
+
+  def getSuccessErrorResponseFromJson[Success, Error](wsResponse: Future[WSResponse])(implicit exec: ExecutionContext, logger: Logger, module: String, reads1: Reads[Success], reads2: Reads[Error]): Future[(Option[Success], Option[Error])] = {
+    wsResponse.map { response =>
+      Json.fromJson[Success](response.json) match {
+        case JsSuccess(value: Success, _: JsPath) => (Option(value), None)
+        case successJsError: JsError => {
+          Json.fromJson[Error](response.json) match {
+            case JsSuccess(value: Error, _: JsPath) => (None, Option(value))
+            case errorJsError: JsError => logJsonError(response.json.toString(), successJsError, errorJsError)
+              constants.Response.JSON_PARSE_EXCEPTION.throwBaseException()
+          }
+        }
+      }
+    }.recover {
+      case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
+        constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
+      case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
+        constants.Response.JSON_MAPPING_EXCEPTION.throwBaseException(jsonMappingException)
+      case nullPointerException: NullPointerException => logger.error(nullPointerException.getMessage, nullPointerException)
+        logger.error("Check order of case class definitions")
+        constants.Response.NULL_POINTER_EXCEPTION.throwBaseException(nullPointerException)
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
+        constants.Response.GENERIC_JSON_EXCEPTION.throwBaseException(exception)
+    }
+  }
 }

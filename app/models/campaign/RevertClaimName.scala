@@ -2,33 +2,64 @@ package models.campaign
 
 import constants.Scheduler
 import exceptions.BaseException
+import models.common.Serializable.Coin
 import models.traits._
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration}
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-case class RevertClaimName(claimTxHash: String, fromAddress: String, returnTxHash: Option[String], returnStatus: Option[Boolean], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
-  def id: String = claimTxHash
+case class RevertClaimName(claimTxHash: String, height: Int, address: String, coins: Seq[Coin], returnTxHash: Option[String], returnStatus: Option[Boolean], timeoutHeight: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging {
+
+  def serialize(): RevertClaimNames.RevertClaimNameSerializable = RevertClaimNames.RevertClaimNameSerializable(
+    claimTxHash = this.claimTxHash,
+    height = this.height,
+    address = this.address,
+    coins = Json.toJson(this.coins).toString(),
+    returnTxHash = this.returnTxHash,
+    returnStatus = this.returnStatus,
+    timeoutHeight = this.timeoutHeight,
+    createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+  )
 }
 
 private[campaign] object RevertClaimNames {
-  class RevertClaimNameTable(tag: Tag) extends Table[RevertClaimName](tag, "RevertClaimName") with ModelTable[String] {
+  case class RevertClaimNameSerializable(claimTxHash: String, height: Int, address: String, coins: String, returnTxHash: Option[String], returnStatus: Option[Boolean], timeoutHeight: Option[Int], createdBy: Option[String] = None, createdOnMillisEpoch: Option[Long] = None, updatedBy: Option[String] = None, updatedOnMillisEpoch: Option[Long] = None) extends Logging with Entity[String] {
+    def id: String = claimTxHash
 
-    def * = (claimTxHash, name, fromAddress, returnTxHash.?, returnStatus.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (RevertClaimName.tupled, RevertClaimName.unapply)
+    def deserialize()(implicit module: String, logger: Logger): RevertClaimName = RevertClaimName(
+      claimTxHash = this.claimTxHash,
+      height = this.height,
+      address = this.address,
+      coins = utilities.JSON.convertJsonStringToObject[Seq[Coin]](this.coins),
+      returnTxHash = this.returnTxHash,
+      returnStatus = this.returnStatus,
+      timeoutHeight = this.timeoutHeight,
+      createdBy = this.createdBy, createdOnMillisEpoch = this.createdOnMillisEpoch, updatedBy = this.updatedBy, updatedOnMillisEpoch = this.updatedOnMillisEpoch
+    )
+  }
+
+  class RevertClaimNameTable(tag: Tag) extends Table[RevertClaimNameSerializable](tag, "RevertClaimName") with ModelTable[String] {
+
+    def * = (claimTxHash, height, address, coins, returnTxHash.?, returnStatus.?, timeoutHeight.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (RevertClaimNameSerializable.tupled, RevertClaimNameSerializable.unapply)
 
     def claimTxHash = column[String]("claimTxHash", O.PrimaryKey)
 
-    def name = column[String]("name", O.Unique)
+    def height = column[Int]("height")
 
-    def fromAddress = column[String]("fromAddress")
+    def address = column[String]("address")
+
+    def coins = column[String]("coins")
 
     def returnTxHash = column[String]("returnTxHash")
 
     def returnStatus = column[Boolean]("returnStatus")
+
+    def timeoutHeight = column[Int]("timeoutHeight")
 
     def createdBy = column[String]("createdBy")
 
@@ -47,7 +78,7 @@ class RevertClaimNames @Inject()(
                                   utilitiesOperations: utilities.Operations,
                                   protected val dbConfigProvider: DatabaseConfigProvider
                                 )(implicit val executionContext: ExecutionContext)
-  extends GenericDaoImpl[RevertClaimNames.RevertClaimNameTable, RevertClaimName, String]() {
+  extends GenericDaoImpl[RevertClaimNames.RevertClaimNameTable, RevertClaimNames.RevertClaimNameSerializable, String]() {
 
   implicit val module: String = constants.Module.CAMPAIGN_REVERT_CLAIM_NAME
 
@@ -57,19 +88,17 @@ class RevertClaimNames @Inject()(
 
   object Service {
 
-    def add(revertClaimName: RevertClaimName): Future[String] = create(revertClaimName).map(_.id)
+    def add(revertClaimName: RevertClaimName): Future[String] = create(revertClaimName.serialize()).map(_.id)
 
-    def add(revertClaimNames: Seq[RevertClaimName]): Future[Int] = create(revertClaimNames)
+    def add(revertClaimNames: Seq[RevertClaimName]): Future[Int] = create(revertClaimNames.map(_.serialize()))
 
-    def get(claimTxHash: String): Future[Option[RevertClaimName]] = getById(claimTxHash)
+    def get(claimTxHash: String): Future[Option[RevertClaimName]] = getById(claimTxHash).map(_.map(_.deserialize()))
 
-    def get(claimTxHashes: Seq[String]): Future[Seq[RevertClaimName]] = getByIds(claimTxHashes)
+    def get(claimTxHashes: Seq[String]): Future[Seq[RevertClaimName]] = getByIds(claimTxHashes).map(_.map(_.deserialize()))
 
-    def checkExistsByName(name: String): Future[Boolean] = filterAndExists(_.name === name)
+    def tryGet(claimTxHash: String): Future[RevertClaimName] = tryGetById(claimTxHash).map(_.deserialize())
 
-    def tryGet(claimTxHash: String): Future[RevertClaimName] = tryGetById(claimTxHash)
-
-    def update(revertClaimName: RevertClaimName): Future[Unit] = updateById(revertClaimName)
+    def update(revertClaimName: RevertClaimName): Future[Unit] = updateById(revertClaimName.serialize())
 
     def countAll: Future[Int] = countTotal()
 
@@ -79,11 +108,13 @@ class RevertClaimNames @Inject()(
 
     def getWithNullStatus: Future[Seq[RevertClaimName]] = {
       val booleanNull: Option[Boolean] = null
-      filter(_.returnStatus.? === booleanNull).map(_.take(50))
+      filter(_.returnStatus.? === booleanNull).map(_.take(50)).map(_.map(_.deserialize()))
     }
 
-    def getFailedTx: Future[Seq[RevertClaimName]] = filter(!_.returnStatus).map(_.take(50))
+    def getFailedTx: Future[Seq[RevertClaimName]] = filter(!_.returnStatus).map(_.take(50)).map(_.map(_.deserialize()))
 
+
+    def checkAnyPendingTx: Future[Boolean] = filterAndExists(_.returnStatus.?.isEmpty)
   }
 
   object Utility {
