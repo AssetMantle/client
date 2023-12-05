@@ -1,20 +1,19 @@
-@import views.html.base.cards._
-@import views.html.base._
-@import scala.collection.immutable.ListMap
-@import models.common.Serializable.UndelegationEntry
-@import views.html.component.blockchain.account.accountDelegationsDelegated
-@import views.html.component.blockchain.account.accountDelegationsUndelegating
+@import models.blockchain.Validator
+@import models.common.Serializable.{RedelegationEntry, UndelegationEntry}
 @import utilities.MicroNumber
+@import views.html.base._
+@import views.html.base.cards._
+@import views.html.component.blockchain.account._
 
-@import views.html.component.blockchain.account.accountDelegationsRedelegating
-@import models.common.Serializable.RedelegationEntry
-@(delegations: ListMap[String, MicroNumber], undelegations: ListMap[String, Seq[UndelegationEntry]], validatorsMoniker: Map[String, String], redelegations: ListMap[(String, String), Seq[RedelegationEntry]])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import scala.collection.immutable.ListMap
 
-@commonCard(constants.View.ACCOUNT_DELEGATIONS) {
-} {
-    @commonHorizontalSwitcher(ListMap(
-        constants.View.DELEGATED -> accountDelegationsDelegated(delegations, validatorsMoniker),
-        constants.View.UNDELEGATING -> accountDelegationsUndelegating(undelegations, validatorsMoniker),
-        constants.View.REDELEGATING -> accountDelegationsRedelegating(redelegations, validatorsMoniker),
-    ))
-}
+@(delegations: ListMap[String, MicroNumber], undelegations: ListMap[String, Seq[UndelegationEntry]], validatorsMoniker: Map[String, String], redelegations: ListMap[(String, String), Seq[RedelegationEntry]], validators: Seq[Validator])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+    @commonCard(constants.View.ACCOUNT_DELEGATIONS) {
+    } {
+        @commonHorizontalSwitcher(ListMap(
+            constants.View.DELEGATED -> accountDelegationsDelegated(delegations, validatorsMoniker, validators),
+            constants.View.UNDELEGATING -> accountDelegationsUndelegating(undelegations, validatorsMoniker),
+            constants.View.REDELEGATING -> accountDelegationsRedelegating(redelegations, validatorsMoniker),
+        ))
+    }

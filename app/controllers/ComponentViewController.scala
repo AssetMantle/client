@@ -361,7 +361,7 @@ class ComponentViewController @Inject()(
           undelegations <- undelegations
           validators <- validators
           redelegations <- redelegations
-        } yield Ok(views.html.component.blockchain.account.accountDelegations(delegations = getDelegationsMap(delegations, validators), undelegations = getUndelegationsMap(undelegations), validatorsMoniker = getValidatorsMoniker(validators), redelegations = getRedelegationsMap(redelegations)))
+        } yield Ok(views.html.component.blockchain.account.accountDelegations(delegations = getDelegationsMap(delegations, validators), undelegations = getUndelegationsMap(undelegations), validatorsMoniker = getValidatorsMoniker(validators), redelegations = getRedelegationsMap(redelegations), validators = validators))
           ).recover {
           case baseException: BaseException => InternalServerError(baseException.failure.message)
         }

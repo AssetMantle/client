@@ -4,7 +4,8 @@ import com.cosmos.bank.{v1beta1 => bankTx}
 import com.google.protobuf.{Any => protoBufAny}
 import constants.Scheduler
 import exceptions.BaseException
-import models.blockchain.Transaction
+import models.blockchain
+import models.blockchain._
 import models.common.Serializable.Coin
 import models.traits._
 import play.api.Logger
@@ -12,6 +13,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.twirl.api.TwirlHelperImports.twirlJavaCollectionToScala
 import queries.blockchain.BroadcastTxSync
 import queries.responses.blockchain.BroadcastTxSyncResponse
+import queries.responses.common.Header
 import slick.jdbc.H2Profile.api._
 
 import javax.inject.{Inject, Singleton}
@@ -23,7 +25,7 @@ case class ClaimName(claimTxHash: String, name: String, height: Int, address: St
 }
 
 private[campaign] object ClaimNames {
-  class ClaimNameTable(tag: Tag) extends Table[ClaimName](tag, "ClaimName") with ModelTable[String] {
+  class ClaimNameTable(tag: Tag) extends Table[ClaimName](tag, Option("campaign"), "ClaimName") with ModelTable[String] {
 
     def * = (claimTxHash, name, height, address, transferTxHash.?, transferStatus.?, timeoutHeight.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (ClaimName.tupled, ClaimName.unapply)
 
@@ -57,6 +59,7 @@ private[campaign] object ClaimNames {
 class ClaimNames @Inject()(
                             broadcastTxSync: BroadcastTxSync,
                             revertClaimNames: RevertClaimNames,
+                            blockchainIdentities: blockchain.Identities,
                             utilitiesOperations: utilities.Operations,
                             utilitiesTransaction: utilities.Transaction,
                             protected val dbConfigProvider: DatabaseConfigProvider
@@ -69,6 +72,8 @@ class ClaimNames @Inject()(
 
   val tableQuery = new TableQuery(tag => new ClaimNames.ClaimNameTable(tag))
   val CampaignAddress = ""
+  val Wallet = utilities.Wallet.getRandomWallet
+  val ReceiveAmount: BigInt = BigInt(100000000)
 
   object Service {
 
@@ -88,9 +93,9 @@ class ClaimNames @Inject()(
 
     def countAll: Future[Int] = countTotal()
 
-    def getForTransfer: Future[Seq[ClaimName]] = {
-      val booleanString: Option[String] = null
-      filter(_.transferTxHash.? === booleanString).map(_.take(50))
+    def getForTransfer: Future[Option[ClaimName]] = {
+      val nullString: Option[String] = null
+      filter(_.transferTxHash.? === nullString).map(_.headOption)
     }
 
     def markTransferTxStatusSuccess(txHashes: Seq[String]): Future[Int] = customUpdate(tableQuery.filter(_.transferTxHash.inSet(txHashes)).map(_.transferStatus).update(true))
@@ -99,78 +104,83 @@ class ClaimNames @Inject()(
 
     def markTransferTxStatusFailed(txHash: String): Future[Int] = customUpdate(tableQuery.filter(_.transferTxHash === txHash).map(_.transferStatus).update(false))
 
-    def getWithNullStatus: Future[Seq[ClaimName]] = {
-      val booleanNull: Option[Boolean] = null
-      filter(_.transferStatus.? === booleanNull).map(_.take(50))
+    def markTimedOutTransferTxStatusFailed(currentHeight: Int): Future[Int] = {
+      val nullBool: Option[Boolean] = null
+      customUpdate(tableQuery.filter(x => x.transferStatus.? === nullBool && x.timeoutHeight <= currentHeight).map(_.transferStatus).update(false))
     }
-
-    def getFailedTx: Future[Seq[ClaimName]] = filter(!_.transferStatus).map(_.take(50))
 
     def checkAnyPendingTx: Future[Boolean] = filterAndExists(_.transferStatus.?.isEmpty)
 
-    def updateTransferTxHash(claimTxHashes: Seq[String], transferTxHash: String, timeoutHeight: Int): Future[Int] = customUpdate(tableQuery.filter(_.claimTxHash.inSet(claimTxHashes)).map(x => (x.transferTxHash, x.timeoutHeight)).update((transferTxHash, timeoutHeight)))
+    def updateTransferTxHash(claimTxHash: String, transferTxHash: String, timeoutHeight: Int): Future[Int] = customUpdate(tableQuery.filter(_.claimTxHash === claimTxHash).map(x => (x.transferTxHash, x.timeoutHeight)).update((transferTxHash, timeoutHeight)))
+
+    def markFailedForRetry: Future[Int] = customUpdate(tableQuery.filter(!_.transferStatus).map(x => (x.transferTxHash.?, x.transferStatus.?, x.timeoutHeight.?)).update((null, null, null)))
 
   }
 
   object Utility {
 
     private def onTransaction(tx: Transaction): Future[Unit] = if (tx.status) {
-      val sendCoinMsg = tx.getMessages.filter(_.getTypeUrl == schema.constants.Messages.SEND_COIN)
+      val sendCoinMsg = tx.getMessages
+        .filter(_.getTypeUrl == schema.constants.Messages.SEND_COIN)
         .map(x => bankTx.MsgSend.parseFrom(x.getValue))
         .find(_.getToAddress == CampaignAddress)
       if (sendCoinMsg.isDefined) {
+        val alreadyTaken = Service.checkExistsByName(tx.getMemo)
+        val identity = blockchainIdentities.Service.get(schema.document.NameIdentity.getNameIdentityID(tx.getMemo))
         val transferredAmount = sendCoinMsg.get.getAmountList.toSeq.find(_.getDenom == "umntl").fold(BigInt(0))(x => BigInt(x.getAmount))
-        val checkAlreadyTaken = Service.checkExistsByName(tx.getMemo)
 
-        def checkAndAdd(checkAlreadyTaken: Boolean) = if (!checkAlreadyTaken && transferredAmount >= BigInt(1)) Service.add(ClaimName(claimTxHash = tx.hash, name = tx.getMemo, height = tx.height, address = sendCoinMsg.get.getFromAddress, transferTxHash = None, transferStatus = None))
+        def checkAndAdd(alreadyTaken: Boolean, identity: Option[Identity]) = if (!alreadyTaken && tx.getMemo != "" && transferredAmount == ReceiveAmount && identity.isDefined && identity.get.isAuthenticated(CampaignAddress)) Service.add(ClaimName(claimTxHash = tx.hash, name = tx.getMemo, height = tx.height, address = sendCoinMsg.get.getFromAddress, transferTxHash = None, transferStatus = None, timeoutHeight = None))
         else revertSendCoin(claimTxHash = tx.hash, height = tx.height, coins = sendCoinMsg.get.getAmountList.toSeq.map(x => Coin(x)), address = sendCoinMsg.get.getFromAddress)
 
         for {
-          checkAlreadyTaken <- checkAlreadyTaken
-          _ <- checkAndAdd(checkAlreadyTaken)
+          alreadyTaken <- alreadyTaken
+          identity <- identity
+          _ <- checkAndAdd(alreadyTaken, identity)
         } yield ()
       } else Future()
     } else Future()
 
-    def onTransactions(txs: Seq[Transaction]): Future[Unit] = {
-      val process = utilitiesOperations.traverse(txs)(tx => onTransaction(tx))
-      val markSuccess = Service.markTransferTxStatusSuccess(txs.filter(_.status).map(_.hash))
-      val markFailed = Service.markTransferTxStatusFailed(txs.filter(!_.status).map(_.hash))
+    def onNewBlock(header: Header, txs: Seq[Transaction]): Future[Unit] = {
+      val markTimedOut = Service.markTimedOutTransferTxStatusFailed(header.height)
+
+      def markSuccess = Service.markTransferTxStatusSuccess(txs.filter(_.status).map(_.hash))
+
+      def markFailed = Service.markTransferTxStatusFailed(txs.filter(!_.status).map(_.hash))
+
+      def process = utilitiesOperations.traverse(txs)(tx => onTransaction(tx))
 
       (for {
-        _ <- process
+        _ <- markTimedOut
         _ <- markSuccess
         _ <- markFailed
+        _ <- process
       } yield ()).recover {
         case baseException: BaseException => logger.error(baseException.failure.message)
         case exception: Exception => logger.error(exception.getLocalizedMessage)
       }
     }
 
-    private def processFailedTx(): Future[Unit] = {
-      Future()
-    }
+    private def processFailedTx(): Future[Int] = Service.markFailedForRetry
 
     private def transferIdentity(): Future[Unit] = {
       val pendingTx = Service.checkAnyPendingTx
+      val toTransfer = Service.getForTransfer
 
-      def createMessages(toTransfer: Seq[ClaimName]) = toTransfer.flatMap(x => {
-        val nameID = schema.document.NameIdentity.getNameIdentityID(x.name)
-        val provision = utilities.BlockchainTransaction.getProvisionMsg(fromAddress = CampaignAddress, fromID = nameID, toAddress = x.address)
+      def createMessage(toTransfer: ClaimName) = {
+        val nameID = schema.document.NameIdentity.getNameIdentityID(toTransfer.name)
+        val provision = utilities.BlockchainTransaction.getProvisionMsg(fromAddress = CampaignAddress, fromID = nameID, toAddress = toTransfer.address)
         val unprovision = utilities.BlockchainTransaction.getUnprovisionMsg(fromAddress = CampaignAddress, fromID = nameID, toAddress = CampaignAddress)
         Seq(provision, unprovision)
-      })
-
-      def getAndDoTx(pendingTx: Boolean) = if (!pendingTx) {
-        val toTransfer = Service.getForTransfer
-        for {
-          toTransfer <- toTransfer
-          _ <- doTx(messages = createMessages(toTransfer))
-        } yield ()
       }
+
+      def getAndDoTx(pendingTx: Boolean, toTransfer: Option[ClaimName]) = if (!pendingTx && toTransfer.isDefined) {
+        doTx(messages = createMessage(toTransfer.get), claimName = toTransfer.get)
+      } else Future()
 
       for {
         pendingTx <- pendingTx
+        toTransfer <- toTransfer
+        _ <- getAndDoTx(pendingTx, toTransfer)
       } yield ()
     }
 
@@ -178,7 +188,7 @@ class ClaimNames @Inject()(
       revertClaimNames.Service.add(RevertClaimName(claimTxHash = claimTxHash, height = height, address = address, coins = coins, returnTxHash = None, returnStatus = None, timeoutHeight = None))
     }
 
-    private def broadcastTxAndUpdate(txRawBytes: Array[Byte], txHash: String) = {
+    private def broadcastTxAndUpdate(txRawBytes: Array[Byte]) = {
 
       val broadcastTx = broadcastTxSync.Service.get(txRawBytes.map("%02x".format(_)).mkString.toUpperCase)
 
@@ -187,7 +197,7 @@ class ClaimNames @Inject()(
         else if (successResponse.nonEmpty && successResponse.get.result.code != 0) Option(successResponse.get.result.log)
         else None
 
-        val updateTx = if (log.nonEmpty) Service.markTransferTxStatusFailed(txHash) else Future()
+        val updateTx = if (log.nonEmpty) Service.markTransferTxStatusFailed(utilities.Secrets.sha256HashHexString(txRawBytes)) else Future()
         for {
           _ <- updateTx
         } yield ()
@@ -199,30 +209,25 @@ class ClaimNames @Inject()(
       } yield ()
     }
 
-    private def doTx(messages: Seq[protoBufAny], claimNames: Seq[ClaimName]) = {
-      val latestHeightAccountUnconfirmedTxs = utilitiesTransaction.getLatestHeightAccountAndUnconfirmedTxs(wallet.address)
+    private def doTx(messages: Seq[protoBufAny], claimName: ClaimName) = {
+      val latestHeightAccountUnconfirmedTxs = utilitiesTransaction.getLatestHeightAccountAndUnconfirmedTxs(Wallet.address)
 
       def checkMempoolAndAddTx(bcAccount: models.blockchain.Account, latestBlockHeight: Int, unconfirmedTxHashes: Seq[String]) = {
-        val (timeoutHeight, txRawBytes, txHash) = utilitiesTransaction.getTx(latestBlockHeight = latestBlockHeight, messages = messages, gasPrice = 0.001, gasLimit = txUtil.gasLimit, bcAccount = bcAccount, ecKey = wallet.getECKey)
+        val (timeoutHeight, txRawBytes, txHash) = utilitiesTransaction.getTx(latestBlockHeight = latestBlockHeight, messages = messages, gasPrice = constants.Campaign.ClaimNameGasPrice, gasLimit = constants.Campaign.ClaimNameGasLimit, bcAccount = bcAccount, ecKey = Wallet.getECKey, memo = claimName.claimTxHash)
 
         if (!unconfirmedTxHashes.contains(txHash)) {
-          val adminTx = Service.updateTransferTxHash(claimTxHashes = claimNames.map(_.claimTxHash), transferTxHash = txHash, timeoutHeight = timeoutHeight)
-
-          def broadcastTxAndUpdate(txRawBytes: Array[Byte]) = adminTransactions.Utility.broadcastTxAndUpdate(adminTx, txRawBytes)
-
+          val updateTxHash = Service.updateTransferTxHash(claimTxHash = claimName.claimTxHash, transferTxHash = txHash, timeoutHeight = timeoutHeight)
           for {
-            adminTx <- adminTx
-            masterTxValue <- addToMasterTransaction(txHash)
-            updatedUserTransaction <- broadcastTxAndUpdate(adminTx, txRawBytes)
-          } yield (updatedUserTransaction, masterTxValue)
+            _ <- updateTxHash
+            updatedTransaction <- broadcastTxAndUpdate(txRawBytes)
+          } yield updatedTransaction
         } else constants.Response.TRANSACTION_ALREADY_IN_MEMPOOL.throwBaseException()
       }
 
       (for {
         (latestHeight, bcAccount, unconfirmedTxs) <- latestHeightAccountUnconfirmedTxs
-        pendingTx <- pendingTx
-        (updatedUserTransaction, masterTxValue) <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
-      } yield (updatedUserTransaction, masterTxValue)
+        updatedTransaction <- checkMempoolAndAddTx(bcAccount, latestHeight, unconfirmedTxs.result.txs.map(x => utilities.Secrets.base64URLDecode(x).map("%02x".format(_)).mkString.toUpperCase))
+      } yield updatedTransaction
         ).recover {
         case exception: Exception => logger.error(exception.getLocalizedMessage)
       }

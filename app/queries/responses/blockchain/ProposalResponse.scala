@@ -5,7 +5,6 @@ import models.common.Serializable
 import play.api.libs.json.{Json, Reads}
 import queries.Abstract.ProposalContent
 import queries.responses.common.Coin
-import transactions.Abstract.BaseResponse
 import utilities.Date.RFC3339
 
 object ProposalResponse {
@@ -22,7 +21,7 @@ object ProposalResponse {
 
   implicit val proposalReads: Reads[Proposal] = Json.reads[Proposal]
 
-  case class Response(proposal: Proposal) extends BaseResponse
+  case class Response(proposal: Proposal)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

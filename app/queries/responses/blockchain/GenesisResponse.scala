@@ -6,11 +6,9 @@ import models.common.Parameters._
 import models.common.Serializable
 import play.api.libs.json.{Json, Reads}
 import queries.Abstract.Account
-import queries.responses.blockchain.common.ID._
 import queries.responses.blockchain.common._
 import queries.responses.blockchain.params._
 import queries.responses.common.{Coin, Delegation, Validator, Authz => commonAuthz, FeeGrant => commonFeeGrant}
-import transactions.Abstract.BaseResponse
 import utilities.Date.RFC3339
 import utilities.MicroNumber
 
@@ -173,7 +171,7 @@ object GenesisResponse {
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]
 
-  case class Response(result: Result) extends BaseResponse
+  case class Response(result: Result)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

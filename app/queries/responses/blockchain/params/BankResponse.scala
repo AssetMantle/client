@@ -3,7 +3,7 @@ package queries.responses.blockchain.params
 import models.Abstract.Parameter
 import models.common.Parameters
 import play.api.libs.json.{Json, Reads}
-import transactions.Abstract.BaseResponse
+
 
 object BankResponse {
 
@@ -17,7 +17,7 @@ object BankResponse {
 
   implicit val paramsReads: Reads[Params] = Json.reads[Params]
 
-  case class Response(params: Params) extends BaseResponse
+  case class Response(params: Params)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

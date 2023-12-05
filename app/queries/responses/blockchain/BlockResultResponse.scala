@@ -2,7 +2,7 @@ package queries.responses.blockchain
 
 import play.api.libs.json.{Json, Reads}
 import queries.responses.common.Event
-import transactions.Abstract.BaseResponse
+
 
 object BlockResultResponse {
 
@@ -48,7 +48,7 @@ object BlockResultResponse {
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]
 
-  case class Response(result: Result) extends BaseResponse
+  case class Response(result: Result)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

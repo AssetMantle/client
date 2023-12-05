@@ -1,7 +1,6 @@
 package queries.blockchain
 
-import exceptions.BaseException
-import play.api.{Configuration, Logger}
+import play.api.Logger
 import play.api.libs.ws.WSClient
 import queries.responses.blockchain.BalanceResponse.Response
 

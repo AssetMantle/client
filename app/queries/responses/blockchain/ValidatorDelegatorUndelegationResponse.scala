@@ -2,11 +2,11 @@ package queries.responses.blockchain
 
 import play.api.libs.json.{Json, Reads}
 import queries.responses.common.Undelegation
-import transactions.Abstract.BaseResponse
+
 
 object ValidatorDelegatorUndelegationResponse {
 
-  case class Response(unbond: Undelegation.Result) extends BaseResponse
+  case class Response(unbond: Undelegation.Result)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

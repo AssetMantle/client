@@ -2,10 +2,10 @@ package controllers
 
 import constants.AppConfig._
 import controllers.actions._
-import play.api.{Configuration, Logger}
 import play.api.cache.Cached
 import play.api.i18n.I18nSupport
 import play.api.mvc._
+import play.api.{Configuration, Logger}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
@@ -96,6 +96,13 @@ class ViewController @Inject()(
     withoutLoginAction { implicit loginState =>
       implicit request =>
         Ok(views.html.explorer.document(id))
+    }
+  }
+
+  def name(name: String): EssentialAction = cached.apply(req => req.path + "/" + name, constants.AppConfig.CacheDuration) {
+    withoutLoginAction { implicit loginState =>
+      implicit request =>
+        Ok(views.html.explorer.document(schema.document.NameIdentity.getNameIdentityID(name).asString))
     }
   }
 }

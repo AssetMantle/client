@@ -4,7 +4,6 @@ import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads}
 import queries.Abstract.TendermintEvidence
 import queries.responses.common.Header
-import transactions.Abstract.BaseResponse
 import utilities.Blockchain.SlashingEvidence
 import utilities.Date.RFC3339
 import utilities.MicroNumber
@@ -57,7 +56,7 @@ object BlockResponse {
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]
 
-  case class Response(result: Result) extends BaseResponse
+  case class Response(result: Result)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

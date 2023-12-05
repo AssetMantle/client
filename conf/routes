@@ -14,6 +14,7 @@ GET        /blocks                                         controllers.ViewContr
 GET        /blocks/:height                                 controllers.ViewController.block(height: Int)
 GET        /transactions                                   controllers.ViewController.transactions()
 GET        /document/:id                                   controllers.ViewController.document(id: String)
+GET        /name/:name                                     controllers.ViewController.name(name: String)
 GET        /transactions/:txHash                           controllers.ViewController.transaction(txHash: String)
 GET        /wallet/:address                                controllers.ViewController.wallet(address: String)
 GET        /validators                                     controllers.ViewController.validators()

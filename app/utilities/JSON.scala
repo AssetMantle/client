@@ -7,7 +7,6 @@ import exceptions.BaseException
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSResponse
-import transactions.Abstract.BaseResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -18,7 +17,7 @@ object JSON {
     logger.error(jsonString)
   }
 
-  def getResponseFromJson[T <: BaseResponse](response: Future[WSResponse])(implicit exec: ExecutionContext, logger: Logger, module: String, reads: Reads[T]): Future[T] = {
+  def getResponseFromJson[T](response: Future[WSResponse])(implicit exec: ExecutionContext, logger: Logger, module: String, reads: Reads[T]): Future[T] = {
     response.map { response =>
       Json.fromJson[T](response.json) match {
         case JsSuccess(value: T, _: JsPath) => value

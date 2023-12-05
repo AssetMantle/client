@@ -1,10 +1,9 @@
 package queries.blockchain.params
 
-import exceptions.BaseException
-import play.api.Configuration
 import play.api.Logger
 import play.api.libs.ws.WSClient
 import queries.responses.blockchain.params.AuthResponse.Response
+
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

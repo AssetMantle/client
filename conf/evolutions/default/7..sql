@@ -1,3 +1,4 @@
+
 # --- !Ups
 
 CREATE SCHEMA IF NOT EXISTS CAMPAIGN
@@ -11,6 +12,7 @@ CREATE TABLE IF NOT EXISTS CAMPAIGN."ClaimName"
     "address"              VARCHAR NOT NULL,
     "transferTxHash"       VARCHAR,
     "transferStatus"       BOOLEAN,
+    "timeoutHeight"        INTEGER,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,
@@ -26,6 +28,7 @@ CREATE TABLE IF NOT EXISTS CAMPAIGN."RevertClaimName"
     "coins"                VARCHAR NOT NULL,
     "returnTxHash"         VARCHAR,
     "returnStatus"         BOOLEAN,
+    "timeoutHeight"        INTEGER,
     "createdBy"            VARCHAR,
     "createdOnMillisEpoch" BIGINT,
     "updatedBy"            VARCHAR,

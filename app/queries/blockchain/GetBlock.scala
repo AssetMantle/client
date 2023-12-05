@@ -1,9 +1,8 @@
 package queries.blockchain
 
 import exceptions.BaseException
-import play.api.libs.ws.WSClient
-import play.api.Configuration
 import play.api.Logger
+import play.api.libs.ws.WSClient
 import queries.responses.blockchain.BlockResponse.Response
 
 import java.net.ConnectException

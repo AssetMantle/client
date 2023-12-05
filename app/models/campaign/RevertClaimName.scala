@@ -43,7 +43,7 @@ private[campaign] object RevertClaimNames {
     )
   }
 
-  class RevertClaimNameTable(tag: Tag) extends Table[RevertClaimNameSerializable](tag, "RevertClaimName") with ModelTable[String] {
+  class RevertClaimNameTable(tag: Tag) extends Table[RevertClaimNameSerializable](tag, Option("campaign"), "RevertClaimName") with ModelTable[String] {
 
     def * = (claimTxHash, height, address, coins, returnTxHash.?, returnStatus.?, timeoutHeight.?, createdBy.?, createdOnMillisEpoch.?, updatedBy.?, updatedOnMillisEpoch.?) <> (RevertClaimNameSerializable.tupled, RevertClaimNameSerializable.unapply)
 
@@ -112,7 +112,6 @@ class RevertClaimNames @Inject()(
     }
 
     def getFailedTx: Future[Seq[RevertClaimName]] = filter(!_.returnStatus).map(_.take(50)).map(_.map(_.deserialize()))
-
 
     def checkAnyPendingTx: Future[Boolean] = filterAndExists(_.returnStatus.?.isEmpty)
   }

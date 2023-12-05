@@ -3,8 +3,9 @@
 @import scala.collection.immutable.ListMap
 @import utilities.MicroNumber
 @import views.html.base.cards._
+@import models.blockchain.Validator
 
-@(delegations: ListMap[String, MicroNumber], validatorsMoniker: Map[String, String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(delegations: ListMap[String, MicroNumber], validatorsMoniker: Map[String, String], validators: Seq[Validator])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div class="pieChartContainer tableCard">
     <div class="cmuk-card-body">
         <div class="delegationsDelegatedContainer">
@@ -15,7 +16,7 @@
                     <tr>
                         <td>
                             <div class="tableField">
-                                <div class="tableFieldTitle">@commonJavascriptLink(validatorsMoniker.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))"""))</div>
+                                <div class="tableFieldTitle">@commonJavascriptLink(validators.find(_.operatorAddress == validatorAddress).fold(validatorsMoniker.getOrElse(validatorAddress, validatorAddress))(x => if (x.isBonded) validatorsMoniker.getOrElse(validatorAddress, validatorAddress) else s"${validatorsMoniker.getOrElse(validatorAddress, validatorAddress)} [Inactive]"), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))"""))</div>
                                 <div class="tableFieldValue">@Html(utilities.NumericOperation.formatNumber(amount))</div>
                             </div>
                         </td>

@@ -86,6 +86,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ViewController.proposals,
           routes.javascript.ViewController.wallet,
           routes.javascript.ViewController.document,
+          routes.javascript.ViewController.name,
           routes.javascript.ViewController.parameters,
 
         )

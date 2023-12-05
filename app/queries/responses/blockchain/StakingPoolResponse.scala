@@ -2,7 +2,6 @@ package queries.responses.blockchain
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads}
-import transactions.Abstract.BaseResponse
 import utilities.MicroNumber
 
 object StakingPoolResponse {
@@ -18,7 +17,7 @@ object StakingPoolResponse {
       (JsPath \ "bonded_tokens").read[String]
     ) (Pool.apply _)
 
-  case class Response(pool: Pool) extends BaseResponse
+  case class Response(pool: Pool)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

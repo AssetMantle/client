@@ -2,7 +2,6 @@ package queries.responses.blockchain
 
 import play.api.libs.json.{Json, Reads}
 import queries.responses.common.Authz._
-import transactions.Abstract.BaseResponse
 import utilities.Date.RFC3339
 
 object AuthorizationsResponse {
@@ -11,7 +10,7 @@ object AuthorizationsResponse {
 
   implicit val grantReads: Reads[Grant] = Json.reads[Grant]
 
-  case class Response(grants: Seq[Grant]) extends BaseResponse
+  case class Response(grants: Seq[Grant])
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

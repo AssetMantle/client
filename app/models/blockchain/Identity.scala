@@ -45,6 +45,8 @@ case class Identity(id: Array[Byte], idString: String, classificationID: Array[B
     } else ListData(Seq())
   }
 
+  def isAuthenticated(address: String): Boolean = this.getAuthenticationAddress.contains(address)
+
   def getBondAmount: NumberData = {
     val value = this.getMutables.getProperty(schema.constants.Properties.BondAmountProperty.getID)
     NumberData((if (value.isDefined) MetaProperty(value.get.getProtoBytes) else schema.constants.Properties.BondAmountProperty).getData.getProtoBytes)

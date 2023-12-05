@@ -3,7 +3,7 @@ package queries.responses.blockchain
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Json, Reads}
 import queries.responses.common.Header
-import transactions.Abstract.BaseResponse
+
 
 object WSClientBlockResponse {
 
@@ -43,7 +43,7 @@ object WSClientBlockResponse {
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]
 
-  case class Response(result: Result) extends BaseResponse
+  case class Response(result: Result)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

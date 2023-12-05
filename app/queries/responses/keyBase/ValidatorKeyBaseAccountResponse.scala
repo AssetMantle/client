@@ -1,7 +1,7 @@
 package queries.responses.keyBase
 
 import play.api.libs.json.{Json, Reads}
-import transactions.Abstract.BaseResponse
+
 
 object ValidatorKeyBaseAccountResponse {
 
@@ -25,7 +25,7 @@ object ValidatorKeyBaseAccountResponse {
 
   implicit val themReads: Reads[Them] = Json.reads[Them]
 
-  case class Response(status: Status, them: Seq[Them]) extends BaseResponse
+  case class Response(status: Status, them: Seq[Them])
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

@@ -2,11 +2,11 @@ package queries.responses.blockchain
 
 import play.api.libs.json.{Json, Reads}
 import queries.responses.common.Coin
-import transactions.Abstract.BaseResponse
+
 
 object CommunityPoolResponse {
 
-  case class Response(pool: Seq[Coin]) extends BaseResponse
+  case class Response(pool: Seq[Coin])
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

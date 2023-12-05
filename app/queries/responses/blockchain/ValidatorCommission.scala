@@ -2,7 +2,7 @@ package queries.responses.blockchain
 
 import play.api.libs.json.{Json, Reads}
 import queries.responses.common.Coin
-import transactions.Abstract.BaseResponse
+
 
 object ValidatorCommission {
 
@@ -10,7 +10,7 @@ object ValidatorCommission {
 
   implicit val commissionReads: Reads[Commission] = Json.reads[Commission]
 
-  case class Response(commission: Commission) extends BaseResponse
+  case class Response(commission: Commission)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

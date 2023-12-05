@@ -1,9 +1,9 @@
 package queries.responses.blockchain
 
+import models.blockchain.{ProposalDeposit => BlockchainProposalDeposit}
 import play.api.libs.json.{Json, Reads}
 import queries.responses.common.Coin
-import models.blockchain.{ProposalDeposit => BlockchainProposalDeposit}
-import transactions.Abstract.BaseResponse
+
 
 object ProposalDepositResponse {
 
@@ -13,7 +13,7 @@ object ProposalDepositResponse {
 
   implicit val depositReads: Reads[Deposit] = Json.reads[Deposit]
 
-  case class Response(deposit: Deposit) extends BaseResponse
+  case class Response(deposit: Deposit)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

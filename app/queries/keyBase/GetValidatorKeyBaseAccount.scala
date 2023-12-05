@@ -1,9 +1,7 @@
 package queries.keyBase
 
-import exceptions.BaseException
+import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
-import play.api.Configuration
-import play.api.Logger
 import queries.responses.keyBase.ValidatorKeyBaseAccountResponse.Response
 
 import java.net.ConnectException

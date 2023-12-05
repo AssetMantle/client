@@ -1,6 +1,6 @@
 package queries.responses.common
 
-import play.api.libs.json.{JsPath, Json, Reads}
+import play.api.libs.json.{Json, Reads}
 
 case class Event(`type`: String, attributes: Seq[Attribute]) {
   //Careful while using the following function, if the attributes are not be encoded throws base exception

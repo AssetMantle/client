@@ -1,7 +1,7 @@
 package queries.responses.blockchain
 
 import play.api.libs.json.{Json, Reads}
-import transactions.Abstract.BaseResponse
+
 
 object ABCIInfoResponse {
 
@@ -13,7 +13,7 @@ object ABCIInfoResponse {
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]
 
-  case class Response(jsonrpc: String, id: Int, result: Result) extends BaseResponse
+  case class Response(jsonrpc: String, id: Int, result: Result)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 }

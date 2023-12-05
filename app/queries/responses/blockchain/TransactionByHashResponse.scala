@@ -2,7 +2,7 @@ package queries.responses.blockchain
 
 import models.blockchain.Transaction
 import play.api.libs.json.{Json, Reads}
-import transactions.Abstract.BaseResponse
+
 
 object TransactionByHashResponse {
 
@@ -18,7 +18,7 @@ object TransactionByHashResponse {
 
   implicit val resultReads: Reads[Result] = Json.reads[Result]
 
-  case class Response(result: Result) extends BaseResponse
+  case class Response(result: Result)
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

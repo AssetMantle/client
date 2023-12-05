@@ -1,6 +1,5 @@
 package queries.responses.common
 
-import exceptions.BaseException
 import models.Abstract.{Authorization => commonAuthzAbstract}
 import models.common.{Serializable, Authz => SerializableAuthz}
 import play.api.Logger
