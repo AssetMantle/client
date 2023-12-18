@@ -2,9 +2,8 @@
 ARG BUILD_IMAGE=adoptopenjdk:11-jdk-hotspot
 ARG JRE_IMAGE=adoptopenjdk:11-jre-hotspot
 ARG GITHUB_ACCESS_TOKEN
-RUN git config --global credential.helper '!f() { echo "username=oauth_token"; echo "password=${GITHUB_ACCESS_TOKEN}"; }; f'
-
-# Rest of your Dockerfile
+ARG GITHUB_USER
+RUN git config --global credential.helper '!f() { echo "username=${GITHUB_USERNAME}"; echo "password=${GITHUB_ACCESS_TOKEN}"; }; f'
 
 
 FROM ${BUILD_IMAGE} as build
