@@ -1,16 +1,23 @@
 # syntax=docker/dockerfile:latest
 ARG BUILD_IMAGE=adoptopenjdk:11-jdk-hotspot
 ARG JRE_IMAGE=adoptopenjdk:11-jre-hotspot
+ARG GITHUB_ACCESS_TOKEN
+RUN git config --global credential.helper '!f() { echo "username=oauth_token"; echo "password=${GITHUB_ACCESS_TOKEN}"; }; f'
+
+# Rest of your Dockerfile
+
 
 FROM ${BUILD_IMAGE} as build
 SHELL [ "/bin/bash", "-cx" ]
 WORKDIR /tmp
+# Debugging commands
+RUN pwd && ls -al
 RUN apt update; apt install -yqq git curl wget ssh; \
   mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
-# COPY ./project/build.properties ./
-# COPY <<EOF /root/.ssh/id_rsa
-# PRIV KEY TO FETCH THE REPO
-# EOF
+COPY ./project/build.properties ./
+COPY <<EOF /root/.ssh/id_rsa
+PRIV KEY TO FETCH THE REPO
+EOF
 RUN --mount=type=secret,id=git,target=/root/.ssh/id_rsa \
   SBT_VERSION=$(grep 'sbt.version' build.properties | cut -d'=' -f2); \
   curl -sLo - https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz | tar -xvzf -; \
@@ -30,10 +37,14 @@ RUN --mount=type=cache,target=/root/.sbt \
   --mount=type=cache,target=/root/.ivy2 \
   sbt dist; \
   echo $APP_VERSION
+# Debugging commands
+RUN pwd && ls -al
 
 FROM ${JRE_IMAGE} as extract
 SHELL [ "/bin/bash", "-cx" ]
 WORKDIR /app
+# Debugging commands before 'sbt dist'
+RUN pwd && ls -al
 RUN --mount=type=cache,target=/var/lib/apt/cache \
   --mount=type=cache,target=/var/lib/cache \
   apt update; \
