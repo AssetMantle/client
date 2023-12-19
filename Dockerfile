@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:latest
 ARG BUILD_IMAGE=adoptopenjdk:11-jdk-hotspot
 ARG JRE_IMAGE=adoptopenjdk:11-jre-hotspot
-ARG GITHUB_ACCESS_TOKEN
-ARG GITHUB_USER
-RUN git config --global credential.helper '!f() { echo "username=${GITHUB_USERNAME}"; echo "password=${GITHUB_ACCESS_TOKEN}"; }; f'
+# ARG GITHUB_ACCESS_TOKEN
+# ARG GITHUB_USER
+# RUN git config --global credential.helper '!f() { echo "username=${GITHUB_USERNAME}"; echo "password=${GITHUB_ACCESS_TOKEN}"; }; f'
 
 
 FROM ${BUILD_IMAGE} as build
