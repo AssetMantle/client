@@ -1,6 +1,6 @@
 package services
 
-import akka.actor.Cancellable
+import constants.Scheduler
 import exceptions.BaseException
 import models.Abstract.Parameter
 import models.blockchain.{Token, Validator, Transaction => blockchainTransaction}
@@ -22,7 +22,7 @@ import utilities.Date.RFC3339
 import utilities.MicroNumber
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.{Duration, DurationInt}
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.{Source => ScalaSource}
 
@@ -68,10 +68,6 @@ class Startup @Inject()(
   private val genesisFilePath = configuration.get[String]("blockchain.genesisFilePath")
 
   private val blockchainStartHeight = configuration.get[Int]("blockchain.startHeight")
-
-  private val explorerInitialDelay = configuration.get[Int]("blockchain.explorer.initialDelay").millis
-
-  private val explorerFixedDelay = configuration.get[Int]("blockchain.explorer.fixedDelay").millis
 
   archiving.setLastArchiveHeight()
 
@@ -296,8 +292,10 @@ class Startup @Inject()(
     } yield ()
   }
 
-  private val explorerRunnable = new Runnable {
-    def run(): Unit = if (!utilities.Scheduler.getSignalReceived) {
+  val blockScheduler: Scheduler = new Scheduler {
+    val name: String = "BLOCK_SCHEDULER"
+
+    def runner(): Unit = {
       //TODO Bug Source: Continuously emits sometimes when app starts - queries.blockchain.GetABCIInfo in application-akka.actor.default-dispatcher-66  - LOG.ILLEGAL_STATE_EXCEPTION
       //TODO java.lang.IllegalStateException: Closed
       //TODO (Runtime Exception) Explorer keeps on working fine
@@ -352,10 +350,22 @@ class Startup @Inject()(
       }
       //This Await ensures next app doesn't starts updating next block without completing the current one.
       Await.result(forComplete, Duration.Inf)
-    } else utilities.Scheduler.shutdownThread()
+    }
   }
 
-  //Needs to be called via function otherwise as soon as Startup gets injected, this runs (when without function) and probably INSERT_OR_UPDATE_TRIGGER doesnt work.
-  def start(): Cancellable = actors.Service.actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = explorerInitialDelay, delay = explorerFixedDelay)(explorerRunnable)(schedulerExecutionContext)
+  val transactionScheduler: Scheduler = new Scheduler {
+    val name: String = "TRANSACTION_SCHEDULER"
 
+    def runner(): Unit = {
+      val processTransactions = blocksServices.processTransactions()
+
+      val forComplete = (for {
+        _ <- processTransactions
+      } yield ()).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message)
+        case exception: Exception => logger.error(exception.getLocalizedMessage)
+      }
+      Await.result(forComplete, Duration.Inf)
+    }
+  }
 }

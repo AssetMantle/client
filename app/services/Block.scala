@@ -125,7 +125,7 @@ class Block @Inject()(
     }
 
     def insertTransactions(transactions: Seq[TransactionByHeightResponseTx]): Future[Seq[blockchainTransaction]] = if (transactions.nonEmpty) {
-      val bcTxs = transactions.map(_.toTransaction)
+      val bcTxs = transactions.map(_.toTransaction(false))
       val insertTxs = blockchainTransactions.Service.insertMultiple(bcTxs)
       val updateTransactionCounter = analyticTransactionCounters.Utility.addStatisticsData(epoch = header.time.epoch, totalTxs = transactions.length)
       val updateMessageCounter = analyticMessageCounters.Utility.updateMessageCounter(bcTxs)
@@ -136,7 +136,6 @@ class Block @Inject()(
         _ <- insertTxs
         _ <- updateTransactionCounter
         _ <- updateMessageCounter
-        _ <- actionsOnTransactions(bcTxs)(header)
         _ <- wallet
         _ <- validator
       } yield bcTxs
@@ -524,6 +523,29 @@ class Block @Inject()(
     for {
       validator <- validator
       _ <- update(validator)
+    } yield ()
+  }
+
+  def processTransactions(): Future[Unit] = {
+    val unprocessedTransactions = blockchainTransactions.Service.getUnprocessedTransactions
+
+    def getHeaders(unprocessedTransactions: Seq[blockchainTransaction]) = blockchainBlocks.Service.get(unprocessedTransactions.map(_.height)).map(_.map(x => Header(height = x.height, time = RFC3339(x.time), proposer_address = x.proposerAddress)))
+
+    def processTransaction(unprocessedTransactions: Seq[blockchainTransaction], headers: Seq[Header]) = utilitiesOperations.traverse(headers.sortBy(_.height)) { header =>
+      val process = actionsOnTransactions(unprocessedTransactions.filter(_.height == header.height))(header)
+
+      def markProcessed = blockchainTransactions.Service.markProcessed(header.height)
+
+      for {
+        _ <- process
+        _ <- markProcessed
+      } yield ()
+    }
+
+    for {
+      unprocessedTransactions <- unprocessedTransactions
+      headers <- getHeaders(unprocessedTransactions)
+      _ <- processTransaction(unprocessedTransactions, headers)
     } yield ()
   }
 }

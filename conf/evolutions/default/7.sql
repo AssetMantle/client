@@ -1,0 +1,6 @@
+# --- !Ups
+
+ALTER TABLE BLOCKCHAIN."Transaction"
+    ADD COLUMN IF NOT EXISTS "processed" BOOLEAN NOT NULL DEFAULT TRUE;
+
+# --- !Downs

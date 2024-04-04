@@ -50,6 +50,11 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     }
   }
 
+  // Starts in given order wise
+  utilities.Scheduler.startSchedulers(
+    startup.blockScheduler,
+    startup.transactionScheduler
+  )
+
   coordinatedShutdown.addTask(CoordinatedShutdown.PhaseBeforeServiceUnbind, "ThreadShutdown")(utilities.Scheduler.shutdownListener())
-  utilities.Scheduler.setShutdownCancellable(startup.start())
 }

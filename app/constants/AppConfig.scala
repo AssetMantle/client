@@ -32,4 +32,9 @@ object AppConfig {
     val ChatId: String = configuration.get[String]("telegram.chatId")
   }
 
+  val ExplorerInitialDelay: FiniteDuration = configuration.get[Int]("blockchain.explorer.initialDelay").millis
+
+  val ExplorerFixedDelay: FiniteDuration = configuration.get[Int]("blockchain.explorer.fixedDelay").millis
+
+
 }

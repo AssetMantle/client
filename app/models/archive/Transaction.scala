@@ -18,7 +18,7 @@ import scala.util.{Failure, Success}
 
 case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, gasUsed: String, txBytes: Array[Byte], log: Option[String]) {
 
-  def toTx: blockchain.Transaction = blockchain.Transaction(hash = hash, height = height, code = code, gasWanted = gasWanted, gasUsed = gasUsed, txBytes = txBytes, log = log)
+  def toTx: blockchain.Transaction = blockchain.Transaction(hash = hash, height = height, code = code, gasWanted = gasWanted, gasUsed = gasUsed, txBytes = txBytes, log = log, processed = true)
 
   lazy val parsedTx: Tx = Tx.parseFrom(txBytes)
 

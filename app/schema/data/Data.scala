@@ -20,6 +20,8 @@ abstract class Data {
 
   def getProtoBytes: Array[Byte]
 
+  def getAnyDataProtoBytes: Array[Byte] = this.toAnyData.toByteArray
+
   def viewString: String
 
   def getBondWeight: Int

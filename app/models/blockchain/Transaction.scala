@@ -17,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Success}
 
-case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, gasUsed: String, txBytes: Array[Byte], log: Option[String]) {
+case class Transaction(hash: String, height: Int, code: Int, gasWanted: String, gasUsed: String, txBytes: Array[Byte], log: Option[String], processed: Boolean) {
 
   lazy val parsedTx: Tx = Tx.parseFrom(txBytes)
 
@@ -72,8 +72,6 @@ class Transactions @Inject()(
 
   private val blockchainStartHeight = configuration.get[Int]("blockchain.startHeight")
 
-  private val accountTransactionsPerPage = configuration.get[Int]("blockchain.account.transactions.perPage")
-
   import databaseConfig.profile.api._
 
   private[models] val transactionTable = TableQuery[TransactionTable]
@@ -125,6 +123,10 @@ class Transactions @Inject()(
     db.run(a)
   }
 
+  private def getByUnprocessed: Future[Seq[Transaction]] = db.run(transactionTable.filter(!_.processed).result)
+
+  private def updateProcessedByHeight(height: Int) = db.run(transactionTable.filter(_.height === height).map(_.processed).update(true))
+
   private def getByHeightRange(start: Int, end: Int): Future[Seq[Transaction]] = db.run(transactionTable.filter(x => x.height >= start && x.height <= end).result)
 
   private def deleteByHeightRange(start: Int, end: Int): Future[Int] = db.run(transactionTable.filter(x => x.height >= start && x.height <= end).delete)
@@ -132,7 +134,7 @@ class Transactions @Inject()(
 
   private[models] class TransactionTable(tag: Tag) extends Table[Transaction](tag, Option("blockchain"), "Transaction") {
 
-    def * = (hash, height, code, gasWanted, gasUsed, txBytes, log.?) <> (Transaction.tupled, Transaction.unapply)
+    def * = (hash, height, code, gasWanted, gasUsed, txBytes, log.?, processed) <> (Transaction.tupled, Transaction.unapply)
 
     def hash = column[String]("hash", O.PrimaryKey)
 
@@ -147,15 +149,13 @@ class Transactions @Inject()(
     def txBytes = column[Array[Byte]]("txBytes")
 
     def log = column[String]("log")
+
+    def processed = column[Boolean]("processed")
   }
 
   object Service {
 
-    def create(hash: String, height: String, code: Int, log: Option[String], gasWanted: String, gasUsed: String, txBytes: Array[Byte]): Future[Int] = add(Transaction(hash = hash, height = height.toInt, code = code, log = log, gasWanted = gasWanted, gasUsed = gasUsed, txBytes = txBytes))
-
     def insertMultiple(transactions: Seq[Transaction]): Future[Seq[Int]] = addMultiple(transactions)
-
-    def insertOrUpdate(hash: String, height: String, code: Int, log: Option[String], gasWanted: String, gasUsed: String, txBytes: Array[Byte]): Future[Int] = upsert(Transaction(hash = hash, height = height.toInt, code = code, log = log, gasWanted = gasWanted, gasUsed = gasUsed, txBytes = txBytes))
 
     def tryGet(hash: String): Future[Transaction] = get(hash).map(_.getOrElse(constants.Response.TRANSACTION_NOT_FOUND.throwBaseException()))
 
@@ -209,6 +209,10 @@ class Transactions @Inject()(
     def getByHeight(start: Int, end: Int): Future[Seq[Transaction]] = getByHeightRange(start = start, end = end)
 
     def deleteByHeight(start: Int, end: Int): Future[Int] = deleteByHeightRange(start = start, end = end)
+
+    def getUnprocessedTransactions: Future[Seq[Transaction]] = getByUnprocessed
+
+    def markProcessed(height: Int): Future[Int] = updateProcessedByHeight(height)
 
     def getTransactionStatisticsData(latestHeight: Int): Future[ListMap[String, Int]] = {
       val end = if (latestHeight % transactionsStatisticsBinWidth == 0) latestHeight else ((latestHeight / transactionsStatisticsBinWidth) + 1) * transactionsStatisticsBinWidth

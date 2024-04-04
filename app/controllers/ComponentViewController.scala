@@ -522,7 +522,7 @@ class ComponentViewController @Inject()(
   def withdrawRewardAmount(txHash: String, msgIndex: Int): EssentialAction = cached.apply(req => req.path + "/" + txHash + "/" + msgIndex.toString, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
       implicit request =>
-        val transaction = getTxByHash.Service.get(txHash).map(_.result.toTransactionWithLog)
+        val transaction = getTxByHash.Service.get(txHash).map(_.result.toTransactionWithLog(false))
         (for {
           transaction <- transaction
         } yield {
