@@ -31,6 +31,7 @@ case class Meta(dataTypeID: String, dataHashID: Array[Byte], dataHashIDString: S
     case schema.data.constants.LinkedDataTypeID.value => LinkedData(this.dataBytes)
     case schema.data.constants.NumberDataTypeID.value => NumberData(this.dataBytes)
     case schema.data.constants.StringDataTypeID.value => StringData(this.dataBytes)
+    case _ => constants.Response.INVALID_DATA_TYPE.throwBaseException()(constants.Module.BLOCKCHAIN_META, Logger(this.getClass))
   }
 
   def id1: String = this.dataTypeID
