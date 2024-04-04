@@ -5273,3 +5273,7 @@ figure .block:hover {
 .navigationBarLogo{
     width: 160px !important;
 }
+
+.headerSpace{
+    padding: 0px 16px 6px 16px;
+}

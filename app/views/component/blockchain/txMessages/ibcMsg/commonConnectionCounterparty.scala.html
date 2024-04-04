@@ -3,7 +3,7 @@
 
 @(key: String, connectionCounterparty: Counterparty)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@Messages(key):
+<div class="headerFontSize headerSpace">@Messages(key):</div>
 <div>
     @commonTextInfo(constants.View.CLIENT_ID, connectionCounterparty.getClientId)
     @commonTextInfo(constants.View.CONNECTION_ID, connectionCounterparty.getConnectionId)

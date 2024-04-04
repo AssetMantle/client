@@ -3,7 +3,7 @@
 
 @(key: String, version: Version)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@Messages(key):
+<div class="headerFontSize headerSpace">@Messages(key):</div>
 <div>
     @commonTextInfo(constants.View.IDENTIFIER, version.getIdentifier)
     @commonTextInfo(constants.View.FEATURES, version.getFeaturesList.mkString(", "))

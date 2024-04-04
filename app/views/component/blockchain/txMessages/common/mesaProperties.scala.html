@@ -7,7 +7,7 @@
 
 @defining(PropertyList(protoPropertyList).getProperties.map(x => x.asInstanceOf[MesaProperty])) { properties =>
     @if(properties.nonEmpty) {
-        <span class="headerFontSize">@Messages(key):</span>
+        <span class="headerFontSize headerSpace">@Messages(key):</span>
         @properties.map { property =>
             @commonTextInfo(s"${property.id.keyID.asString} [${property.id.typeID.asString}]", property.dataID.asString)
         }
