@@ -5121,7 +5121,6 @@ figure .block:hover {
 #accountWallet .allTokensContainer,
 #accountDelegations .delegationsDelegatedContainer {
     display: flex;
-    align-items: center;
 }
 
 #accountWallet .allTokensContainer .ibcDenom,
@@ -5272,4 +5271,22 @@ figure .block:hover {
 
 .navigationBarLogo{
     width: 160px !important;
+}
+
+#accountWalletRewardsDetail .tableFieldValue,
+#accountDelegationsDetail .tableFieldValue,
+#validatorDetail .tableFieldValue
+{
+    text-transform: none;
+}
+
+#accountWalletRewardsDetail .tableFieldValue .infoRowLabel,
+#accountDelegationsDetail .tableFieldValue .infoRowLabel
+{
+    padding-left: 0px;
+    text-transform: none;
+}
+
+#accountDelegationsDetail .tableFieldValue .infoRowValue{
+    white-space: nowrap;
 }

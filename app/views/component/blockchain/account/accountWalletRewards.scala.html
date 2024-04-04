@@ -25,10 +25,18 @@
                 </div>
             </td>
         </tr>
+        <tr>
+            <td>
+                <div class="tableField">
+                    <div class="tableFieldTitle">@Messages(constants.View.VALIDATORS)</div>
+                    <div class="tableFieldValue">
+                        @validatorRewards.map { case (validatorAddress, amount) =>
+                            @commonHtmlToHtmlInfo(key = commonJavascriptLink(validatorsMap.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")), value = Html(amount.getAmountWithNormalizedDenom()))
+                        }
+                    </div>
+                </div>
+            </td>
+        </tr>
     }
-        <div class="cmuk-text-left title">@Messages(constants.View.VALIDATORS)</div>
-        @validatorRewards.map { case (validatorAddress, amount) =>
-            @commonHtmlToHtmlInfo(key = commonJavascriptLink(validatorsMap.getOrElse(validatorAddress, validatorAddress), JavaScript(s"""componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validator('${validatorAddress}'))""")), value = Html(amount.getAmountWithNormalizedDenom()))
-        }
     </div>
 </div>
