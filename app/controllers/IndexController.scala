@@ -50,6 +50,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     }
   }
 
+  startup.startFixes
+
   // Starts in given order wise
   utilities.Scheduler.startSchedulers(
     startup.blockScheduler,

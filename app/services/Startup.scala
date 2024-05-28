@@ -8,6 +8,7 @@ import models.{blockchain, keyBase}
 import play.api.{Configuration, Logger}
 import queries.Abstract.Account
 import queries.blockchain._
+import com.assetmantle.modules.identities.transactions.name
 import queries.responses.blockchain.BlockCommitResponse.{Response => BlockCommitResponse}
 import queries.responses.blockchain.BlockResultResponse.{Response => BlockResultResponse}
 import queries.responses.blockchain.CommunityPoolResponse.{Response => CommunityPoolResponse}
@@ -18,6 +19,7 @@ import queries.responses.blockchain.StakingPoolResponse.{Response => StakingPool
 import queries.responses.blockchain.TotalSupplyResponse.{Response => TotalSupplyResponse}
 import queries.responses.blockchain.common._
 import queries.responses.common.Header
+import schema.id.base.StringID
 import utilities.Date.RFC3339
 import utilities.MicroNumber
 
@@ -366,6 +368,20 @@ class Startup @Inject()(
         case exception: Exception => logger.error(exception.getLocalizedMessage)
       }
       Await.result(forComplete, Duration.Inf)
+    }
+  }
+
+  def startFixes: Future[Unit] = {
+    val header: Header = Header(height = 0, time = RFC3339(0), proposer_address = "")
+    val addMissing = blockchainIdentities.Utility.onName(name.Message.newBuilder()
+      .setFrom("mantle1e2xkc64txeegnuplkr4w2pn6pqzt2qh9ffdlf5")
+      .setName(StringID("276").asProtoStringID).build())(header)
+
+    (for {
+      _ <- addMissing
+    } yield ()
+      ).recover {
+      case exception: Exception => logger.error(exception.getLocalizedMessage)
     }
   }
 }
