@@ -69,14 +69,14 @@
                 <nav class="cmuk-navbar-container" cmuk-navbar="mode: click">
                     <div class="mobileNavigationHeader cmuk-hidden@@m">
                         <a class="cmuk-navbar-item cmuk-logo" href="@controllers.routes.IndexController.index">
-                            <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
+                            <img src="@routes.Assets.versioned("images/1522logo.png")" class="navigationBarLogo">
                         </a>
                         <a class="cmuk-navbar-toggle cmuk-margin-auto-left" onclick="mobileNavigation()" cmuk-navbar-toggle-icon></a>
                     </div>
                     <div id="mobileNavigation" class="mobileNavigation">
                         <div class="cmuk-navbar-left">
                             <a class="cmuk-navbar-item cmuk-logo cmuk-visible@@m" href="@controllers.routes.IndexController.index">
-                                <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
+                                <img src="@routes.Assets.versioned("images/1522logo.png")" class="navigationBarLogo">
                             </a>
                             <ul class="cmuk-navbar-nav" onclick="setActiveLink(event)">
                                 <li><a id="dashBoard" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.dashboard())" class="navItemRippleEffect"><span class="dashboardIcon">
@@ -97,35 +97,35 @@
                                     @Messages(constants.View.TRANSACTIONS)
                                 </a>
                                 </li>
-                                <li><a id="validators" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validatorList())" class="navItemRippleEffect"><span class="validatorsIcon">
-                                @commonIcon("validatorsIcon")
-                                </span>
-                                    @Messages(constants.View.VALIDATORS)
-                                </a>
-                                </li>
-                                <li><a id="proposals" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposalList())" class="navItemRippleEffect"><span class="proposalsIcon">
-                                @commonIcon("proposalsIcon")
-                                </span>
-                                    @Messages(constants.View.PROPOSALS)
-                                </a>
-                                </li>
-                                <li><a id="parameters" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.parameters())" class="navItemRippleEffect"><span class="proposalsIcon">
-                                @commonIcon("parametersIcon")
-                                </span>
-                                    @Messages(constants.View.PARAMETERS)
-                                </a>
-                                </li>
-                                <li>
-                                    <a id="wallet" href="https://wallet.assetmantle.one" class="navItemRippleEffect" target="_blank">
-                                        <span class="walletIcon">
-                                            @commonIcon("walletIcon")
-                                        </span>
-                                        @Messages(constants.View.WALLET)
-                                        <span class="walletLinkIcon">
-                                            @commonIcon("walletLinkIcon")
-                                        </span>
-                                    </a>
-                                </li>
+@*                                <li><a id="validators" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.validatorListDelete())" class="navItemRippleEffect"><span class="validatorsIcon">*@
+@*                                @commonIcon("validatorsIcon")*@
+@*                                </span>*@
+@*                                    @Messages(constants.View.VALIDATORS)*@
+@*                                </a>*@
+@*                                </li>*@
+@*                                <li><a id="proposals" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.proposalList())" class="navItemRippleEffect"><span class="proposalsIcon">*@
+@*                                @commonIcon("proposalsIcon")*@
+@*                                </span>*@
+@*                                    @Messages(constants.View.PROPOSALS)*@
+@*                                </a>*@
+@*                                </li>*@
+@*                                <li><a id="parameters" onclick="componentResource('explorerContent', jsRoutes.controllers.ComponentViewController.parameters())" class="navItemRippleEffect"><span class="proposalsIcon">*@
+@*                                @commonIcon("parametersIcon")*@
+@*                                </span>*@
+@*                                    @Messages(constants.View.PARAMETERS)*@
+@*                                </a>*@
+@*                                </li>*@
+@*                                <li>*@
+@*                                    <a id="wallet" href="https://wallet.assetmantle.one" class="navItemRippleEffect" target="_blank">*@
+@*                                        <span class="walletIcon">*@
+@*                                            @commonIcon("walletIcon")*@
+@*                                        </span>*@
+@*                                        @Messages(constants.View.WALLET)*@
+@*                                        <span class="walletLinkIcon">*@
+@*                                            @commonIcon("walletLinkIcon")*@
+@*                                        </span>*@
+@*                                    </a>*@
+@*                                </li>*@
                             </ul>
                         </div>
                         <div class="cmuk-navbar-right">

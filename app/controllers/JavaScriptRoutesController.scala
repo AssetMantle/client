@@ -22,20 +22,20 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.dashboard,
           routes.javascript.ComponentViewController.block,
           routes.javascript.ComponentViewController.transaction,
-          routes.javascript.ComponentViewController.validator,
-          routes.javascript.ComponentViewController.wallet,
-          routes.javascript.ComponentViewController.proposal,
+//          routes.javascript.ComponentViewController.validator,
+//          routes.javascript.ComponentViewController.wallet,
+//          routes.javascript.ComponentViewController.proposal,
           routes.javascript.ComponentViewController.document,
 
           routes.javascript.ComponentViewController.recentActivities,
 
           routes.javascript.ComponentViewController.latestBlockHeight,
-          routes.javascript.ComponentViewController.tokensStatistics,
-          routes.javascript.ComponentViewController.votingPowers,
+//          routes.javascript.ComponentViewController.tokensStatistics,
+//          routes.javascript.ComponentViewController.votingPowers,
 
           routes.javascript.ComponentViewController.assetMantleStatistics,
 
-          routes.javascript.ComponentViewController.tokensPrices,
+//          routes.javascript.ComponentViewController.tokensPricesDelete,
           routes.javascript.ComponentViewController.transactionStatistics,
           routes.javascript.ComponentViewController.transactionMessagesStatistics,
 
@@ -56,37 +56,37 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
           routes.javascript.ComponentViewController.transactionMessages,
           routes.javascript.ComponentViewController.withdrawRewardAmount,
 
-          routes.javascript.ComponentViewController.proposalList,
-          routes.javascript.ComponentViewController.proposalDetails,
-          routes.javascript.ComponentViewController.proposalDeposits,
-          routes.javascript.ComponentViewController.proposalVotes,
-
-          routes.javascript.ComponentViewController.validatorList,
-          routes.javascript.ComponentViewController.activeValidatorList,
-          routes.javascript.ComponentViewController.inactiveValidatorList,
-          routes.javascript.ComponentViewController.validatorDetails,
-          routes.javascript.ComponentViewController.validatorUptime,
-          routes.javascript.ComponentViewController.validatorDelegations,
-          routes.javascript.ComponentViewController.validatorTransactions,
-          routes.javascript.ComponentViewController.validatorTransactionsPerPage,
-
-          routes.javascript.ComponentViewController.parameters,
+//          routes.javascript.ComponentViewController.proposalList,
+//          routes.javascript.ComponentViewController.proposalDetails,
+//          routes.javascript.ComponentViewController.proposalDeposits,
+//          routes.javascript.ComponentViewController.proposalVotes,
+//
+//          routes.javascript.ComponentViewController.validatorListDelete,
+//          routes.javascript.ComponentViewController.activeValidatorList,
+//          routes.javascript.ComponentViewController.inactiveValidatorList,
+//          routes.javascript.ComponentViewController.validatorDetails,
+//          routes.javascript.ComponentViewController.validatorUptime,
+//          routes.javascript.ComponentViewController.validatorDelegations,
+//          routes.javascript.ComponentViewController.validatorTransactions,
+//          routes.javascript.ComponentViewController.validatorTransactionsPerPage,
+//
+//          routes.javascript.ComponentViewController.parameters,
 
           routes.javascript.IndexController.search,
 
           routes.javascript.NotificationController.recentActivityMessages,
 
           routes.javascript.ViewController.block,
-          routes.javascript.ViewController.validator,
+//          routes.javascript.ViewController.validator,
           routes.javascript.ViewController.transaction,
-          routes.javascript.ViewController.proposal,
+//          routes.javascript.ViewController.proposal,
           routes.javascript.ViewController.blocks,
           routes.javascript.ViewController.transactions,
-          routes.javascript.ViewController.validators,
-          routes.javascript.ViewController.proposals,
-          routes.javascript.ViewController.wallet,
+//          routes.javascript.ViewController.validators,
+//          routes.javascript.ViewController.proposals,
+//          routes.javascript.ViewController.wallet,
           routes.javascript.ViewController.document,
-          routes.javascript.ViewController.parameters,
+//          routes.javascript.ViewController.parameters,
 
         )
       ).as("text/javascript")
