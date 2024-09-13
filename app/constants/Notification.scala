@@ -39,12 +39,12 @@ object Notification {
   }
 
 
-  val VALIDATOR_CREATED = new Notification(notificationType = "VALIDATOR_CREATED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ComponentViewController.validator))
-  val VALIDATOR_EDITED = new Notification(notificationType = "VALIDATOR_EDITED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ComponentViewController.validator))
-  val VALIDATOR_UNJAILED = new Notification(notificationType = "VALIDATOR_UNJAILED", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ComponentViewController.validator))
-  val VALIDATOR_MISSING_SIGNATURE_SLASHING = new Notification(notificationType = "VALIDATOR_MISSING_SIGNATURE_SLASHING", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ComponentViewController.validator))
-  val VALIDATOR_DOUBLE_SIGNING_SLASHING = new Notification(notificationType = "VALIDATOR_DOUBLE_SIGNING_SLASHING", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ComponentViewController.validator))
-  val VALIDATOR_MISSED_BLOCKS = new Notification(notificationType = "VALIDATOR_MISSED_BLOCKS", sendEmail = false, sendPushNotification = false, sendSMS = false, route = Option(routes.javascript.ComponentViewController.validator))
+  val VALIDATOR_CREATED = new Notification(notificationType = "VALIDATOR_CREATED", sendEmail = false, sendPushNotification = false, sendSMS = false /*route = Option(routes.javascript.ComponentViewController.validator)*/)
+  val VALIDATOR_EDITED = new Notification(notificationType = "VALIDATOR_EDITED", sendEmail = false, sendPushNotification = false, sendSMS = false /*route = Option(routes.javascript.ComponentViewController.validator)*/)
+  val VALIDATOR_UNJAILED = new Notification(notificationType = "VALIDATOR_UNJAILED", sendEmail = false, sendPushNotification = false, sendSMS = false /*route = Option(routes.javascript.ComponentViewController.validator)*/)
+  val VALIDATOR_MISSING_SIGNATURE_SLASHING = new Notification(notificationType = "VALIDATOR_MISSING_SIGNATURE_SLASHING", sendEmail = false, sendPushNotification = false, sendSMS = false /*route = Option(routes.javascript.ComponentViewController.validator)*/)
+  val VALIDATOR_DOUBLE_SIGNING_SLASHING = new Notification(notificationType = "VALIDATOR_DOUBLE_SIGNING_SLASHING", sendEmail = false, sendPushNotification = false, sendSMS = false /*route = Option(routes.javascript.ComponentViewController.validator)*/)
+  val VALIDATOR_MISSED_BLOCKS = new Notification(notificationType = "VALIDATOR_MISSED_BLOCKS", sendEmail = false, sendPushNotification = false, sendSMS = false /*route = Option(routes.javascript.ComponentViewController.validator)*/)
 
 
   val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)

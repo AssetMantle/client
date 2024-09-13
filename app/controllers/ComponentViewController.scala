@@ -72,12 +72,12 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def wallet(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        Future(Ok(views.html.component.blockchain.account.wallet(address)))
-    }
-  }
+//  def wallet(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        Future(Ok(views.html.component.blockchain.account.wallet(address)))
+//    }
+//  }
 
   def document(id: String): EssentialAction = cached.apply(req => req.path + "/" + id, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
@@ -123,16 +123,16 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def parameters: EssentialAction = cached.apply(req => req.path, 3600) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val parameters = blockchainParameters.Service.getAll
-
-        for {
-          parameters <- parameters
-        } yield Ok(views.html.component.blockchain.parameters.paramaters(parameters))
-    }
-  }
+//  def parameters: EssentialAction = cached.apply(req => req.path, 3600) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val parameters = blockchainParameters.Service.getAll
+//
+//        for {
+//          parameters <- parameters
+//        } yield Ok(views.html.component.blockchain.parameters.paramaters(parameters))
+//    }
+//  }
 
   def transaction(txHash: String): EssentialAction = cached.apply(req => req.path + "/" + txHash, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
@@ -141,19 +141,19 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def validator(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        Future(Ok(views.html.component.blockchain.validator.validator(address)))
-    }
-  }
+//  def validator(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        Future(Ok(views.html.component.blockchain.validator.validator(address)))
+//    }
+//  }
 
-  def proposal(id: Int): EssentialAction = cached.apply(req => req.path + "/" + id.toString, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        Future(Ok(views.html.component.blockchain.proposal.proposal(id)))
-    }
-  }
+//  def proposal(id: Int): EssentialAction = cached.apply(req => req.path + "/" + id.toString, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        Future(Ok(views.html.component.blockchain.proposal.proposal(id)))
+//    }
+//  }
 
   def dashboard: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
@@ -184,59 +184,59 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def tokensStatistics(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val token = blockchainTokens.Service.getStakingToken
-        (for {
-          token <- token
-        } yield Ok(views.html.component.blockchain.tokensStatistics(token = token, tokenTickers = tokenTickers))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
+//  def tokensStatistics(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val token = blockchainTokens.Service.getStakingToken
+//        (for {
+//          token <- token
+//        } yield Ok(views.html.component.blockchain.tokensStatistics(token = token, tokenTickers = tokenTickers))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
 
-  def votingPowers(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val allSortedValidators = blockchainValidators.Service.getAll.map(_.sortBy(_.tokens).reverse)
+//  def votingPowers(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val allSortedValidators = blockchainValidators.Service.getAll.map(_.sortBy(_.tokens).reverse)
+//
+//        def getVotingPowerMaps(sortedBondedValidators: Seq[Validator]): Seq[(String, Double)] = {
+//          val totalTokens = sortedBondedValidators.map(_.tokens).sum
+//          var countedToken = MicroNumber.zero
+//          val bottomValidators = sortedBondedValidators.reverse.takeWhile(validator => {
+//            countedToken = countedToken + validator.tokens
+//            countedToken <= totalTokens / 3
+//          })
+//          val bottomValidatorAddresses = bottomValidators.map(_.operatorAddress)
+//          sortedBondedValidators.filterNot(x => bottomValidatorAddresses.contains(x.operatorAddress))
+//            .map(validator => validator.description.moniker -> validator.tokens.toDouble) :+ (constants.View.OTHERS -> bottomValidators.map(_.tokens).sum.toDouble)
+//        }
+//
+//        (for {
+//          allSortedValidators <- allSortedValidators
+//        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = ListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == schema.constants.Validator.Status.BONDED)): _*), totalActiveValidators = allSortedValidators.count(x => x.status == schema.constants.Validator.Status.BONDED), totalValidators = allSortedValidators.length))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
 
-        def getVotingPowerMaps(sortedBondedValidators: Seq[Validator]): Seq[(String, Double)] = {
-          val totalTokens = sortedBondedValidators.map(_.tokens).sum
-          var countedToken = MicroNumber.zero
-          val bottomValidators = sortedBondedValidators.reverse.takeWhile(validator => {
-            countedToken = countedToken + validator.tokens
-            countedToken <= totalTokens / 3
-          })
-          val bottomValidatorAddresses = bottomValidators.map(_.operatorAddress)
-          sortedBondedValidators.filterNot(x => bottomValidatorAddresses.contains(x.operatorAddress))
-            .map(validator => validator.description.moniker -> validator.tokens.toDouble) :+ (constants.View.OTHERS -> bottomValidators.map(_.tokens).sum.toDouble)
-        }
-
-        (for {
-          allSortedValidators <- allSortedValidators
-        } yield Ok(views.html.component.blockchain.votingPowers(sortedVotingPowerMap = ListMap(getVotingPowerMaps(allSortedValidators.filter(x => x.status == schema.constants.Validator.Status.BONDED)): _*), totalActiveValidators = allSortedValidators.count(x => x.status == schema.constants.Validator.Status.BONDED), totalValidators = allSortedValidators.length))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def tokensPrices(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-
-        def getTokenPrices = masterTransactionTokenPrices.Service.getLatestByToken(denom = constants.Blockchain.StakingDenom, n = priceChartDataPoints)
-
-        (for {
-          tokenPrices <- getTokenPrices
-        } yield Ok(views.html.component.blockchain.dashboard.tokensPrices(tokenPrices, constants.Blockchain.StakingDenom, tokenTickers))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
+//  def tokensPricesDelete(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//
+//        def getTokenPrices = masterTransactionTokenPrices.Service.getLatestByToken(denom = constants.Blockchain.StakingDenom, n = priceChartDataPoints)
+//
+//        (for {
+//          tokenPrices <- getTokenPrices
+//        } yield Ok(views.html.component.blockchain.dashboard.tokensPricesDelete(tokenPrices, constants.Blockchain.StakingDenom, tokenTickers))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
 
   def transactionStatistics(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
@@ -554,199 +554,199 @@ class ComponentViewController @Inject()(
     }
   }
 
-  def proposalList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val proposals = blockchainProposals.Service.get()
-        (for {
-          proposals <- proposals
-        } yield Ok(views.html.component.blockchain.proposal.proposalList(proposals))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
+//  def proposalList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val proposals = blockchainProposals.Service.get()
+//        (for {
+//          proposals <- proposals
+//        } yield Ok(views.html.component.blockchain.proposal.proposalList(proposals))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
 
-  def proposalDetails(id: Int): EssentialAction = cached.apply(req => req.path + "/" + id.toString, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val proposal = blockchainProposals.Service.tryGet(id)
-        (for {
-          proposal <- proposal
-        } yield Ok(views.html.component.blockchain.proposal.proposalDetails(proposal))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
+//  def proposalDetails(id: Int): EssentialAction = cached.apply(req => req.path + "/" + id.toString, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val proposal = blockchainProposals.Service.tryGet(id)
+//        (for {
+//          proposal <- proposal
+//        } yield Ok(views.html.component.blockchain.proposal.proposalDetails(proposal))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
+//
+//  def proposalDeposits(id: Int): EssentialAction = cached.apply(req => req.path + "/" + id.toString, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val proposalDeposits = blockchainProposalDeposits.Service.getByProposalID(id)
+//        (for {
+//          proposalDeposits <- proposalDeposits
+//        } yield Ok(views.html.component.blockchain.proposal.proposalDeposits(proposalDeposits))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
 
-  def proposalDeposits(id: Int): EssentialAction = cached.apply(req => req.path + "/" + id.toString, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val proposalDeposits = blockchainProposalDeposits.Service.getByProposalID(id)
-        (for {
-          proposalDeposits <- proposalDeposits
-        } yield Ok(views.html.component.blockchain.proposal.proposalDeposits(proposalDeposits))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
+//  def proposalVotes(id: Int): EssentialAction = cached.apply(req => req.path + "/" + id.toString, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val allValidators = blockchainValidators.Service.getAll
+//
+//        def proposalVotes(allValidators: Seq[String]) = blockchainProposalVotes.Service.getAllByIDAndAddresses(id, allValidators)
+//
+//        (for {
+//          allValidators <- allValidators
+//          proposalVotes <- proposalVotes(allValidators.map(_.getDelegatorAddress))
+//        } yield Ok(views.html.component.blockchain.proposal.proposalVotes(proposalVotes, allValidators.map(x => x.getDelegatorAddress -> x.description.moniker).toMap))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
 
-  def proposalVotes(id: Int): EssentialAction = cached.apply(req => req.path + "/" + id.toString, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val allValidators = blockchainValidators.Service.getAll
+//  def validatorListDelete(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+//    withoutLoginAction { implicit loginState =>
+//      implicit request =>
+//        Ok(views.html.component.blockchain.validator.validatorListDelete())
+//    }
+//  }
 
-        def proposalVotes(allValidators: Seq[String]) = blockchainProposalVotes.Service.getAllByIDAndAddresses(id, allValidators)
-
-        (for {
-          allValidators <- allValidators
-          proposalVotes <- proposalVotes(allValidators.map(_.getDelegatorAddress))
-        } yield Ok(views.html.component.blockchain.proposal.proposalVotes(proposalVotes, allValidators.map(x => x.getDelegatorAddress -> x.description.moniker).toMap))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def validatorList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
-    withoutLoginAction { implicit loginState =>
-      implicit request =>
-        Ok(views.html.component.blockchain.validator.validatorList())
-    }
-  }
-
-  def activeValidatorList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val validators = blockchainValidators.Service.getAllActiveValidatorList
-
-        def keyBaseValidators(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(addresses)
-
-        (for {
-          validators <- validators
-          keyBaseValidators <- keyBaseValidators(validators.map(_.operatorAddress))
-        } yield Ok(views.html.component.blockchain.validator.activeValidatorList(validators.sortBy(_.tokens).reverse, validators.map(_.tokens).sum, keyBaseValidators))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def inactiveValidatorList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val validators = blockchainValidators.Service.getAllInactiveValidatorList
-
-        def keyBaseValidators(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(addresses)
-
-        (for {
-          validators <- validators
-          keyBaseValidators <- keyBaseValidators(validators.map(_.operatorAddress))
-        } yield Ok(views.html.component.blockchain.validator.inactiveValidatorList(validators, keyBaseValidators))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def validatorDetails(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val validator = blockchainValidators.Service.tryGet(address)
-        val totalBondedAmount = blockchainTokens.Service.getTotalBondedAmount
-
-        def keyBaseValidator(address: String): Future[Option[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(address)
-
-        (for {
-          validator <- validator
-          totalBondedAmount <- totalBondedAmount
-          keyBaseValidator <- keyBaseValidator(validator.operatorAddress)
-        } yield Ok(views.html.component.blockchain.validator.validatorDetails(validator, utilities.Crypto.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), schema.constants.Validator.Status.BONDED, keyBaseValidator))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def validatorUptime(address: String, n: Int): EssentialAction = cached.apply(req => req.path + "/" + address + "/" + n.toString, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val hexAddress = if (utilities.Validator.isHexAddress(address)) Future(address) else blockchainValidators.Service.tryGetHexAddress(address)
-        val lastNBlocks = blockchainBlocks.Service.getLastNBlocks(n)
-
-        def getUptime(lastNBlocks: Seq[Block], validatorHexAddress: String): Double = (lastNBlocks.count(block => block.validators.contains(validatorHexAddress)) * 100.0) / n
-
-        def getUptimeMap(lastNBlocks: Seq[Block], validatorHexAddress: String): ListMap[Int, Boolean] = ListMap(lastNBlocks.map(block => block.height -> block.validators.contains(validatorHexAddress)): _*)
-
-        (for {
-          hexAddress <- hexAddress
-          lastNBlocks <- lastNBlocks
-        } yield Ok(views.html.component.blockchain.validator.validatorUptime(uptime = getUptime(lastNBlocks, hexAddress), uptimeMap = getUptimeMap(lastNBlocks, hexAddress), hexAddress = hexAddress))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def validatorDelegations(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetOperatorAddress(address) else Future(address)
-        val validator = blockchainValidators.Service.tryGet(address)
-
-        def getDelegations(operatorAddress: String) = blockchainDelegations.Service.getAllForValidator(operatorAddress)
-
-        def getDelegationsMap(delegations: Seq[Delegation], validator: Validator) = Future {
-          val selfDelegated = delegations.find(x => x.delegatorAddress == utilities.Crypto.convertOperatorAddressToAccountAddress(x.validatorAddress)).fold(BigDecimal(0.0))(_.shares)
-          val othersDelegated = validator.delegatorShares - selfDelegated
-          val delegationsMap = ListMap(constants.View.SELF_DELEGATED -> selfDelegated.toDouble, constants.View.OTHERS_DELEGATED -> othersDelegated.toDouble)
-          (delegationsMap, (selfDelegated * 100.0 / validator.delegatorShares).toDouble, (othersDelegated * 100.0 / validator.delegatorShares).toDouble)
-        }
-
-        (for {
-          operatorAddress <- operatorAddress
-          validator <- validator
-          delegations <- getDelegations(operatorAddress)
-          (delegationsMap, selfDelegatedPercentage, othersDelegatedPercentage) <- getDelegationsMap(delegations, validator)
-        } yield Ok(views.html.component.blockchain.validator.validatorDelegations(delegationsMap = delegationsMap, selfDelegatedPercentage = selfDelegatedPercentage, othersDelegatedPercentage = othersDelegatedPercentage))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def validatorTransactions(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
-    withoutLoginActionAsync { implicit loginState =>
-      implicit request =>
-        val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetOperatorAddress(address) else Future(address)
-        (for {
-          operatorAddress <- operatorAddress
-        } yield Ok(views.html.component.blockchain.validator.validatorTransactions(operatorAddress))
-          ).recover {
-          case baseException: BaseException => InternalServerError(baseException.failure.message)
-        }
-    }
-  }
-
-  def validatorTransactionsPerPage(address: String, page: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
-    implicit request =>
-      val validatorTxs = masterTransactionValidatorTransactions.Service.getTransactions(address, page)
-
-      def getTransactions(txHashes: Seq[String]) = blockchainTransactions.Service.get(txHashes)
-
-      def blocks(heights: Seq[Int]) = blockchainBlocks.Service.get(heights)
-
-      (for {
-        validatorTxs <- validatorTxs
-        transactions <- getTransactions(validatorTxs.map(_.txHash))
-        blocks <- blocks(transactions.map(_.height))
-      } yield Ok(views.html.component.blockchain.validator.validatorTransactionsPerPage(transactions.sortBy(_.height).reverse, blocks))
-        ).recover {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }
-  }
+//  def activeValidatorList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val validators = blockchainValidators.Service.getAllActiveValidatorList
+//
+//        def keyBaseValidators(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(addresses)
+//
+//        (for {
+//          validators <- validators
+//          keyBaseValidators <- keyBaseValidators(validators.map(_.operatorAddress))
+//        } yield Ok(views.html.component.blockchain.validator.activeValidatorList(validators.sortBy(_.tokens).reverse, validators.map(_.tokens).sum, keyBaseValidators))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
+//
+//  def inactiveValidatorList(): EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val validators = blockchainValidators.Service.getAllInactiveValidatorList
+//
+//        def keyBaseValidators(addresses: Seq[String]): Future[Seq[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(addresses)
+//
+//        (for {
+//          validators <- validators
+//          keyBaseValidators <- keyBaseValidators(validators.map(_.operatorAddress))
+//        } yield Ok(views.html.component.blockchain.validator.inactiveValidatorList(validators, keyBaseValidators))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
+//
+//  def validatorDetails(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val validator = blockchainValidators.Service.tryGet(address)
+//        val totalBondedAmount = blockchainTokens.Service.getTotalBondedAmount
+//
+//        def keyBaseValidator(address: String): Future[Option[ValidatorAccount]] = keyBaseValidatorAccounts.Service.get(address)
+//
+//        (for {
+//          validator <- validator
+//          totalBondedAmount <- totalBondedAmount
+//          keyBaseValidator <- keyBaseValidator(validator.operatorAddress)
+//        } yield Ok(views.html.component.blockchain.validator.validatorDetails(validator, utilities.Crypto.convertOperatorAddressToAccountAddress(validator.operatorAddress), (validator.tokens * 100 / totalBondedAmount).toRoundedOffString(), schema.constants.Validator.Status.BONDED, keyBaseValidator))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
+//
+//  def validatorUptime(address: String, n: Int): EssentialAction = cached.apply(req => req.path + "/" + address + "/" + n.toString, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val hexAddress = if (utilities.Validator.isHexAddress(address)) Future(address) else blockchainValidators.Service.tryGetHexAddress(address)
+//        val lastNBlocks = blockchainBlocks.Service.getLastNBlocks(n)
+//
+//        def getUptime(lastNBlocks: Seq[Block], validatorHexAddress: String): Double = (lastNBlocks.count(block => block.validators.contains(validatorHexAddress)) * 100.0) / n
+//
+//        def getUptimeMap(lastNBlocks: Seq[Block], validatorHexAddress: String): ListMap[Int, Boolean] = ListMap(lastNBlocks.map(block => block.height -> block.validators.contains(validatorHexAddress)): _*)
+//
+//        (for {
+//          hexAddress <- hexAddress
+//          lastNBlocks <- lastNBlocks
+//        } yield Ok(views.html.component.blockchain.validator.validatorUptime(uptime = getUptime(lastNBlocks, hexAddress), uptimeMap = getUptimeMap(lastNBlocks, hexAddress), hexAddress = hexAddress))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
+//
+//  def validatorDelegations(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetOperatorAddress(address) else Future(address)
+//        val validator = blockchainValidators.Service.tryGet(address)
+//
+//        def getDelegations(operatorAddress: String) = blockchainDelegations.Service.getAllForValidator(operatorAddress)
+//
+//        def getDelegationsMap(delegations: Seq[Delegation], validator: Validator) = Future {
+//          val selfDelegated = delegations.find(x => x.delegatorAddress == utilities.Crypto.convertOperatorAddressToAccountAddress(x.validatorAddress)).fold(BigDecimal(0.0))(_.shares)
+//          val othersDelegated = validator.delegatorShares - selfDelegated
+//          val delegationsMap = ListMap(constants.View.SELF_DELEGATED -> selfDelegated.toDouble, constants.View.OTHERS_DELEGATED -> othersDelegated.toDouble)
+//          (delegationsMap, (selfDelegated * 100.0 / validator.delegatorShares).toDouble, (othersDelegated * 100.0 / validator.delegatorShares).toDouble)
+//        }
+//
+//        (for {
+//          operatorAddress <- operatorAddress
+//          validator <- validator
+//          delegations <- getDelegations(operatorAddress)
+//          (delegationsMap, selfDelegatedPercentage, othersDelegatedPercentage) <- getDelegationsMap(delegations, validator)
+//        } yield Ok(views.html.component.blockchain.validator.validatorDelegations(delegationsMap = delegationsMap, selfDelegatedPercentage = selfDelegatedPercentage, othersDelegatedPercentage = othersDelegatedPercentage))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
+//
+//  def validatorTransactions(address: String): EssentialAction = cached.apply(req => req.path + "/" + address, constants.AppConfig.CacheDuration) {
+//    withoutLoginActionAsync { implicit loginState =>
+//      implicit request =>
+//        val operatorAddress = if (utilities.Validator.isHexAddress(address)) blockchainValidators.Service.tryGetOperatorAddress(address) else Future(address)
+//        (for {
+//          operatorAddress <- operatorAddress
+//        } yield Ok(views.html.component.blockchain.validator.validatorTransactions(operatorAddress))
+//          ).recover {
+//          case baseException: BaseException => InternalServerError(baseException.failure.message)
+//        }
+//    }
+//  }
+//
+//  def validatorTransactionsPerPage(address: String, page: Int): Action[AnyContent] = withoutLoginActionAsync { implicit loginState =>
+//    implicit request =>
+//      val validatorTxs = masterTransactionValidatorTransactions.Service.getTransactions(address, page)
+//
+//      def getTransactions(txHashes: Seq[String]) = blockchainTransactions.Service.get(txHashes)
+//
+//      def blocks(heights: Seq[Int]) = blockchainBlocks.Service.get(heights)
+//
+//      (for {
+//        validatorTxs <- validatorTxs
+//        transactions <- getTransactions(validatorTxs.map(_.txHash))
+//        blocks <- blocks(transactions.map(_.height))
+//      } yield Ok(views.html.component.blockchain.validator.validatorTransactionsPerPage(transactions.sortBy(_.height).reverse, blocks))
+//        ).recover {
+//        case baseException: BaseException => InternalServerError(baseException.failure.message)
+//      }
+//  }
 
   def assetMantleStatistics: EssentialAction = cached.apply(req => req.path, constants.AppConfig.CacheDuration) {
     withoutLoginActionAsync { implicit loginState =>
