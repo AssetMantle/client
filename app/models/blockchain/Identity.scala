@@ -13,6 +13,7 @@ import schema.id.base._
 import schema.list.PropertyList
 import schema.property.Property
 import schema.property.base.MetaProperty
+import models.masterTransaction.{NameTransaction, NameTransactions}
 import schema.qualified.{Immutables, Mutables}
 import slick.jdbc.H2Profile.api._
 
@@ -92,6 +93,7 @@ private[blockchain] object Identities {
 class Identities @Inject()(
                             blockchainMaintainers: Maintainers,
                             blockchainClassifications: Classifications,
+                            nameTransactions: NameTransactions,
                             protected val dbConfigProvider: DatabaseConfigProvider
                           )(implicit val executionContext: ExecutionContext)
   extends GenericDaoImpl[Identities.IdentityTable, Identity, Array[Byte]]() {
@@ -207,10 +209,13 @@ class Identities @Inject()(
       val mutables = Mutables(PropertyList(Seq(schema.constants.Properties.AuthenticationProperty.mutate(ListData(Seq(AccAddressData(msg.getFrom)))))))
       val identityID = schema.utilities.ID.getIdentityID(classificationID = schema.document.NameIdentity.DocumentClassificationID, immutables = immutables)
       val identity = Identity(id = identityID.getBytes, idString = identityID.asString, classificationID = schema.document.NameIdentity.DocumentClassificationID.getBytes, immutables = immutables.getProtoBytes, mutables = mutables.getProtoBytes)
-      val add = Service.add(identity)
+      val nameTransaction = NameTransaction(username = msg.getName.getIDString, email = None, idString = identityID.asString, isClaimed = false)
+      val addIdentity = Service.add(identity)
+      val addNameTransaction = nameTransactions.Service.insertOrUpdate(nameTransaction)
 
       (for {
-        _ <- add
+        _ <- addIdentity
+        _ <- addNameTransaction
       } yield msg.getFrom).recover {
         case _: BaseException => logger.error(schema.constants.Messages.IDENTITY_NAME + ": " + constants.Response.TRANSACTION_PROCESSING_FAILED.logMessage + " at height " + header.height.toString)
           msg.getFrom
