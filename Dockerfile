@@ -5,6 +5,7 @@ ARG JRE_IMAGE=adoptopenjdk:11-jre-hotspot
 FROM ${BUILD_IMAGE} as build
 SHELL [ "/bin/bash", "-cx" ]
 WORKDIR /tmp
+COPY ./project/build.properties ./
 RUN apt update; apt install -yqq git curl wget ssh; \
   mkdir -p -m 0700 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 # COPY ./project/build.properties ./
