@@ -7,7 +7,7 @@ import models.traits.Logging
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries.coingecko.GetTicker
+import queries.coinmarketcap.GetTicker
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
@@ -22,7 +22,7 @@ class TokenPrices @Inject()(
                              actorSystem: ActorSystem,
                              protected val databaseConfigProvider: DatabaseConfigProvider,
                              configuration: Configuration,
-                             getCoingeckoTicker: GetTicker,
+                             getCoinMarketCapTicker: GetTicker,
                              blockchainTokens: blockchain.Tokens,
                              utilitiesOperations: utilities.Operations
                            )(implicit executionContext: ExecutionContext) {
@@ -125,7 +125,7 @@ class TokenPrices @Inject()(
     def insertPrice(): Future[Unit] = {
       val tokenTicker = constants.AppConfig.tokenTickers.find(_.denom == constants.Blockchain.StakingDenom)
       if (tokenTicker.isDefined) {
-        val price = getCoingeckoTicker.Service.get().map(_.assetmantle.usd)
+        val price = getCoinMarketCapTicker.Service.get().map(_.data.headOption.flatMap(_.quotes.headOption).map(_.price).getOrElse(0.0))
         for {
           price <- price
           _ <- Service.create(denom = constants.Blockchain.StakingDenom, price = price)
