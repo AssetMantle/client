@@ -1,8 +1,8 @@
-package queries.coingecko
+package queries.coinmarketcap
 
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
-import queries.responses.coingecko.TickerResponse.Response
+import queries.responses.coinmarketcap.TickerResponse.Response
 
 import java.net.ConnectException
 import javax.inject.{Inject, Singleton}
@@ -11,14 +11,14 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class GetTicker @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.QUERIES_GET_COINGECKO_TICKER
+  private implicit val module: String = constants.Module.QUERIES_GET_COINMARKETCAP_TICKER
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private val host = configuration.get[String]("blockchain.token.priceURL")
 
-  // Should not make id as config parameter as response structure has a key name same as id
-  private val path = "/simple/price?ids=assetmantle&vs_currencies=usd"
+  // id=19686 is AssetMantle (MNTL); convertId=2781 is USD.
+  private val path = "/cryptocurrency/quote/latest?id=19686&convertId=2781"
 
   private val url = host + path
 
