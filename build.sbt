@@ -22,6 +22,12 @@ resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
 
 scalaVersion := "2.13.11"
 
+// Run sbt-digest over public/* during `dist`, so @routes.Assets.versioned
+// emits content-addressed URLs (e.g. /assets/-<sha1>-lineChart.js) and the
+// Play Assets controller can serve them with long-TTL immutable caching.
+// Root scope = applies to the production pipeline (sbt dist / sbt stage).
+pipelineStages := Seq(digest)
+
 libraryDependencies ++= Seq(ws, specs2 % Test, guice, caffeine)
 
 libraryDependencies ++= Seq(
