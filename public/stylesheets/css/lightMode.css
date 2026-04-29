@@ -1,0 +1,367 @@
+/* ============================================================================
+   AssetMantle Explorer — light-mode design lift
+   ----------------------------------------------------------------------------
+   The base class.css is dark-mode-first: card and header backgrounds reach
+   directly for --card-color / --dark-1 / --header-bg even when the body has
+   lightMode applied, so cards float as black blocks on a cream page.
+
+   This overlay is loaded AFTER class.css so its lightMode-scoped rules win.
+   Goal: visual parity with assetmantle.one (cream surfaces, BPdotsSquare
+   for display, DMSans for body, soft borders + lift on hover) without
+   touching markup or copy.
+
+   Token additions (read by rules below):
+     --surface       primary card bg
+     --surface-2     nested surfaces (chart wrappers, sub-cards)
+     --surface-hover lifted card on hover
+     --ink           body copy
+     --ink-muted     secondary copy
+     --rule          1px separators (low alpha black)
+     --shadow-1      resting card depth
+     --shadow-2      lifted card depth
+   ============================================================================ */
+
+body.lightMode {
+    --surface: #fffdfa;
+    --surface-2: #f7f5f0;
+    --surface-hover: #ffffff;
+    --ink: #0d0a03;
+    --ink-muted: #565656;
+    --rule: rgba(13, 10, 3, 0.08);
+    --rule-strong: rgba(13, 10, 3, 0.16);
+    --shadow-1: 0 1px 2px rgba(13, 10, 3, 0.04), 0 4px 14px rgba(13, 10, 3, 0.05);
+    --shadow-2: 0 2px 6px rgba(13, 10, 3, 0.06), 0 12px 28px rgba(13, 10, 3, 0.10);
+
+    /* Token remap: class.css uses --dark-1 / --card-color / --darkmode-color-*
+       inline (no body.darkMode scoping) for chart wrappers, scroll-tracks,
+       activity-feed text, etc. Map them to light equivalents so existing
+       rules paint correctly inside lightMode without us touching class.css. */
+    --dark-1: var(--surface);
+    --dark-2: var(--surface-2);
+    --card-color: var(--surface);
+    --bg-popup: var(--surface);
+    --darkmode-color-1: var(--ink);
+    --darkmode-color-2: var(--rule);
+    --darkmode-color-3: var(--ink-muted);
+    --darkmode-icon-fill: var(--ink-muted);
+    --darkmode-border: var(--rule);
+    --white-font: var(--ink);
+    --header-bg: rgba(252, 251, 249, 0.92);
+    --inactive-grey: rgba(13, 10, 3, 0.45);
+    --line: var(--rule);
+
+    color: var(--ink);
+    font-family: "DMSans", "Montserrat", sans-serif;
+}
+
+/* ------------------------------------------------------------------ Header */
+body.lightMode .header,
+body.lightMode .header .cmuk-navbar-container:not(.cmuk-navbar-transparent) {
+    background: rgba(252, 251, 249, 0.92) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--rule);
+}
+
+body.lightMode .header .cmuk-navbar-nav > li > a,
+body.lightMode .header .cmuk-navbar-nav > li > a.active {
+    color: var(--ink-muted) !important;
+    font-family: var(--font-type-1, "BPdotsSquare"), monospace;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    transition: color 180ms ease;
+}
+
+body.lightMode .header .cmuk-navbar-nav > li > a:hover,
+body.lightMode .header .cmuk-navbar-nav > li > a.active {
+    color: var(--ink) !important;
+}
+
+body.lightMode .header .cmuk-navbar-nav > li > a.active::after {
+    content: "";
+    display: block;
+    height: 2px;
+    background: var(--primary-color);
+    margin-top: 6px;
+    width: 100%;
+    border-radius: 1px;
+}
+
+/* Search bar */
+body.lightMode .searchInput input,
+body.lightMode .header input[type="text"],
+body.lightMode .header input[type="search"] {
+    background: var(--surface) !important;
+    border: 1px solid var(--rule) !important;
+    color: var(--ink) !important;
+    border-radius: 0;
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+body.lightMode .header input:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(251, 171, 48, 0.16) !important;
+    outline: none !important;
+}
+
+/* ------------------------------------------------------------------ Cards  */
+body.lightMode .cmuk-card,
+body.lightMode .cmuk-card-default,
+body.lightMode .commonCard,
+body.lightMode .tableViewCard,
+body.lightMode .cmuk-card-styles,
+body.lightMode .leftContainer .cmuk-card-body,
+body.lightMode .rightContainer .recentActivityContainer .cmuk-card-body .recentActivityMessages {
+    background: var(--surface) !important;
+    color: var(--ink) !important;
+    border: 1px solid var(--rule) !important;
+    box-shadow: var(--shadow-1) !important;
+    border-radius: 0 !important;
+    transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+}
+
+body.lightMode .cmuk-card:hover,
+body.lightMode .commonCard:hover,
+body.lightMode .tableViewCard:hover {
+    box-shadow: var(--shadow-2) !important;
+    transform: translateY(-1px);
+    border-color: var(--rule-strong) !important;
+}
+
+body.lightMode .cmuk-card-header,
+body.lightMode .cmuk-card-body {
+    background: transparent !important;
+    color: var(--ink) !important;
+}
+
+body.lightMode .cmuk-card-header {
+    border-bottom: 1px solid var(--rule);
+    padding-block: 14px 12px;
+}
+
+/* ------------------------- Section titles (the orange "Latest Block" etc.) */
+body.lightMode .commonCard .cmuk-card-header .headerFontSize,
+body.lightMode .cmuk-card-header > * > .headerFontSize,
+body.lightMode .tableViewCard .cmuk-card-header > .headerFontSize {
+    font-family: var(--font-type-1, "BPdotsSquare"), monospace !important;
+    font-size: 0.95rem !important;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--primary-color) !important;
+}
+
+body.lightMode .cmuk-card-header > div > p,
+body.lightMode .cmuk-card-header > p {
+    font-family: var(--font-type-1, "BPdotsSquare"), monospace;
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+}
+
+/* ------------------------------------------------- Info rows (label / value) */
+body.lightMode .infoRow,
+body.lightMode .tableViewCard .infoRow {
+    border-bottom: 1px solid var(--rule);
+    padding-block: 12px;
+}
+body.lightMode .infoRow:last-child,
+body.lightMode .tableViewCard .infoRow:last-child {
+    border-bottom: none;
+}
+
+body.lightMode .infoRowLabel,
+body.lightMode .tableViewCard .infoRow .infoRowLabel {
+    color: var(--ink-muted) !important;
+    font-family: var(--font-type-2, "DMSans"), sans-serif !important;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+}
+
+body.lightMode .infoRowValue,
+body.lightMode .infoRowValue p,
+body.lightMode .tableViewCard .infoRow .infoRowValue {
+    color: var(--ink) !important;
+    font-family: var(--font-type-2, "DMSans"), sans-serif !important;
+    font-size: 1rem;
+    font-weight: 500;
+    font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* ----------------------------------------------------- Chart card wrappers */
+body.lightMode .chartContainer,
+body.lightMode .pieChartContainer,
+body.lightMode .pieChartContainer .cmuk-card-body,
+body.lightMode #tokensPrices .cmuk-card-body .chartContainer {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* ----------------------------------------------------- Recent activity feed */
+body.lightMode .recentActivityMessages,
+body.lightMode .recentActivityContainer .cmuk-card-body .recentActivityMessages {
+    background: var(--surface-2) !important;
+    border: 1px solid var(--rule) !important;
+    border-radius: 0 !important;
+    color: var(--ink) !important;
+}
+/* Notification timeline (used inside Recent Activity card). The base CSS
+   uses --mantle-off-white for the title, which on a cream surface is
+   cream-on-cream — invisible. Override with the lightMode ink hierarchy. */
+body.lightMode .timeline .timeline-item .timeline-content .activityContent .timelineItemTitle {
+    color: var(--ink) !important;
+    font-weight: 700;
+}
+body.lightMode .timeline .timeline-item .timeline-content .activityContent .timelineItemMessage {
+    color: var(--ink-muted) !important;
+}
+body.lightMode .timeline .timeline-item .timeline-content .activityContent .timelineItemTime {
+    color: var(--ink-muted) !important;
+    opacity: 0.85;
+}
+body.lightMode .timeline-icon,
+body.lightMode .timeline-icon svg {
+    color: var(--primary-color) !important;
+    fill: var(--primary-color) !important;
+}
+
+/* ----------------------------------------------------------- Buttons (cmuk) */
+body.lightMode .cmuk-button,
+body.lightMode button.cmuk-button,
+body.lightMode .commonBtn {
+    background: var(--ink) !important;
+    color: var(--surface) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-family: var(--font-type-1, "BPdotsSquare"), monospace !important;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: background 180ms ease, transform 180ms ease;
+}
+body.lightMode .cmuk-button:hover,
+body.lightMode button.cmuk-button:hover,
+body.lightMode .commonBtn:hover {
+    background: var(--primary-color) !important;
+    color: var(--ink) !important;
+    transform: translateY(-1px);
+}
+
+body.lightMode .cmuk-button-default,
+body.lightMode .cmuk-button-secondary {
+    background: transparent !important;
+    color: var(--ink) !important;
+    border: 1px solid var(--ink) !important;
+}
+body.lightMode .cmuk-button-default:hover,
+body.lightMode .cmuk-button-secondary:hover {
+    background: var(--ink) !important;
+    color: var(--surface) !important;
+}
+
+/* "Load More", subnav pill items */
+body.lightMode .cmuk-subnav-pill > * > a,
+body.lightMode .cmuk-subnav-pill > .cmuk-active > a {
+    background: transparent !important;
+    color: var(--ink-muted) !important;
+    border: 1px solid var(--rule);
+    font-family: var(--font-type-1, "BPdotsSquare"), monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+body.lightMode .cmuk-subnav-pill > .cmuk-active > a {
+    background: var(--ink) !important;
+    color: var(--surface) !important;
+    border-color: var(--ink) !important;
+}
+
+/* ------------------------------------------------------------------ Tables */
+body.lightMode .cmuk-table,
+body.lightMode .productTable,
+body.lightMode table.dataTable {
+    background: transparent !important;
+    color: var(--ink) !important;
+    border-color: var(--rule) !important;
+}
+body.lightMode .cmuk-table th,
+body.lightMode table.dataTable thead th {
+    background: var(--surface-2) !important;
+    color: var(--ink) !important;
+    font-family: var(--font-type-1, "BPdotsSquare"), monospace !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.78rem;
+    border-bottom: 1px solid var(--rule-strong) !important;
+}
+body.lightMode .cmuk-table td,
+body.lightMode table.dataTable tbody td {
+    color: var(--ink) !important;
+    border-color: var(--rule) !important;
+    font-variant-numeric: lining-nums tabular-nums;
+}
+body.lightMode .cmuk-table-striped tbody tr:nth-of-type(odd) {
+    background: var(--surface-2) !important;
+}
+
+/* --------------------------------------------------- Links / clickable text */
+body.lightMode a,
+body.lightMode .cmuk-link {
+    color: var(--ink);
+    transition: color 180ms ease;
+}
+body.lightMode a:hover {
+    color: var(--primary-color);
+}
+
+/* ------------------------------------------------- Spinner / loading hints */
+body.lightMode [cmuk-spinner] {
+    color: var(--primary-color) !important;
+}
+
+/* ----------------------------------------------- "Load More" button bottom */
+body.lightMode .loadMore,
+body.lightMode .recentActivityContainer .loadMore {
+    border-top: 1px solid var(--rule);
+    color: var(--ink-muted);
+    font-family: var(--font-type-1, "BPdotsSquare"), monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+body.lightMode .loadMore:hover {
+    color: var(--ink);
+}
+
+/* ----------------------------- "$MNTL" / token symbol pill in card headers */
+body.lightMode .commonCard .cmuk-card-header > p {
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+    padding: 4px 10px;
+    font-family: var(--font-type-1, "BPdotsSquare"), monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-muted);
+    margin: 0;
+}
+
+/* ---------------------------------------- Soften the GoL cells in lightMode */
+body.lightMode #am-game-bg {
+    opacity: 0.045 !important;
+    mix-blend-mode: multiply;
+}
+
+/* ------------------------------------------- Logo container in lightMode    */
+body.lightMode .navigationBarLogo {
+    filter: none;
+}
+
+/* ----------------------------------------------- Nav item ripple compatibility */
+body.lightMode .navItemRippleEffect {
+    color: var(--ink-muted);
+}
+
+/* ------------------------------------------------- Footer / bottom spacing */
+body.lightMode .bodyContainer {
+    color: var(--ink);
+}
