@@ -316,8 +316,18 @@ class Startup @Inject()(
         // account, instantly tripping upstream nginx rate limits (429 Too Many
         // Requests, then JSON_PARSE_EXCEPTION on the HTML body, scheduler stuck
         // in retry loop). Skip it.
+        //
+        // BUT we still need the Token table seeded with the staking denom row, or
+        // any view that calls blockchainTokens.Service.getTotalBondedAmount (e.g.
+        // /component/validatorInfo, dashboard cards) 500s with CRYPTO_TOKEN_NOT_FOUND.
+        // insertAllTokensOnStart() pulls live current-state from REST so it works
+        // independent of the genesis file.
+        def seedTokensIfEmpty: Future[Unit] = blockchainTokens.Service.getAllDenoms.flatMap { denoms =>
+          if (denoms.isEmpty) insertAllTokensOnStart() else Future.successful(())
+        }
+
         for {
-          _ <- if (blockchainStartHeight <= 1) onGenesis() else Future.successful(())
+          _ <- if (blockchainStartHeight <= 1) onGenesis() else seedTokensIfEmpty
           _ <- insertBlock(blockchainStartHeight)
         } yield ()
       } else {
@@ -384,8 +394,19 @@ class Startup @Inject()(
       .setFrom("mantle1e2xkc64txeegnuplkr4w2pn6pqzt2qh9ffdlf5")
       .setName(StringID("276").asProtoStringID).build())(header)
 
+    // When started from a non-genesis height (blockchain.startHeight > 1), the
+    // Token table never gets seeded by onGenesis(), and any view that calls
+    // getTotalBondedAmount (validatorDetails, dashboard cards) 500s with
+    // CRYPTO_TOKEN_NOT_FOUND. Seed it once on every boot if empty —
+    // insertAllTokensOnStart pulls live current state from REST so it works
+    // independent of the genesis file. Idempotent thanks to the empty check.
+    val seedTokens = blockchainTokens.Service.getAllDenoms.flatMap { denoms =>
+      if (denoms.isEmpty) insertAllTokensOnStart() else Future.successful(())
+    }
+
     (for {
       _ <- addMissing
+      _ <- seedTokens
     } yield ()
       ).recover {
       case exception: Exception => logger.error(exception.getLocalizedMessage)
