@@ -14,7 +14,7 @@ function togglePageContentLightDark() {
     } else if ($('body').hasClass('lightMode')) {
         newClass = 'darkMode';
     } else {
-        newClass = 'darkMode';
+        newClass = 'lightMode';
     }
     body.className = newClass
     let date = new Date(Date.now() + 86400e3);

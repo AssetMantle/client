@@ -1,9 +1,12 @@
 :root {
-  font-family: "Montserrat", sans-serif !important;
+  font-family: "DMSans", "Montserrat", sans-serif !important;
   box-sizing: border-box;
+  /* Brand accent (matches assetmantle.one --am-theme) */
   --primary-color: #fbab30;
-  --bg-light-primary: #f0f0f0;
-  --bg-light-card: #fafafa;
+  /* Light-mode surfaces (mirrors website --white-200 / --white-100) */
+  --bg-light-primary: #fcfbf9;
+  --bg-light-card: #fffdfa;
+  /* Dark-mode surfaces (existing palette) */
   --dark-1: #1e1e1e;
   --dark-2: #2c2c2c;
   --white-font: #ffffff;
@@ -15,11 +18,12 @@
   --darkmode-border: #e5e5e5;
   --success-color: #148919;
   --error-color: #e44651;
-  --font-type-1: "Work Sans";
-  --font-type-2: "Lato";
+  /* Brand fonts (mirrors website --font-BPdotsSquare / --font-DMSans) */
+  --font-type-1: "BPdotsSquare";
+  --font-type-2: "DMSans";
   --header-bg: rgba(4, 4, 4, 0.8);
   --text-medium: rgba(255, 253, 250, 0.75);
-  --gray: #b0b0b0;
+  --gray: #9c9a9a;
   --mantle-off-white: #fffdfa;
   --dark: #f2af13;
   --card-color: #252525;
@@ -27,5 +31,5 @@
   --inactive-grey: rgba(255, 253, 250, 0.5);
   --disabled: #5f5d5a;
   --line: #383838;
-  --button-text: #2c2c2c;
+  --button-text: #0d0a03;
 }
