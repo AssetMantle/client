@@ -309,8 +309,15 @@ class Startup @Inject()(
       def latestExplorerBlockHeight = blockchainBlocks.Service.getLatestBlockHeight
 
       def checkAndInsertBlock(latestChainHeight: Int, latestExplorerBlockHeight: Int) = if (latestExplorerBlockHeight == 0) {
+        // When starting from a non-genesis height (e.g. blockchain.startHeight=22M
+        // because upstream RPCs don't have block 1), onGenesis() is both pointless
+        // (genesis app_state at the chain's actual genesis is mostly empty for
+        // mantle-1) and harmful: it parallel-fans out GetAccount calls per genesis
+        // account, instantly tripping upstream nginx rate limits (429 Too Many
+        // Requests, then JSON_PARSE_EXCEPTION on the HTML body, scheduler stuck
+        // in retry loop). Skip it.
         for {
-          _ <- onGenesis()
+          _ <- if (blockchainStartHeight <= 1) onGenesis() else Future.successful(())
           _ <- insertBlock(blockchainStartHeight)
         } yield ()
       } else {

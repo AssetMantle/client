@@ -20,10 +20,20 @@ object JSON {
 
   def getResponseFromJson[T <: BaseResponse](response: Future[WSResponse])(implicit exec: ExecutionContext, logger: Logger, module: String, reads: Reads[T]): Future[T] = {
     response.map { response =>
-      Json.fromJson[T](response.json) match {
-        case JsSuccess(value: T, _: JsPath) => value
-        case jsError: JsError => logJsonError(response.json.toString(), jsError)
-          new Failure(response.json.toString()).throwBaseException()
+      try {
+        Json.fromJson[T](response.json) match {
+          case JsSuccess(value: T, _: JsPath) => value
+          case jsError: JsError => logJsonError(response.json.toString(), jsError)
+            new Failure(response.json.toString()).throwBaseException()
+        }
+      } catch {
+        // When the upstream returns non-JSON (typical example: nginx 429 HTML),
+        // include the HTTP status + content-type so the operator can see at a
+        // glance whether it's a rate limit, 5xx, redirect, etc., without having
+        // to decode the JsonParseException's internal message.
+        case e: JsonParseException =>
+          logger.error(s"non-JSON response: status=${response.status} content-type=${response.header("Content-Type").getOrElse("?")}")
+          throw e
       }
     }.recover {
       case jsonParseException: JsonParseException => constants.Response.JSON_PARSE_EXCEPTION.throwBaseException(jsonParseException)
