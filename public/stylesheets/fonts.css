@@ -1,3 +1,38 @@
+/* AssetMantle brand fonts (mirrored from website repo) */
+@font-face {
+    font-family: 'BPdotsSquare';
+    src: url('./fonts/assetMantle/BPdotsSquare.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'BPdotsSquare';
+    src: url('./fonts/assetMantle/BPdotsSquareBold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'BPdotsSquare';
+    src: url('./fonts/assetMantle/BPdotsSquareLight.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'DMSans';
+    src: url('./fonts/assetMantle/DMSans.woff2') format('woff2');
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'DMSans';
+    src: url('./fonts/assetMantle/DMSansItalic.woff2') format('woff2');
+    font-style: italic;
+    font-display: swap;
+}
+
 /* latin-ext */
 
 
