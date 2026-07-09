@@ -1,11 +1,11 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 <div class="cmuk-container cmuk-margin-bottom">
-    <div class="cmuk-grid-match" cmuk-grid>
-        <div class="cmuk-width-expand@@m">
-            <div id="tokensPrices" class="cardSelectHeader cmuk-card-styles"></div>
-        </div>
-    </div>
+@*    <div class="cmuk-grid-match" cmuk-grid>*@
+@*        <div class="cmuk-width-expand@@m">*@
+@*            <div id="tokensPricesDelete" class="cardSelectHeader cmuk-card-styles"></div>*@
+@*        </div>*@
+@*    </div>*@
     <div class="cmuk-grid-match" cmuk-grid>
         <div class="cmuk-width-expand@@m">
             <div id="assetMantleStatistics" class="tableViewCard tableCard tableGridLayout"></div>
@@ -24,7 +24,7 @@
 </div>
 <script>
         componentResource('assetMantleStatistics', jsRoutes.controllers.ComponentViewController.assetMantleStatistics());
-        componentResource('tokensPrices', jsRoutes.controllers.ComponentViewController.tokensPrices());
+        // componentResource('tokensPricesDelete', jsRoutes.controllers.ComponentViewController.tokensPricesDelete());
         componentResource('transactionStatistics', jsRoutes.controllers.ComponentViewController.transactionStatistics());
         componentResource('transactionMessagesStatistics', jsRoutes.controllers.ComponentViewController.transactionMessagesStatistics());
         checkAndPushState("", "", "");

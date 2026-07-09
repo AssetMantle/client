@@ -15,12 +15,12 @@ GET        /blocks/:height                                 controllers.ViewContr
 GET        /transactions                                   controllers.ViewController.transactions()
 GET        /document/:id                                   controllers.ViewController.document(id: String)
 GET        /transactions/:txHash                           controllers.ViewController.transaction(txHash: String)
-GET        /wallet/:address                                controllers.ViewController.wallet(address: String)
-GET        /validators                                     controllers.ViewController.validators()
-GET        /validators/:address                            controllers.ViewController.validator(address: String)
-GET        /proposals                                      controllers.ViewController.proposals()
-GET        /proposals/:proposalID                          controllers.ViewController.proposal(proposalID: Int)
-GET        /parameters                                     controllers.ViewController.parameters()
+#GET        /wallet/:address                                controllers.ViewController.wallet(address: String)
+#GET        /validators                                     controllers.ViewController.validators()
+#GET        /validators/:address                            controllers.ViewController.validator(address: String)
+#GET        /proposals                                      controllers.ViewController.proposals()
+#GET        /proposals/:proposalID                          controllers.ViewController.proposal(proposalID: Int)
+#GET        /parameters                                     controllers.ViewController.parameters()
 
 GET        /component/transactionList                      controllers.ComponentViewController.transactionList
 GET        /component/transactionListPage                  controllers.ComponentViewController.transactionListPage(pageNumber: Int)
@@ -30,20 +30,20 @@ GET        /component/withdrawRewardAmount                 controllers.Component
 
 GET        /dashboard                                      controllers.ComponentViewController.dashboard
 GET        /documentDetails                                controllers.ComponentViewController.document(id: String)
-GET        /walletAddress                                  controllers.ComponentViewController.wallet(address: String)
+#GET        /walletAddress                                  controllers.ComponentViewController.wallet(address: String)
 GET        /blockHeight                                    controllers.ComponentViewController.block(height: Int)
 GET        /transactionHash                                controllers.ComponentViewController.transaction(txHash: String)
-GET        /validatorAddress                               controllers.ComponentViewController.validator(address: String)
-GET        /proposalID                                     controllers.ComponentViewController.proposal(id: Int)
+#GET        /validatorAddress                               controllers.ComponentViewController.validator(address: String)
+#GET        /proposalID                                     controllers.ComponentViewController.proposal(id: Int)
 
 GET        /notification/recentActivityMessages            controllers.NotificationController.recentActivityMessages(pageNumber: Int)
 GET        /component/recentActivities                     controllers.ComponentViewController.recentActivities
 
 GET        /component/latestBlockHeight                    controllers.ComponentViewController.latestBlockHeight
-GET        /component/tokensStatistics                     controllers.ComponentViewController.tokensStatistics
-GET        /component/votingPowers                         controllers.ComponentViewController.votingPowers
+#GET        /component/tokensStatistics                     controllers.ComponentViewController.tokensStatistics
+#GET        /component/votingPowers                         controllers.ComponentViewController.votingPowers
 
-GET        /component/tokensPrices                         controllers.ComponentViewController.tokensPrices
+#GET        /component/tokensPricesDelete                         controllers.ComponentViewController.tokensPricesDelete
 GET        /component/transactionStatistics                controllers.ComponentViewController.transactionStatistics
 GET        /component/transactionMessagesStatistics        controllers.ComponentViewController.transactionMessagesStatistics
 
@@ -60,18 +60,18 @@ GET        /component/blockListPage                        controllers.Component
 GET        /component/blockDetails                         controllers.ComponentViewController.blockDetails(height: Int)
 GET        /component/blockTransactions                    controllers.ComponentViewController.blockTransactions(height: Int)
 
-GET        /component/proposalList                         controllers.ComponentViewController.proposalList
-GET        /component/proposalDetails                      controllers.ComponentViewController.proposalDetails(id: Int)
-GET        /component/proposalDeposits                     controllers.ComponentViewController.proposalDeposits(id: Int)
-GET        /component/proposalVotes                        controllers.ComponentViewController.proposalVotes(id: Int)
-
-GET        /component/validatorList                        controllers.ComponentViewController.validatorList
-GET        /component/activeValidatorList                  controllers.ComponentViewController.activeValidatorList
-GET        /component/inactiveValidatorList                controllers.ComponentViewController.inactiveValidatorList
-GET        /component/validatorInfo                        controllers.ComponentViewController.validatorDetails(address: String)
-GET        /component/validatorUptime                      controllers.ComponentViewController.validatorUptime(address: String, n: Int)
-GET        /component/validatorDelegations                 controllers.ComponentViewController.validatorDelegations(address: String)
-GET        /component/validatorTransactions                controllers.ComponentViewController.validatorTransactions(address: String)
-GET        /component/validatorTransactionsPerPage         controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
-
-GET        /component/parameters                           controllers.ComponentViewController.parameters
+#GET        /component/proposalList                         controllers.ComponentViewController.proposalList
+#GET        /component/proposalDetails                      controllers.ComponentViewController.proposalDetails(id: Int)
+#GET        /component/proposalDeposits                     controllers.ComponentViewController.proposalDeposits(id: Int)
+#GET        /component/proposalVotes                        controllers.ComponentViewController.proposalVotes(id: Int)
+#
+#GET        /component/validatorListDelete                        controllers.ComponentViewController.validatorListDelete
+#GET        /component/activeValidatorList                  controllers.ComponentViewController.activeValidatorList
+#GET        /component/inactiveValidatorList                controllers.ComponentViewController.inactiveValidatorList
+#GET        /component/validatorInfo                        controllers.ComponentViewController.validatorDetails(address: String)
+#GET        /component/validatorUptime                      controllers.ComponentViewController.validatorUptime(address: String, n: Int)
+#GET        /component/validatorDelegations                 controllers.ComponentViewController.validatorDelegations(address: String)
+#GET        /component/validatorTransactions                controllers.ComponentViewController.validatorTransactions(address: String)
+#GET        /component/validatorTransactionsPerPage         controllers.ComponentViewController.validatorTransactionsPerPage(address: String, page: Int)
+#
+#GET        /component/parameters                           controllers.ComponentViewController.parameters
