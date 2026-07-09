@@ -152,6 +152,9 @@ object Response {
   val PARAMETER_NOT_FOUND = new Failure("PARAMETER_NOT_FOUND")
   val PARAMETER_TYPE_NOT_FOUND = new Failure("PARAMETER_TYPE_NOT_FOUND")
   val EMPTY_QUERY = new Failure("EMPTY_QUERY")
+  val NAME_TRANSACTION_INSERT_FAILED = new Failure("NAME_TRANSACTION_INSERT_FAILED")
+  val NAME_TRANSACTION_UPSERT_FAILED = new Failure("NAME_TRANSACTION_INSERT_FAILED")
+  val NAME_TRANSACTION_NOT_FOUND = new Failure("NAME_TRANSACTION_NOT_FOUND")
 
   class Failure(private val response: String) {
     val message: String = PREFIX + FAILURE_PREFIX + response
